@@ -1,0 +1,991 @@
+import { useState } from "react";
+
+// ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
+const C = {
+  bg:"#F4F2ED", surface:"#FFFFFF", surface2:"#F9F8F5",
+  ink:"#1A1C1E", ink2:"#3D4145", muted:"#7A7E84", dim:"#B0B4B9",
+  border:"#E2DFD9", borderMd:"#C8C4BC",
+  accent:"#2C5F54", accentLt:"#EAF2F0", accentMd:"#C2D9D5",
+  gold:"#9A7B3F", goldLt:"#F5EFE0",
+  red:"#C0392B",
+};
+const CAT = {
+  "Weight Loss":"#4A6FA5","Performance":"#2C5F54",
+  "Recovery":"#7B5EA7","Longevity":"#9A7B3F","Supplies":"#7A7E84",
+};
+const LAUNCH_PW = "vantagen2025";
+const ADMIN_PW  = "vtadmin2025";
+const mono  = "'Courier Prime','Courier New',monospace";
+const serif = "'Libre Baskerville',Georgia,serif";
+const sans  = "'Outfit',system-ui,sans-serif";
+
+// ─── PRODUCT DATA ─────────────────────────────────────────────────────────────
+// fullDesc: displayed in the modal — accessible but professional
+const KITS = [
+  {
+    id:"k1", name:"Retatrutide", code:"RT10", mg:"10mg × 10 vials",
+    supplierPrice:230, sellPrice:289, category:"Weight Loss", badge:"BESTSELLER",
+    desc:"Triple GIP/GLP-1/Glucagon agonist. The most advanced metabolic research compound currently available.",
+    fullDesc:`Retatrutide is a next-generation synthetic peptide designed to simultaneously engage three distinct hormonal receptor systems: GLP-1 (glucagon-like peptide-1), GIP (glucose-dependent insulinotropic polypeptide), and glucagon receptors. This triple-agonist profile makes it one of the most structurally sophisticated compounds currently studied in metabolic research.
+
+Each of these receptor pathways plays a specific role in how the body processes energy, regulates appetite signalling, and manages fat tissue. By engaging all three at once, Retatrutide allows researchers to study the combined and individual contributions of each pathway in a single experimental model — something that was previously difficult to achieve without multiple compounds.
+
+This material is supplied as a lyophilised (freeze-dried) research-grade peptide, intended strictly for in-vitro and analytical laboratory applications by qualified scientific professionals. It is not approved for human or veterinary use.`,
+  },
+  {
+    id:"k2", name:"Retatrutide 20", code:"RT20", mg:"20mg × 10 vials",
+    supplierPrice:410, sellPrice:519, category:"Weight Loss", badge:"HIGH DOSE",
+    desc:"High-dose Retatrutide kit for extended metabolic research protocols.",
+    fullDesc:`Retatrutide 20 is the high-dose formulation of the triple GIP/GLP-1/Glucagon receptor agonist, supplied at 20mg per vial for research applications that require larger quantities or longer-duration protocols.
+
+Its triple-agonist mechanism engages three interconnected hormonal receptor systems simultaneously, making it particularly relevant to studies exploring the relative contributions of each receptor pathway to metabolic regulation, energy homeostasis, and adipose tissue behaviour.
+
+The higher per-vial concentration reduces reconstitution frequency and is suited to extended or comparative in-vitro studies. Supplied as a lyophilised research-grade substance for use exclusively in regulated laboratory environments by qualified researchers.`,
+  },
+  {
+    id:"k3", name:"Tirzepatide", code:"TR10", mg:"10mg × 10 vials",
+    supplierPrice:115, sellPrice:145, category:"Weight Loss", badge:null,
+    desc:"Dual GIP/GLP-1 receptor agonist. Extensively studied for metabolic and glycaemic research.",
+    fullDesc:`Tirzepatide is a dual-incretin peptide that acts as a simultaneous agonist at two receptor types: GLP-1 (glucagon-like peptide-1) and GIP (glucose-dependent insulinotropic polypeptide). Both are naturally occurring hormones secreted by the gut in response to food intake, and they play complementary roles in insulin regulation and metabolic signalling.
+
+What makes Tirzepatide particularly interesting from a research perspective is how the combined GIP and GLP-1 activation appears to produce effects that differ from activating either receptor alone — a phenomenon known as synergistic receptor crosstalk. This makes it a valuable tool for studying how these two systems interact at a cellular and molecular level.
+
+Supplied as a lyophilised research-grade peptide for in-vitro and laboratory use only. Not intended for human or veterinary application.`,
+  },
+  {
+    id:"k4", name:"Tirzepatide 20", code:"TR20", mg:"20mg × 10 vials",
+    supplierPrice:220, sellPrice:279, category:"Weight Loss", badge:null,
+    desc:"High-dose Tirzepatide. Comprehensive dual-receptor metabolic pathway research.",
+    fullDesc:`Tirzepatide 20 is the high-dose kit formulation of the dual GLP-1 and GIP receptor agonist, providing 20mg per vial for research protocols requiring extended quantities or dose-escalation study designs.
+
+As a dual-incretin compound, Tirzepatide engages the GLP-1 and GIP receptor systems that govern insulin secretion, nutrient sensing, and energy storage pathways. The 20mg format is particularly suited for longitudinal studies, multi-group experimental designs, or comparative assays where consistent compound availability is critical.
+
+Supplied as a lyophilised research-grade substance for qualified laboratory professionals. Intended solely for in-vitro and analytical research applications within regulated environments.`,
+  },
+  {
+    id:"k5", name:"CJC-1295 (no DAC)", code:"CJC", mg:"2mg × 10 vials",
+    supplierPrice:110, sellPrice:139, category:"Performance", badge:null,
+    desc:"Modified GRF 1-29 GHRH analog. Short-acting, pulsatile GH release without DAC modification.",
+    fullDesc:`CJC-1295 without DAC — also referred to as Modified GRF 1-29 — is a synthetic analogue of Growth Hormone Releasing Hormone (GHRH), the natural signal produced by the hypothalamus that prompts the pituitary gland to secrete growth hormone.
+
+The "no DAC" designation indicates the absence of a Drug Affinity Complex modification, which means this version has a shorter duration of action compared to its DAC counterpart. This shorter active window is intentional for certain research designs, as it more closely mimics the natural pulsatile (pulse-like) rhythm in which growth hormone is released by the body under normal physiological conditions.
+
+This compound is widely used in GH axis research, endocrinological studies, and experiments examining how pulsatile hormone release differs from continuous exposure. Supplied as a lyophilised research-grade peptide for laboratory use by qualified professionals only.`,
+  },
+  {
+    id:"k6", name:"TB-500", code:"TB4", mg:"5mg × 10 vials",
+    supplierPrice:140, sellPrice:179, category:"Recovery", badge:null,
+    desc:"Thymosin Beta-4 fragment. Widely studied for systemic healing and cellular migration.",
+    fullDesc:`TB-500 is a synthetic peptide corresponding to the most biologically active region of Thymosin Beta-4 — a naturally occurring protein present in virtually all human and animal cells, where it plays structural and regulatory roles in cellular organisation.
+
+The specific fragment used in TB-500 (amino acids 17–23 of the full Thymosin Beta-4 sequence) is associated with actin regulation — actin being a fundamental protein involved in cell movement, shape, and division. This connection to actin dynamics is what makes TB-500 particularly relevant to researchers studying tissue repair signalling, cellular migration, inflammation modulation, and wound healing pathways at a molecular level.
+
+TB-500 has been studied in a broad range of research contexts and is considered a well-characterised reference compound in regenerative biochemistry. Supplied as a lyophilised research-grade substance for in-vitro and analytical use in regulated laboratory environments only.`,
+  },
+  {
+    id:"k7", name:"BPC-157", code:"BPC157", mg:"5mg × 10 vials",
+    supplierPrice:80, sellPrice:99, category:"Recovery", badge:"POPULAR",
+    desc:"Body Protective Compound. Among the most extensively researched peptides for gut and tissue repair.",
+    fullDesc:`BPC-157, or Body Protective Compound-157, is a synthetic pentadecapeptide — a chain of precisely 15 amino acids — originally derived from a protein naturally present in human gastric secretions. Despite its small size, it has become one of the most extensively researched peptides in the fields of regenerative biochemistry and gastrointestinal physiology.
+
+What makes BPC-157 compelling from a research perspective is the breadth of biological processes it appears to interact with. Studies have examined its involvement in angiogenesis (the formation of new blood vessels), nitric oxide signalling, tendon and ligament biology, gut-brain axis interactions, and cytoprotective mechanisms in the gastrointestinal tract.
+
+Its stability under acidic conditions — unusual for a peptide — has also made it a subject of interest in oral bioavailability research. BPC-157 is available in both a 10-vial kit and as a single vial, making it suitable for both extended research protocols and smaller-scale pilot studies. Supplied as a lyophilised research-grade compound for laboratory use by qualified professionals only.`,
+    hasSingle: true,
+  },
+  {
+    id:"k8", name:"DSIP", code:"DSIP", mg:"5mg × 10 vials",
+    supplierPrice:90, sellPrice:115, category:"Longevity", badge:null,
+    desc:"Delta Sleep-Inducing Peptide. Studied for sleep architecture regulation and stress response.",
+    fullDesc:`DSIP — Delta Sleep-Inducing Peptide — is a nonapeptide (nine amino acids) first isolated in the 1970s from the cerebral venous blood of rabbits during slow-wave sleep states. Since its discovery, it has attracted sustained interest in neurochemical and neuroendocrine research.
+
+Its name reflects its original association with the induction of delta-wave brain activity — the slow oscillations characteristic of deep, restorative sleep. Beyond sleep architecture, DSIP has been studied in the context of the hypothalamic-pituitary-adrenal (HPA) axis, stress hormone modulation, and circadian rhythm regulation.
+
+DSIP is considered a structurally unusual peptide due to its apparent resistance to rapid degradation and its ability to cross the blood-brain barrier — both properties that make it a useful tool in neurochemical research. Supplied as a lyophilised research-grade peptide for regulated laboratory use by qualified professionals only.`,
+  },
+  {
+    id:"k9", name:"Selank", code:"SELANK", mg:"5mg × 10 vials",
+    supplierPrice:80, sellPrice:99, category:"Longevity", badge:null,
+    desc:"Anxiolytic heptapeptide. Studied extensively for cognitive and neurological research applications.",
+    fullDesc:`Selank is a synthetic heptapeptide (seven amino acids) developed as a structural analogue of Tuftsin — a naturally occurring immunomodulatory tetrapeptide derived from immunoglobulin G. Through the addition of a stabilising amino acid sequence, Selank exhibits enhanced metabolic stability compared to its parent compound.
+
+It belongs to a class of compounds studied in neurochemical research for their interactions with the GABAergic system — the primary inhibitory signalling network in the brain. Research has also examined Selank in relation to BDNF (Brain-Derived Neurotrophic Factor) expression, serotonin metabolism, and the regulation of anxiety-related neurological pathways.
+
+Selank was originally developed and researched extensively in Russian scientific institutions and has been the subject of numerous peer-reviewed neurobiological studies. This material is supplied as a research-grade compound for use exclusively in qualified laboratory environments, and is not associated with any approved therapeutic application in the EU.`,
+  },
+  {
+    id:"k10", name:"Semax", code:"SEMAX", mg:"10mg × 10 vials",
+    supplierPrice:100, sellPrice:129, category:"Longevity", badge:null,
+    desc:"Neuropeptide ACTH analog. Studied for cognitive performance and neuroprotective mechanisms.",
+    fullDesc:`Semax is a synthetic heptapeptide derived from the 4–10 fragment of adrenocorticotropic hormone (ACTH) — a pituitary hormone involved in the stress response — with modifications that remove its hormonal activity while preserving and enhancing its neurological research properties.
+
+It is primarily studied for its effects on BDNF (Brain-Derived Neurotrophic Factor) — a protein critical to the growth, maintenance, and survival of neurons. Research has also examined Semax in relation to cognitive signalling pathways, neuroprotective mechanisms following ischemic events, and attention-related neurochemical processes.
+
+Like Selank, Semax was developed within Russian academic research institutions and has been documented in a substantial body of peer-reviewed literature. It is supplied here as a lyophilised research-grade peptide for in-vitro and analytical laboratory applications by qualified professionals. Not approved for any therapeutic, cosmetic, or nutritional use.`,
+  },
+  {
+    id:"k11", name:"CJC + Ipamorelin", code:"CJC+IPA", mg:"5mg × 10 vials",
+    supplierPrice:190, sellPrice:239, category:"Performance", badge:"STACK KIT",
+    desc:"Pre-combined synergistic GH secretagogue kit. Full pulsatile GH release research protocol.",
+    fullDesc:`This kit combines two complementary growth hormone secretagogues — CJC-1295 (no DAC) and Ipamorelin — pre-formulated together in each vial, making it a convenient option for research protocols that study both compounds in combination.
+
+CJC-1295 (no DAC) works at the level of the hypothalamus, acting as a GHRH (Growth Hormone Releasing Hormone) analogue to signal the pituitary gland to prepare and release growth hormone. Ipamorelin operates through a different receptor pathway — the ghrelin receptor — to also stimulate GH secretion, but independently of the GHRH axis.
+
+When studied together, these two mechanisms are understood to have a synergistic relationship: activating both pathways simultaneously produces a stronger and more sustained GH secretion pulse than either compound alone. This makes the combination particularly useful for researchers studying GH axis dynamics, secretagogue interactions, or pulsatile hormone release patterns. Pre-combined in each vial for research convenience. Supplied as a lyophilised research-grade substance for laboratory use only.`,
+  },
+  {
+    id:"k12", name:"Ipamorelin", code:"IPA", mg:"5mg × 10 vials",
+    supplierPrice:90, sellPrice:115, category:"Performance", badge:null,
+    desc:"Selective GHRP with minimal side-effect profile. Clean, well-researched GH secretagogue.",
+    fullDesc:`Ipamorelin is a synthetic pentapeptide (five amino acids) classified as a Growth Hormone Releasing Peptide (GHRP). It acts as an agonist at the ghrelin receptor — also known as the GHS-R (Growth Hormone Secretagogue Receptor) — stimulating growth hormone release from the anterior pituitary gland.
+
+What distinguishes Ipamorelin in research settings is its selectivity. Unlike earlier GHRPs such as GHRP-2 or GHRP-6, Ipamorelin produces minimal influence on cortisol, prolactin, or ACTH levels at research-relevant doses. This makes it a cleaner experimental tool when the aim is to study isolated GH axis responses without confounding signals from other endocrine pathways.
+
+Ipamorelin is one of the most frequently cited reference compounds in GH secretagogue research and is available here in both kit format (10 vials) and as a single vial. Supplied as a lyophilised research-grade peptide for use by qualified professionals in regulated laboratory settings only.`,
+    hasSingle: true,
+  },
+  {
+    id:"k13", name:"GHRP-6", code:"GHRP6", mg:"5mg × 10 vials",
+    supplierPrice:80, sellPrice:99, category:"Performance", badge:null,
+    desc:"Growth hormone releasing hexapeptide. Studied for comprehensive GH axis stimulation.",
+    fullDesc:`GHRP-6 — Growth Hormone Releasing Peptide-6 — is a synthetic hexapeptide (six amino acids) and one of the earliest GH secretagogues developed for research purposes. It acts as an agonist at the ghrelin receptor, stimulating growth hormone release from the pituitary gland through a mechanism independent of the GHRH pathway.
+
+As one of the original GHRP compounds, GHRP-6 has an extensive research history and serves as a key reference compound in studies examining the ghrelin receptor system. Its broader receptor activity — compared to more selective GHRPs like Ipamorelin — also makes it a useful tool when researchers aim to study the full spectrum of GHS-R mediated effects, including those on appetite signalling, gastric motility, and energy regulation.
+
+GHRP-6 has been documented across a wide range of peer-reviewed neuroendocrine and endocrinological research. Supplied as a lyophilised research-grade peptide for qualified laboratory professionals. Not intended for human or veterinary use.`,
+  },
+  {
+    id:"k14", name:"MOTS-c", code:"MOTSC", mg:"10mg × 10 vials",
+    supplierPrice:160, sellPrice:199, category:"Longevity", badge:"LONGEVITY",
+    desc:"Mitochondrial-derived peptide. Studied for metabolic regulation and longevity signalling pathways.",
+    fullDesc:`MOTS-c (Mitochondrial Open Reading Frame of the 12S rRNA type-c) is a small peptide encoded not in the cell's nucleus, but within the mitochondrial genome itself — a discovery that challenged long-held assumptions about what mitochondria produce. It was first characterised in 2015 and has since generated significant research interest in geroscience and metabolic biology.
+
+Mitochondria are the energy-producing structures within cells, and MOTS-c appears to function as a signalling molecule that communicates metabolic status between the mitochondria and the cell nucleus — a process called retrograde signalling. Research has associated MOTS-c with insulin sensitivity regulation, AMPK pathway activation, and adaptive responses to metabolic stress, all of which are processes closely linked to healthy cellular ageing.
+
+Its mitochondrial origin and its apparent capacity to translocate to the nucleus under certain conditions make MOTS-c a structurally and functionally unique research compound. Supplied as a lyophilised research-grade peptide for in-vitro and analytical laboratory use by qualified professionals only.`,
+  },
+  {
+    id:"k15", name:"SS-31", code:"SS31", mg:"10mg × 10 vials",
+    supplierPrice:200, sellPrice:249, category:"Longevity", badge:null,
+    desc:"Mitochondria-targeting tetrapeptide. Studied for cardioprotection and anti-aging mechanisms.",
+    fullDesc:`SS-31 (also known by its research name Elamipretide) is a synthetic tetrapeptide (four amino acids) engineered with a specific alternating aromatic-cationic structure that gives it a strong affinity for the inner mitochondrial membrane — a rare and deliberate design feature.
+
+Its primary research focus relates to cardiolipin — a unique phospholipid found almost exclusively in the inner mitochondrial membrane, where it plays an essential structural and functional role in mitochondrial energy production. With age and under oxidative stress conditions, cardiolipin can become damaged or disorganised, compromising mitochondrial efficiency. SS-31 is studied for its ability to bind and stabilise cardiolipin, with implications for research into mitochondrial dysfunction, cardiac biology, and cellular energy metabolism.
+
+SS-31 is considered a leading research compound in the emerging field of mitochondrial medicine, with a growing body of peer-reviewed literature supporting its use as a research tool. Supplied as a lyophilised research-grade peptide for qualified laboratory use only.`,
+  },
+];
+
+const SINGLES = [
+  {
+    id:"s1", name:"BPC-157", mg:"5mg",
+    supplierPrice:25, sellPrice:30, category:"Recovery",
+    desc:"Single vial BPC-157 for targeted gut and tissue repair research.",
+    fullDesc:`BPC-157, or Body Protective Compound-157, is a synthetic pentadecapeptide — a chain of precisely 15 amino acids — originally derived from a protein naturally present in human gastric secretions. Despite its small size, it has become one of the most extensively researched peptides in the fields of regenerative biochemistry and gastrointestinal physiology.
+
+What makes BPC-157 compelling from a research perspective is the breadth of biological processes it appears to interact with. Studies have examined its involvement in angiogenesis (the formation of new blood vessels), nitric oxide signalling, tendon and ligament biology, gut-brain axis interactions, and cytoprotective mechanisms in the gastrointestinal tract.
+
+Its stability under acidic conditions — unusual for a peptide — has also made it a subject of interest in oral bioavailability research. Available as a single vial or in a cost-effective 10-vial kit. Supplied as a lyophilised research-grade compound for laboratory use by qualified professionals only.`,
+    kitId:"k7",
+  },
+  {
+    id:"s2", name:"MT-2", mg:"10mg",
+    supplierPrice:20, sellPrice:24, category:"Performance",
+    desc:"Melanotan II. Studied for melanocortin receptor activity and pigmentation research.",
+    fullDesc:`Melanotan II (MT-2) is a synthetic analogue of alpha-melanocyte-stimulating hormone (α-MSH), a naturally occurring peptide hormone that interacts with the melanocortin receptor family — a group of receptors distributed across diverse tissue types including the skin, brain, and adipose tissue.
+
+In research contexts, MT-2 is primarily used to study melanocortin receptor pharmacology — particularly MC1R (associated with pigmentation), MC3R and MC4R (associated with energy regulation and appetite signalling), and MC2R (associated with adrenal function). Its non-selective binding across multiple receptor subtypes makes it a useful tool for comparative receptor studies.
+
+MT-2 has been documented extensively in dermatological, endocrinological, and neuroscience research literature. Supplied as a lyophilised research-grade compound for in-vitro and analytical use by qualified laboratory professionals only. Not approved for any therapeutic or cosmetic application within the EU.`,
+  },
+  {
+    id:"s3", name:"Tesamorelin", mg:"5mg",
+    supplierPrice:30, sellPrice:37, category:"Performance",
+    desc:"Growth hormone releasing factor analog. Studied for visceral adipose tissue research.",
+    fullDesc:`Tesamorelin is a synthetic analogue of Growth Hormone Releasing Hormone (GHRH) — the hypothalamic signal that instructs the pituitary gland to produce and secrete growth hormone. It consists of the full 44-amino acid GHRH sequence with the addition of a trans-3-hexenoic acid group at the N-terminus, a modification that significantly increases the peptide's metabolic stability without altering its receptor binding profile.
+
+In research settings, Tesamorelin is particularly associated with studies on visceral adipose tissue (VAT) — the fat stored around abdominal organs — and its relationship to GH/IGF-1 axis dynamics. Its full-length GHRH sequence makes it structurally distinct from truncated analogues like CJC-1295, offering researchers a different tool for studying GHRH receptor pharmacology and GH secretion kinetics.
+
+Supplied as a lyophilised research-grade peptide for in-vitro and analytical laboratory use only. Not approved for human or veterinary use in the EU outside of specifically authorised clinical contexts.`,
+  },
+  {
+    id:"s4", name:"Ipamorelin", mg:"5mg",
+    supplierPrice:15, sellPrice:19, category:"Performance",
+    desc:"Single vial Ipamorelin for introductory GH secretagogue research.",
+    fullDesc:`Ipamorelin is a synthetic pentapeptide (five amino acids) classified as a Growth Hormone Releasing Peptide (GHRP). It acts as an agonist at the ghrelin receptor — also known as the GHS-R (Growth Hormone Secretagogue Receptor) — stimulating growth hormone release from the anterior pituitary gland.
+
+What distinguishes Ipamorelin in research settings is its selectivity. Unlike earlier GHRPs such as GHRP-2 or GHRP-6, Ipamorelin produces minimal influence on cortisol, prolactin, or ACTH levels at research-relevant doses. This makes it a cleaner experimental tool when the aim is to study isolated GH axis responses without confounding signals from other endocrine pathways.
+
+Available as a single vial for pilot studies or smaller research runs, or in a cost-effective 10-vial kit for extended protocols. Supplied as a lyophilised research-grade peptide for use by qualified professionals in regulated laboratory settings only.`,
+    kitId:"k12",
+  },
+  {
+    id:"s5", name:"GHK-Cu", mg:"50mg",
+    supplierPrice:25, sellPrice:30, category:"Longevity",
+    desc:"Copper peptide complex. Studied for wound healing, skin regeneration and antioxidant properties.",
+    fullDesc:`GHK-Cu is a naturally occurring tripeptide — comprising the amino acids Glycine, Histidine, and Lysine — complexed with a copper (II) ion (Cu²⁺). It is found endogenously in human plasma, saliva, and urine, and its concentration declines measurably with age, a fact that has contributed to significant interest in its biological roles.
+
+From a research perspective, GHK-Cu is notable for its interaction with a wide variety of biological processes. Studies have examined its involvement in wound healing signalling, collagen and elastin synthesis, activation of antioxidant defence enzymes (particularly superoxide dismutase), anti-inflammatory gene expression, and more recently, its apparent ability to influence the expression of genes associated with tissue remodelling and cellular rejuvenation.
+
+The copper coordination is essential to its activity — the Cu²⁺ ion is not merely a structural addition but appears to participate directly in several of GHK-Cu's observed biological interactions. Supplied as a lyophilised research-grade compound for in-vitro and analytical laboratory use by qualified professionals only.`,
+  },
+  {
+    id:"s6", name:"GLOW", mg:"70mg",
+    supplierPrice:65, sellPrice:79, category:"Longevity",
+    desc:"Combined skin-focused peptide blend for regenerative skin research applications.",
+    fullDesc:`GLOW is a research-formulated blend of complementary skin-biology peptides, assembled specifically for use in studies examining regenerative, structural, and anti-aging mechanisms within cutaneous tissue models.
+
+Rather than isolating a single signalling pathway, GLOW is designed to engage multiple biological processes relevant to skin health research simultaneously — including collagen and matrix protein regulation, antioxidant signalling, cellular repair pathways, and barrier integrity. Multi-target approaches like this are increasingly used in dermatological research to model the complex, interdependent nature of skin ageing and regeneration.
+
+The specific peptide composition of GLOW has been selected for complementary mechanisms with minimal pathway overlap, making it a practical starting point for researchers designing multi-target in-vitro skin biology experiments. Supplied as a lyophilised research-grade compound for analytical and laboratory use by qualified professionals only.`,
+  },
+  {
+    id:"s7", name:"BAC Water", mg:"10ml",
+    supplierPrice:5, sellPrice:7, category:"Supplies",
+    desc:"Bacteriostatic water for reconstitution of lyophilised peptides.",
+    fullDesc:`Bacteriostatic Water (BAC Water) is sterile water for injection containing 0.9% benzyl alcohol as a preservative. It is used as the standard diluent for reconstituting lyophilised (freeze-dried) peptide compounds prior to use in laboratory research.
+
+The benzyl alcohol content serves an important function: unlike plain sterile water, it inhibits bacterial growth in the reconstituted solution, allowing the preparation to remain stable and usable over a longer period when stored appropriately (typically refrigerated between 2–8°C). This is particularly relevant in research settings where a single vial of reconstituted peptide may be accessed multiple times over days or weeks.
+
+BAC Water is an essential consumable for any laboratory working with lyophilised peptides. Each 10ml vial provides sufficient volume to reconstitute multiple peptide samples. Supplied for laboratory and research use only.`,
+  },
+];
+
+const TABLETS = [
+  {
+    id:"t1", name:"SLU-PP-332", mg:"450mcg × 100 pcs",
+    supplierPrice:55, sellPrice:69, category:"Performance",
+    desc:"ERR agonist compound. Studied for metabolic activity and exercise-mimetic research effects.",
+    fullDesc:`SLU-PP-332 is a synthetic small-molecule compound functioning as a pan-agonist of the Estrogen-Related Receptor (ERR) family — specifically ERRα, ERRβ, and ERRγ. Despite the name, these receptors are not directly regulated by oestrogen; rather, they are nuclear receptors that act as master regulators of mitochondrial biogenesis and oxidative metabolism.
+
+ERRα and ERRγ in particular are highly expressed in tissues with high energy demands — heart, skeletal muscle, and brown adipose tissue — where they regulate the transcription of genes involved in fatty acid oxidation, mitochondrial function, and ATP production. SLU-PP-332's ability to activate all three ERR subtypes simultaneously makes it a useful tool for researchers studying metabolic pathway regulation and energy expenditure at a molecular level.
+
+It has attracted particular attention in the emerging field of "exercise mimetics" — compounds that activate the molecular pathways engaged by physical exercise, independent of actual muscular activity. This makes it relevant to research into metabolic syndrome, mitochondrial disease models, and comparative physiology. Supplied as a tablet formulation for research use only; not for human consumption.`,
+  },
+];
+
+const STACKS = [
+  {name:"Glow Protocol",      color:C.gold,           category:"Longevity",    tagline:"Skin & Regeneration",       peptides:["GHK-Cu","BPC-157","DSIP"],            desc:"Targets collagen synthesis, tissue remodelling and sleep-phase regeneration simultaneously."},
+  {name:"Forge Protocol",     color:C.accent,         category:"Performance",  tagline:"Performance & GH Axis",     peptides:["CJC + Ipamorelin","GHRP-6","TB-500"],  desc:"Synergistic GH secretion with systemic recovery support. Complete GH axis research protocol."},
+  {name:"Lean Protocol",      color:CAT["Weight Loss"],category:"Weight Loss", tagline:"Metabolic Research",        peptides:["Retatrutide","Tirzepatide","BPC-157"],  desc:"Triple and dual receptor agonists combined with gut-repair compound. Comprehensive metabolic research."},
+  {name:"Longevity Protocol", color:CAT["Longevity"],  category:"Longevity",   tagline:"Cellular & Mitochondrial",  peptides:["MOTS-c","SS-31","Selank"],              desc:"Mitochondrial peptides with neuroprotective support. Advanced longevity pathway research."},
+];
+
+const CATS = ["All","Weight Loss","Performance","Recovery","Longevity","Supplies"];
+const METHODS = [
+  {id:"revolut",label:"Revolut Pay",            sub:"Instant EU transfer · no fees",       icon:"R", color:C.accent,         note:"Send to @vantagen on Revolut. Include your name in the reference. Confirmed instantly."},
+  {id:"bank",   label:"European Bank Transfer",  sub:"SEPA · any EU bank · typically free",  icon:"€", color:CAT["Weight Loss"],note:"IBAN details shown at confirmation. SEPA transfers arrive within 0–1 business days."},
+  {id:"crypto", label:"Crypto",                  sub:"Bitcoin (BTC) or USDT (TRC-20)",       icon:"₿", color:C.gold,           note:"Wallet addresses shown at confirmation. Order processed after 1 network confirmation."},
+  {id:"card",   label:"Card Payment",            sub:"Visa / Mastercard via Revolut link",   icon:"▣", color:C.accent,         note:"We send a secure Revolut payment link to your email after you place the order."},
+  {id:"paypal", label:"PayPal",                  sub:"Friends & Family only",                icon:"P", color:"#003087",        note:"Send as Friends & Family to payments@vantagen.com to avoid transaction fees."},
+];
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+const Tag = ({label, color}) => (
+  <span style={{display:"inline-block",padding:"2px 8px",background:`${color||C.accent}15`,border:`1px solid ${color||C.accent}40`,color:color||C.accent,fontSize:9,letterSpacing:"0.18em",fontFamily:mono,borderRadius:2}}>{label}</span>
+);
+
+// ─── LOGO ─────────────────────────────────────────────────────────────────────
+function Logo({size=20}) {
+  return (
+    <div style={{display:"flex",alignItems:"center",gap:10}}>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="11" stroke={C.accent} strokeWidth="1"/>
+        <path d="M12 4 L19 18 L5 18 Z" stroke={C.accent} strokeWidth="1.2" fill="none"/>
+        <path d="M12 9 L16.5 18 L7.5 18 Z" fill={C.accent} opacity="0.2"/>
+      </svg>
+      <span style={{fontFamily:serif,fontWeight:700,fontSize:size,letterSpacing:"0.12em",color:C.ink}}>VANTAGEN</span>
+    </div>
+  );
+}
+
+// ─── PRODUCT DETAIL MODAL ────────────────────────────────────────────────────
+function ProductModal({item, onClose, onAdd, cartIds}) {
+  // Check if this compound has a counterpart (single ↔ kit)
+  const kitVersion    = item.hasSingle ? item : KITS.find(k => k.id === item.kitId);
+  const singleVersion = item.kitId    ? item : SINGLES.find(s => s.kitId === item.id);
+  const hasBoth = !!(kitVersion && singleVersion);
+
+  // Default selection: if user clicked a kit show kit, if single show single
+  const isKitItem = item.id?.startsWith("k");
+  const [selected, setSelected] = useState(isKitItem ? "kit" : "single");
+
+  const activeItem = hasBoth ? (selected === "kit" ? kitVersion : singleVersion) : item;
+  const inCart = cartIds.includes(activeItem.name);
+  const cc = CAT[item.category] || C.accent;
+
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:3000,background:"rgba(244,242,237,0.9)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={onClose}>
+      <div onClick={e=>e.stopPropagation()} style={{
+        background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:10,
+        width:"100%",maxWidth:620,maxHeight:"90vh",overflowY:"auto",
+        boxShadow:"0 20px 80px rgba(26,28,30,0.2)",
+        display:"flex",flexDirection:"column",
+      }}>
+        {/* Top colour bar */}
+        <div style={{height:4,background:`linear-gradient(90deg, ${cc}, ${cc}80)`,borderRadius:"10px 10px 0 0"}}/>
+
+        {/* Header */}
+        <div style={{padding:"24px 28px 20px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+          <div>
+            <div style={{fontSize:9,letterSpacing:"0.26em",color:cc,fontFamily:mono,marginBottom:8,textTransform:"uppercase"}}>{item.category}</div>
+            <h2 style={{fontFamily:serif,fontSize:24,fontWeight:700,color:C.ink,lineHeight:1.1,marginBottom:6}}>{item.name}</h2>
+            {item.badge && <Tag label={item.badge} color={cc}/>}
+          </div>
+          <button onClick={onClose} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,cursor:"pointer",padding:"6px 11px",borderRadius:3,fontSize:15,flexShrink:0,marginLeft:16}}>✕</button>
+        </div>
+
+        {/* Body */}
+        <div style={{padding:"24px 28px",flex:1}}>
+          {/* Kit / Single toggle */}
+          {hasBoth && (
+            <div style={{marginBottom:24}}>
+              <div style={{fontSize:9,letterSpacing:"0.22em",color:C.muted,fontFamily:mono,textTransform:"uppercase",marginBottom:10}}>Format</div>
+              <div style={{display:"flex",gap:8}}>
+                {[["kit","Kit (10 vials)",kitVersion],["single","Single vial",singleVersion]].map(([val,label,ver])=>(
+                  <button key={val} onClick={()=>setSelected(val)} style={{
+                    flex:1, padding:"11px 16px",
+                    background: selected===val ? C.accentLt : C.surface2,
+                    border:`1px solid ${selected===val ? C.accentMd : C.border}`,
+                    borderRadius:4,cursor:"pointer",transition:"all 0.18s",
+                    textAlign:"left",
+                  }}>
+                    <div style={{fontSize:12,fontWeight:600,color:selected===val?C.accent:C.ink,fontFamily:sans,marginBottom:3}}>{label}</div>
+                    <div style={{fontSize:11,color:C.muted,fontFamily:mono}}>{ver?.mg}</div>
+                    <div style={{fontSize:16,fontWeight:700,color:selected===val?C.accent:C.ink,fontFamily:serif,marginTop:4}}>€{ver?.sellPrice}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Price (when no toggle) */}
+          {!hasBoth && (
+            <div style={{display:"flex",alignItems:"baseline",gap:10,marginBottom:20}}>
+              <span style={{fontFamily:serif,fontSize:28,fontWeight:700,color:C.ink}}>€{item.sellPrice}</span>
+              <span style={{fontSize:12,color:C.muted,fontFamily:mono}}>{item.mg}</span>
+            </div>
+          )}
+
+          {/* Full description */}
+          <div style={{marginBottom:24}}>
+            <div style={{fontSize:9,letterSpacing:"0.22em",color:C.muted,fontFamily:mono,textTransform:"uppercase",marginBottom:12}}>About this compound</div>
+            {(item.fullDesc||item.desc).split("\n\n").map((para,i)=>(
+              <p key={i} style={{fontSize:13,color:C.ink2,lineHeight:1.9,marginBottom:12,fontFamily:sans}}>{para}</p>
+            ))}
+          </div>
+
+          {/* Research disclaimer */}
+          <div style={{padding:"12px 14px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:4,marginBottom:24,fontSize:11,color:C.red,fontFamily:mono,lineHeight:1.7,letterSpacing:"0.02em"}}>
+            ⚠ This compound is supplied strictly for in-vitro and laboratory research purposes only. It is not intended for human or veterinary use. For use by qualified scientific professionals in regulated environments only.
+          </div>
+        </div>
+
+        {/* Footer / Add button */}
+        <div style={{padding:"0 28px 24px"}}>
+          <button
+            onClick={()=>{ onAdd(activeItem); onClose(); }}
+            style={{
+              width:"100%",padding:"14px",
+              background: inCart ? C.surface2 : C.accent,
+              border:`1px solid ${inCart ? C.borderMd : C.accent}`,
+              color: inCart ? C.muted : "#fff",
+              fontFamily:mono,fontSize:11,letterSpacing:"0.18em",
+              cursor: inCart ? "default" : "pointer",
+              borderRadius:4,transition:"all 0.18s",
+            }}
+          >
+            {inCart ? "✓  Already in your order" : `Add to order  ·  €${activeItem.sellPrice}`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── KIT CARD ────────────────────────────────────────────────────────────────
+function KitCard({item, onAdd, inCart, onOpenModal}) {
+  const [hov, setHov] = useState(false);
+  const cc = CAT[item.category] || C.accent;
+  return (
+    <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+      style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:6,padding:"24px",transition:"all 0.22s",boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",display:"flex",flexDirection:"column",position:"relative",overflow:"hidden",cursor:"pointer"}}
+      onClick={()=>onOpenModal(item)}
+    >
+      <div style={{position:"absolute",left:0,top:16,bottom:16,width:3,background:cc,borderRadius:"0 2px 2px 0",opacity:hov?1:0.5,transition:"opacity 0.22s"}}/>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14,paddingLeft:8}}>
+        <div>
+          <div style={{fontSize:8,letterSpacing:"0.28em",color:cc,fontFamily:mono,marginBottom:7,textTransform:"uppercase"}}>{item.category}</div>
+          <div style={{fontSize:17,fontWeight:700,color:C.ink,fontFamily:serif,lineHeight:1.2}}>{item.name}</div>
+          <div style={{fontSize:11,color:C.muted,marginTop:3,fontFamily:mono}}>{item.mg}</div>
+        </div>
+        <div style={{textAlign:"right",flexShrink:0}}>
+          {item.badge&&<div style={{marginBottom:8}}><Tag label={item.badge} color={cc}/></div>}
+          <div style={{fontSize:22,fontWeight:700,color:C.ink,fontFamily:serif}}>€{item.sellPrice}</div>
+          {item.hasSingle && <div style={{fontSize:9,color:C.muted,fontFamily:mono,marginTop:3}}>also single vial</div>}
+        </div>
+      </div>
+      <p style={{fontSize:13,color:C.ink2,lineHeight:1.8,flex:1,marginBottom:18,paddingLeft:8}}>{item.desc}</p>
+      <div style={{paddingLeft:8,display:"flex",gap:8}}>
+        <button onClick={e=>{e.stopPropagation();onOpenModal(item);}} style={{flex:1,padding:"9px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3,transition:"all 0.18s"}}>View details</button>
+        <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{flex:2,padding:"9px",background:inCart?C.accentLt:C.surface2,border:`1px solid ${inCart?C.accentMd:C.border}`,color:inCart?C.accent:C.ink2,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3,transition:"all 0.18s"}}>
+          {inCart?"✓ Added":"Add to order"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── SINGLE ROW ──────────────────────────────────────────────────────────────
+function SingleRow({item, onAdd, inCart, onOpenModal}) {
+  const [hov, setHov] = useState(false);
+  const cc = CAT[item.category] || C.muted;
+  return (
+    <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+      style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:5,padding:"16px 20px",transition:"all 0.2s",display:"flex",alignItems:"center",gap:18,boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",cursor:"pointer"}}
+      onClick={()=>onOpenModal(item)}
+    >
+      <div style={{width:3,height:36,background:cc,borderRadius:2,flexShrink:0,opacity:0.6}}/>
+      <div style={{flex:1}}>
+        <div style={{fontSize:8,letterSpacing:"0.26em",color:cc,fontFamily:mono,marginBottom:4,textTransform:"uppercase"}}>{item.category}</div>
+        <div style={{fontSize:15,fontWeight:700,color:C.ink,fontFamily:serif}}>{item.name}</div>
+        <div style={{fontSize:11,color:C.muted,fontFamily:mono,marginTop:1}}>{item.mg}</div>
+        <div style={{fontSize:12,color:C.ink2,marginTop:6,lineHeight:1.7}}>{item.desc}</div>
+        {item.kitId && <div style={{fontSize:9,color:C.accent,fontFamily:mono,marginTop:4}}>also available as 10-vial kit</div>}
+      </div>
+      <div style={{textAlign:"right",flexShrink:0}}>
+        <div style={{fontSize:18,fontWeight:700,color:C.ink,fontFamily:serif,marginBottom:8}}>€{item.sellPrice}</div>
+        <div style={{display:"flex",gap:6,justifyContent:"flex-end"}}>
+          <button onClick={e=>{e.stopPropagation();onOpenModal(item);}} style={{padding:"6px 10px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:8,letterSpacing:"0.12em",cursor:"pointer",borderRadius:3}}>Details</button>
+          <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{padding:"6px 12px",background:inCart?C.accentLt:C.surface2,border:`1px solid ${inCart?C.accentMd:C.border}`,color:inCart?C.accent:C.ink2,fontFamily:mono,fontSize:8,letterSpacing:"0.12em",cursor:"pointer",borderRadius:3,transition:"all 0.18s"}}>{inCart?"✓ Added":"+ Add"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── STACK CARD ──────────────────────────────────────────────────────────────
+function StackCard({stack, onAddStack, cartIds}) {
+  const [hov, setHov] = useState(false);
+  const items = stack.peptides.map(n=>[...KITS,...SINGLES].find(p=>p.name===n)).filter(Boolean);
+  const tot = items.reduce((s,p)=>s+p.sellPrice,0);
+  const disc = Math.round(tot*0.85);
+  const allIn = stack.peptides.every(n=>cartIds.includes(n));
+  return (
+    <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:6,padding:"24px",transition:"all 0.22s",boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:stack.color,opacity:0.7,borderRadius:"6px 6px 0 0"}}/>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14,marginTop:8}}>
+        <div>
+          <div style={{fontSize:8,letterSpacing:"0.28em",color:stack.color,fontFamily:mono,marginBottom:7,textTransform:"uppercase"}}>{stack.tagline}</div>
+          <div style={{fontSize:18,fontWeight:700,color:C.ink,fontFamily:serif}}>{stack.name}</div>
+        </div>
+        <Tag label="15% OFF" color={stack.color}/>
+      </div>
+      <p style={{fontSize:13,color:C.ink2,lineHeight:1.8,marginBottom:16}}>{stack.desc}</p>
+      <div style={{marginBottom:18,padding:"12px 14px",background:C.surface2,borderRadius:4,border:`1px solid ${C.border}`}}>
+        {stack.peptides.map(n=>(
+          <div key={n} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+            <div style={{width:4,height:4,borderRadius:"50%",background:stack.color,flexShrink:0}}/>
+            <span style={{fontSize:11,color:C.ink2,fontFamily:mono}}>{n}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div>
+          <span style={{fontSize:11,color:C.dim,textDecoration:"line-through",marginRight:8,fontFamily:mono}}>€{tot}</span>
+          <span style={{fontSize:22,fontWeight:700,color:C.ink,fontFamily:serif}}>€{disc}</span>
+        </div>
+        <button onClick={()=>onAddStack(stack)} style={{padding:"9px 18px",background:allIn?C.accentLt:C.surface2,border:`1px solid ${allIn?C.accentMd:C.border}`,color:allIn?C.accent:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3,transition:"all 0.18s"}}>
+          {allIn?"✓ In order":"Add protocol"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── CHECKOUT ────────────────────────────────────────────────────────────────
+function CheckoutModal({cart, onClose, onSuccess}) {
+  const [step, setStep]     = useState("method");
+  const [method, setMethod] = useState(null);
+  const [form, setForm]     = useState({name:"",street:"",postCode:"",city:"",country:"",phone:"",email:""});
+  const [agreed, setAgreed] = useState(false);
+  const total = cart.reduce((s,p)=>s+p.sellPrice,0);
+  const canProceed = form.name&&form.street&&form.postCode&&form.city&&form.email&&form.phone;
+
+  const buildSummary = () => {
+    const items = cart.map(p=>`  • ${p.name} (${p.mg})`).join("\n");
+    return `Items you want:\n${items}\n\nName: ${form.name}\nStreet: ${form.street}\nPost Code: ${form.postCode}\nCity: ${form.city}\nCountry: ${form.country}\nPhone number: ${form.phone}\nMail: ${form.email}\nPayment method: ${METHODS.find(m=>m.id===method)?.label||""}`;
+  };
+
+  const placeOrder = () => {
+    const subj = encodeURIComponent(`VANTAGEN Order — ${form.name}`);
+    const body = encodeURIComponent(buildSummary());
+    window.open(`mailto:orders@vantagen.com?subject=${subj}&body=${body}`);
+    onSuccess(buildSummary());
+  };
+
+  const Inp = ({k,label,ph,type="text"}) => (
+    <div style={{marginBottom:14}}>
+      <label style={{display:"block",fontSize:8,letterSpacing:"0.24em",color:C.muted,marginBottom:5,fontFamily:mono,textTransform:"uppercase"}}>{label}</label>
+      <input type={type} placeholder={ph} value={form[k]} onChange={e=>setForm(p=>({...p,[k]:e.target.value}))}
+        style={{width:"100%",padding:"10px 13px",background:C.surface2,border:`1px solid ${C.border}`,borderRadius:3,color:C.ink,fontFamily:mono,fontSize:12,outline:"none",boxSizing:"border-box",transition:"border-color 0.18s"}}
+        onFocus={e=>e.target.style.borderColor=C.accentMd} onBlur={e=>e.target.style.borderColor=C.border}/>
+    </div>
+  );
+
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(244,242,237,0.88)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+      <div style={{background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:8,width:"100%",maxWidth:520,maxHeight:"92vh",overflowY:"auto",boxShadow:"0 16px 64px rgba(26,28,30,0.18)"}}>
+        <div style={{padding:"18px 26px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,background:C.surface,zIndex:1}}>
+          <div>
+            <div style={{fontFamily:serif,fontSize:15,fontWeight:700,color:C.ink}}>Place Order</div>
+            <div style={{fontSize:8,color:C.muted,marginTop:3,fontFamily:mono,letterSpacing:"0.22em",textTransform:"uppercase"}}>
+              {step==="method"?"01 — Payment method":step==="details"?"02 — Shipping details":"03 — Confirm & send"}
+            </div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:14}}>
+            <span style={{fontFamily:serif,fontSize:18,fontWeight:700,color:C.ink}}>€{total}</span>
+            <button onClick={onClose} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,cursor:"pointer",padding:"5px 9px",borderRadius:2,fontSize:14}}>✕</button>
+          </div>
+        </div>
+
+        <div style={{padding:26}}>
+          {step==="method"&&(
+            <div>
+              <p style={{fontSize:13,color:C.ink2,marginBottom:20,lineHeight:1.8}}>Select your preferred payment method. All options are available to EU customers.</p>
+              {METHODS.map(m=>(
+                <div key={m.id} onClick={()=>setMethod(m.id)} style={{display:"flex",alignItems:"center",gap:14,padding:"14px 16px",marginBottom:8,border:`1px solid ${method===m.id?C.accentMd:C.border}`,borderRadius:4,cursor:"pointer",background:method===m.id?C.accentLt:C.surface2,transition:"all 0.18s"}}>
+                  <div style={{width:32,height:32,borderRadius:"50%",background:method===m.id?C.accentMd:C.border,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontFamily:mono,fontSize:12,color:method===m.id?C.accent:C.muted,transition:"all 0.18s"}}>{m.icon}</div>
+                  <div style={{flex:1}}>
+                    <div style={{color:C.ink,fontSize:13,fontWeight:600,marginBottom:2,fontFamily:sans}}>{m.label}</div>
+                    <div style={{color:C.muted,fontSize:11,fontFamily:mono}}>{m.sub}</div>
+                  </div>
+                  <div style={{width:16,height:16,borderRadius:"50%",flexShrink:0,border:`2px solid ${method===m.id?C.accent:C.dim}`,background:method===m.id?C.accent:"transparent",transition:"all 0.18s"}}/>
+                </div>
+              ))}
+              {method&&<div style={{padding:"12px 14px",marginTop:8,marginBottom:18,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:3,fontSize:12,color:C.accent,lineHeight:1.75,fontFamily:sans}}>{METHODS.find(m=>m.id===method)?.note}</div>}
+              <button disabled={!method} onClick={()=>setStep("details")} style={{width:"100%",padding:"12px",background:method?C.accentLt:C.surface2,border:`1px solid ${method?C.accentMd:C.border}`,color:method?C.accent:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:method?"pointer":"not-allowed",borderRadius:3,opacity:method?1:0.5}}>Continue →</button>
+            </div>
+          )}
+
+          {step==="details"&&(
+            <div>
+              <p style={{fontSize:13,color:C.ink2,marginBottom:18,lineHeight:1.8}}>Shipping details — forwarded to our supplier in their required format.</p>
+              <Inp k="name" label="Full Name" ph="Dr. Jan Novak"/>
+              <Inp k="street" label="Street" ph="Hauptstraße 12"/>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 2fr",gap:12}}>
+                <Inp k="postCode" label="Post Code" ph="10115"/>
+                <Inp k="city" label="City" ph="Berlin"/>
+              </div>
+              <Inp k="country" label="Country" ph="e.g. Germany"/>
+              <Inp k="phone" label="Phone Number" ph="+49 30 0000000" type="tel"/>
+              <Inp k="email" label="Email Address" ph="jan@example.com" type="email"/>
+              <div onClick={()=>setAgreed(!agreed)} style={{display:"flex",alignItems:"flex-start",gap:12,padding:13,marginTop:4,marginBottom:18,border:`1px solid ${agreed?C.accentMd:"#d4a59a"}`,borderRadius:4,cursor:"pointer",background:agreed?C.accentLt:"#fdf5f4",transition:"all 0.18s"}}>
+                <div style={{width:15,height:15,borderRadius:2,flexShrink:0,marginTop:1,border:`2px solid ${agreed?C.accent:"#c0392b"}`,background:agreed?C.accent:"transparent",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.18s"}}>
+                  {agreed&&<span style={{color:"#fff",fontSize:9,fontWeight:700}}>✓</span>}
+                </div>
+                <p style={{fontSize:11,color:C.ink2,lineHeight:1.8,margin:0}}>I confirm these compounds are purchased <strong style={{color:C.ink}}>strictly for in-vitro research purposes only</strong> and will not be used for human or veterinary consumption. I am 18+ and purchasing from a jurisdiction where such compounds are legal.</p>
+              </div>
+              <div style={{display:"flex",gap:10}}>
+                <button onClick={()=>setStep("method")} style={{padding:"11px 16px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3}}>← Back</button>
+                <button disabled={!canProceed||!agreed} onClick={()=>setStep("confirm")} style={{flex:1,padding:"11px",background:canProceed&&agreed?C.accentLt:C.surface2,border:`1px solid ${canProceed&&agreed?C.accentMd:C.border}`,color:canProceed&&agreed?C.accent:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:canProceed&&agreed?"pointer":"not-allowed",borderRadius:3,opacity:canProceed&&agreed?1:0.5}}>Review order →</button>
+              </div>
+            </div>
+          )}
+
+          {step==="confirm"&&(
+            <div>
+              <div style={{marginBottom:22}}>
+                <div style={{fontSize:8,letterSpacing:"0.24em",color:C.muted,marginBottom:10,fontFamily:mono,textTransform:"uppercase"}}>Order Summary — Supplier Format</div>
+                <div style={{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:4,padding:"16px",fontFamily:mono,fontSize:11,color:C.ink2,lineHeight:2,whiteSpace:"pre-wrap"}}>
+                  <span style={{color:C.accent,fontWeight:700}}>Items you want:</span>{"\n"}
+                  {cart.map(p=>`  • ${p.name} (${p.mg})`).join("\n")}{"\n\n"}
+                  <span style={{color:C.accent,fontWeight:700}}>Name:</span> {form.name}{"\n"}
+                  <span style={{color:C.accent,fontWeight:700}}>Street:</span> {form.street}{"\n"}
+                  <span style={{color:C.accent,fontWeight:700}}>Post Code:</span> {form.postCode}{"\n"}
+                  <span style={{color:C.accent,fontWeight:700}}>City:</span> {form.city}{"\n"}
+                  <span style={{color:C.accent,fontWeight:700}}>Country:</span> {form.country}{"\n"}
+                  <span style={{color:C.accent,fontWeight:700}}>Phone number:</span> {form.phone}{"\n"}
+                  <span style={{color:C.accent,fontWeight:700}}>Mail:</span> {form.email}{"\n"}
+                  <span style={{color:C.accent,fontWeight:700}}>Payment method:</span> {METHODS.find(m=>m.id===method)?.label}
+                </div>
+              </div>
+              {method==="crypto"&&<div style={{padding:16,background:C.goldLt,border:`1px solid ${C.gold}40`,borderRadius:4,marginBottom:18}}>
+                <div style={{fontSize:8,color:C.gold,letterSpacing:"0.22em",marginBottom:12,fontFamily:mono,textTransform:"uppercase"}}>Crypto Wallets</div>
+                {[["BTC","bc1q — replace-with-your-wallet"],["USDT TRC-20","T — replace-with-your-wallet"]].map(([k,v])=>(
+                  <div key={k} style={{marginBottom:10}}>
+                    <div style={{fontSize:8,color:C.muted,marginBottom:3,fontFamily:mono,textTransform:"uppercase"}}>{k}</div>
+                    <div style={{fontSize:11,color:C.ink,fontFamily:mono,background:C.surface,padding:"7px 10px",borderRadius:2,border:`1px solid ${C.border}`,wordBreak:"break-all"}}>{v}</div>
+                  </div>
+                ))}
+              </div>}
+              {method==="bank"&&<div style={{padding:16,background:"#EEF2F9",border:`1px solid ${CAT["Weight Loss"]}30`,borderRadius:4,marginBottom:18}}>
+                <div style={{fontSize:8,color:CAT["Weight Loss"],letterSpacing:"0.22em",marginBottom:12,fontFamily:mono,textTransform:"uppercase"}}>European Bank Transfer (SEPA)</div>
+                {[["Account Name","VANTAGEN s.r.o."],["IBAN","— replace with your IBAN —"],["BIC/SWIFT","— replace with your BIC —"],["Reference",`ORD-${Math.floor(Math.random()*90000)+10000}`]].map(([k,v])=>(
+                  <div key={k} style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:`1px solid ${C.border}`}}>
+                    <span style={{color:C.muted,fontFamily:mono,fontSize:9,textTransform:"uppercase"}}>{k}</span>
+                    <span style={{color:C.ink,fontFamily:mono,fontSize:11,fontWeight:600}}>{v}</span>
+                  </div>
+                ))}
+              </div>}
+              {method==="revolut"&&<div style={{padding:16,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:4,marginBottom:18}}>
+                <div style={{fontSize:8,color:C.accent,letterSpacing:"0.22em",marginBottom:8,fontFamily:mono,textTransform:"uppercase"}}>Revolut Pay</div>
+                <div style={{fontSize:15,color:C.ink,fontFamily:mono,marginBottom:6,fontWeight:600}}>@vantagen</div>
+                <p style={{fontSize:11,color:C.ink2,lineHeight:1.7}}>Send €{total} on Revolut to @vantagen. Include your name in the note.</p>
+              </div>}
+              {method==="card"&&<div style={{padding:16,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:4,marginBottom:18,textAlign:"center"}}>
+                <div style={{fontSize:8,color:C.accent,letterSpacing:"0.22em",marginBottom:8,fontFamily:mono,textTransform:"uppercase"}}>Card Payment</div>
+                <p style={{fontSize:12,color:C.ink2,lineHeight:1.8}}>After sending your order, we will email you a secure Revolut payment link. Visa & Mastercard accepted.</p>
+              </div>}
+              {method==="paypal"&&<div style={{padding:16,background:"#EFF5FC",border:"1px solid #003087AA",borderRadius:4,marginBottom:18}}>
+                <div style={{fontSize:8,color:"#003087",letterSpacing:"0.22em",marginBottom:8,fontFamily:mono,textTransform:"uppercase"}}>PayPal — Friends & Family</div>
+                <div style={{fontSize:14,color:C.ink,fontFamily:mono,marginBottom:6,fontWeight:600}}>payments@vantagen.com</div>
+                <p style={{fontSize:11,color:C.ink2,lineHeight:1.7}}>Send as <strong>Friends & Family</strong> only. Include your name in the note.</p>
+              </div>}
+              <div style={{fontSize:11,color:C.ink2,lineHeight:1.8,marginBottom:18,padding:"12px 14px",background:C.surface2,borderRadius:3,border:`1px solid ${C.border}`}}>Clicking "Send order" will open your email client with the full order pre-filled. Send the email to complete your purchase — we confirm within 24 hours.</div>
+              <div style={{display:"flex",gap:10}}>
+                <button onClick={()=>setStep("details")} style={{padding:"11px 16px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:9,cursor:"pointer",borderRadius:3}}>← Back</button>
+                <button onClick={placeOrder} style={{flex:1,padding:"12px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",borderRadius:3}}>Send order →</button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── CART DRAWER ─────────────────────────────────────────────────────────────
+function CartDrawer({cart, onRemove, onClose, onCheckout}) {
+  const total = cart.reduce((s,p)=>s+p.sellPrice,0);
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex"}}>
+      <div onClick={onClose} style={{flex:1,background:"rgba(244,242,237,0.7)",backdropFilter:"blur(4px)"}}/>
+      <div style={{width:340,background:C.surface,borderLeft:`1px solid ${C.border}`,display:"flex",flexDirection:"column",boxShadow:"-4px 0 24px rgba(26,28,30,0.12)"}}>
+        <div style={{padding:"18px 22px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div>
+            <div style={{fontFamily:serif,fontSize:15,fontWeight:700,color:C.ink}}>Your Order</div>
+            <div style={{fontSize:9,color:C.muted,marginTop:2,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.2em"}}>{cart.length} item{cart.length!==1?"s":""}</div>
+          </div>
+          <button onClick={onClose} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,cursor:"pointer",padding:"5px 10px",borderRadius:2,fontSize:12,fontFamily:mono}}>Close</button>
+        </div>
+        <div style={{flex:1,overflowY:"auto",padding:"10px 22px"}}>
+          {cart.length===0
+            ?<div style={{textAlign:"center",padding:"48px 0",color:C.dim,fontSize:13,fontFamily:sans}}>Your order is empty.</div>
+            :cart.map((item,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",padding:"13px 0",borderBottom:`1px solid ${C.border}`}}>
+                <div>
+                  <div style={{color:C.ink,fontSize:13,fontWeight:600,fontFamily:serif}}>{item.name}</div>
+                  <div style={{color:C.muted,fontSize:10,marginTop:2,fontFamily:mono}}>{item.mg}</div>
+                  {item.id?.startsWith("k")&&<div style={{marginTop:4}}><Tag label="KIT" color={C.accent}/></div>}
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+                  <span style={{color:C.ink,fontFamily:serif,fontSize:14,fontWeight:700}}>€{item.sellPrice}</span>
+                  <button onClick={()=>onRemove(i)} style={{background:"none",border:"none",color:C.dim,cursor:"pointer",fontSize:16,padding:0}}>×</button>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+        {cart.length>0&&(
+          <div style={{padding:"18px 22px",borderTop:`1px solid ${C.border}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",padding:"13px 14px",marginBottom:14,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:4}}>
+              <span style={{color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.2em",textTransform:"uppercase",alignSelf:"center"}}>Total</span>
+              <span style={{color:C.ink,fontFamily:serif,fontSize:20,fontWeight:700}}>€{total}</span>
+            </div>
+            <button onClick={onCheckout} style={{width:"100%",padding:"12px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",borderRadius:3,marginBottom:10}}>Proceed to checkout →</button>
+            <p style={{textAlign:"center",fontSize:9,color:C.dim,lineHeight:1.8,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.1em"}}>For research purposes only · Not for human use</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── PASSWORD GATE ─────────────────────────────────────────────────────────────
+function PasswordGate({onUnlock}) {
+  const [pw, setPw]         = useState("");
+  const [email, setEmail]   = useState("");
+  const [error, setError]   = useState("");
+  const [mode, setMode]     = useState("gate");
+  const [joined, setJoined] = useState(false);
+
+  const tryUnlock = () => {
+    if(pw===LAUNCH_PW) onUnlock();
+    else {setError("Invalid access code."); setTimeout(()=>setError(""),2000);}
+  };
+  const joinEarly = () => {
+    if(!email.includes("@")){setError("Please enter a valid email.");return;}
+    setJoined(true); setError("");
+  };
+
+  const inpCls = {width:"100%",padding:"12px 15px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:4,color:C.ink,fontFamily:mono,fontSize:12,outline:"none",boxSizing:"border-box",marginBottom:8,transition:"border-color 0.18s"};
+
+  return (
+    <div style={{minHeight:"100vh",display:"flex",background:C.bg,position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",inset:0,backgroundImage:`radial-gradient(${C.borderMd} 1px,transparent 1px)`,backgroundSize:"28px 28px",opacity:0.5,pointerEvents:"none"}}/>
+      <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0 40px",position:"relative",zIndex:2}}>
+        <div style={{width:"100%",maxWidth:420,textAlign:"center"}}>
+          <div style={{marginBottom:44}}>
+            <div style={{fontSize:8,letterSpacing:"0.4em",color:C.muted,fontFamily:mono,marginBottom:28,textTransform:"uppercase"}}>Research Compounds · EU</div>
+            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:14}}>
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="24" r="22" stroke={C.accent} strokeWidth="1.5"/>
+                <path d="M24 7 L39 37 L9 37 Z" stroke={C.accent} strokeWidth="2" fill="none"/>
+                <path d="M24 17 L34 37 L14 37 Z" fill={C.accent} opacity="0.18"/>
+                <line x1="24" y1="7" x2="24" y2="37" stroke={C.accent} strokeWidth="1" opacity="0.35"/>
+              </svg>
+              <span style={{fontFamily:serif,fontWeight:700,fontSize:36,letterSpacing:"0.18em",color:C.ink,lineHeight:1}}>VANTAGEN</span>
+            </div>
+            <div style={{width:40,height:1,background:C.accentMd,margin:"22px auto 0"}}/>
+          </div>
+
+          <div style={{display:"inline-flex",alignItems:"center",gap:7,padding:"5px 14px",borderRadius:20,border:`1px solid ${C.borderMd}`,background:C.surface,marginBottom:32}}>
+            <div style={{width:5,height:5,borderRadius:"50%",background:C.accent,animation:"blink 2.5s infinite"}}/>
+            <span style={{fontSize:8,letterSpacing:"0.3em",color:C.muted,fontFamily:mono,textTransform:"uppercase"}}>Private Beta</span>
+          </div>
+
+          {mode==="gate"?(
+            <div>
+              <p style={{color:C.ink2,fontSize:13,marginBottom:26,lineHeight:1.85,fontFamily:sans}}>Platform currently in private beta. Enter your access code or request early access below.</p>
+              <input type="password" placeholder="Access code" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&tryUnlock()} style={inpCls} onFocus={e=>e.target.style.borderColor=C.accentMd} onBlur={e=>e.target.style.borderColor=C.border}/>
+              {error&&<div style={{color:C.red,fontSize:11,marginBottom:8,fontFamily:mono,textAlign:"left"}}>{error}</div>}
+              <button onClick={tryUnlock} style={{width:"100%",padding:"13px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.18em",cursor:"pointer",borderRadius:3,marginBottom:12,transition:"all 0.18s"}}>Access Platform →</button>
+              <button onClick={()=>setMode("early")} style={{width:"100%",padding:"12px",background:C.surface,border:`1px solid ${C.borderMd}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3,transition:"all 0.18s"}}>No code? Request early access →</button>
+            </div>
+          ):(
+            <div>
+              {!joined?(
+                <>
+                  <p style={{color:C.ink2,fontSize:13,marginBottom:26,lineHeight:1.85,fontFamily:sans}}>Join the VANTAGEN research community and receive early access with exclusive launch pricing.</p>
+                  <input type="email" placeholder="Email address" value={email} onChange={e=>setEmail(e.target.value)} style={inpCls} onFocus={e=>e.target.style.borderColor=C.accentMd} onBlur={e=>e.target.style.borderColor=C.border}/>
+                  {error&&<div style={{color:C.red,fontSize:11,marginBottom:8}}>{error}</div>}
+                  <button onClick={joinEarly} style={{width:"100%",padding:"13px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.18em",cursor:"pointer",borderRadius:3,marginBottom:12}}>Join Early Access →</button>
+                  <button onClick={()=>setMode("gate")} style={{width:"100%",padding:"12px",background:C.surface,border:`1px solid ${C.borderMd}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3}}>← Have an access code?</button>
+                </>
+              ):(
+                <div style={{padding:28,border:`1px solid ${C.accentMd}`,borderRadius:6,background:C.accentLt}}>
+                  <div style={{width:36,height:36,borderRadius:"50%",background:C.accentMd,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 14px",fontSize:16,color:C.accent}}>✓</div>
+                  <div style={{fontFamily:serif,fontWeight:700,fontSize:15,color:C.ink,marginBottom:10}}>You're on the list</div>
+                  <p style={{color:C.ink2,fontSize:13,lineHeight:1.85,fontFamily:sans}}>We'll contact <strong style={{color:C.ink}}>{email}</strong> at launch with early access pricing and exclusive research protocols.</p>
+                </div>
+              )}
+            </div>
+          )}
+          <p style={{marginTop:44,fontSize:9,color:C.dim,letterSpacing:"0.1em",lineHeight:2.1,fontFamily:mono,textTransform:"uppercase",opacity:0.7}}>For research purposes only · Not for human use<br/>Vantagen © 2025 · EU Regulation Compliant</p>
+        </div>
+      </div>
+      <style>{`@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}`}</style>
+    </div>
+  );
+}
+
+// ─── ADMIN ───────────────────────────────────────────────────────────────────
+function AdminPanel({orders, onClose}) {
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:4000,background:C.bg,overflowY:"auto"}}>
+      <div style={{maxWidth:800,margin:"0 auto",padding:40}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:32}}>
+          <Logo size={16}/>
+          <button onClick={onClose} style={{padding:"8px 16px",background:C.surface,border:`1px solid ${C.border}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3}}>← Exit admin</button>
+        </div>
+        <div style={{fontSize:8,letterSpacing:"0.28em",color:C.muted,marginBottom:24,fontFamily:mono,textTransform:"uppercase"}}>Order backend — {orders.length} order{orders.length!==1?"s":""}</div>
+        {orders.length===0
+          ?<div style={{textAlign:"center",padding:"80px 0",color:C.muted,fontFamily:sans}}>No orders yet.</div>
+          :orders.map((o,i)=>(
+            <div key={i} style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:6,padding:24,marginBottom:14,boxShadow:"0 1px 8px rgba(26,28,30,0.06)"}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:14}}>
+                <div style={{fontFamily:serif,fontWeight:700,fontSize:15,color:C.ink}}>Order #{orders.length-i}</div>
+                <div style={{fontSize:9,color:C.muted,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>{new Date(o.timestamp).toLocaleString("en-GB")}</div>
+              </div>
+              <pre style={{fontFamily:mono,fontSize:12,color:C.ink2,lineHeight:1.9,whiteSpace:"pre-wrap",background:C.surface2,padding:16,borderRadius:4,border:`1px solid ${C.border}`}}>{o.summary}</pre>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  );
+}
+
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+export default function App() {
+  const [unlocked, setUnlocked]       = useState(false);
+  const [tab, setTab]                 = useState("kits");
+  const [catFilter, setCatFilter]     = useState("All");
+  const [cart, setCart]               = useState([]);
+  const [cartOpen, setCartOpen]       = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [orders, setOrders]           = useState([]);
+  const [adminOpen, setAdminOpen]     = useState(false);
+  const [showAdmin, setShowAdmin]     = useState(false);
+  const [adminInput, setAdminInput]   = useState("");
+  const [successMsg, setSuccessMsg]   = useState(false);
+  const [modalItem, setModalItem]     = useState(null);
+
+  if (!unlocked) return <PasswordGate onUnlock={()=>setUnlocked(true)}/>;
+
+  const cartIds   = cart.map(p=>p.name);
+  const addToCart = item => { if(!cartIds.includes(item.name)) setCart(p=>[...p,item]); };
+  const addStack  = stack => {
+    const all   = [...KITS,...SINGLES];
+    const toAdd = stack.peptides.map(n=>all.find(p=>p.name===n)).filter(p=>p&&!cartIds.includes(p.name));
+    setCart(p=>[...p,...toAdd]);
+  };
+  const handleSuccess = summary => {
+    setOrders(p=>[{summary,timestamp:Date.now()},...p]);
+    setCart([]); setCheckoutOpen(false);
+    setSuccessMsg(true); setTimeout(()=>setSuccessMsg(false),5000);
+  };
+
+  const fKits    = catFilter==="All" ? KITS    : KITS.filter(p=>p.category===catFilter);
+  const fSingles = catFilter==="All" ? SINGLES : SINGLES.filter(p=>p.category===catFilter);
+  const fStacks  = catFilter==="All" ? STACKS  : STACKS.filter(s=>s.category===catFilter);
+
+  return (
+    <div style={{minHeight:"100vh",background:C.bg,color:C.ink,fontFamily:sans}}>
+      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,backgroundImage:`radial-gradient(${C.border} 1px,transparent 1px)`,backgroundSize:"28px 28px"}}/>
+
+      {/* HEADER */}
+      <header style={{position:"sticky",top:0,zIndex:100,background:"rgba(244,242,237,0.95)",backdropFilter:"blur(12px)",borderBottom:`1px solid ${C.border}`,padding:"0 40px",height:60,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <Logo size={16}/>
+        <nav style={{display:"flex",gap:2}}>
+          {[["kits","Kits"],["singles","Singles"],["stacks","Stacks"]].map(([id,label])=>(
+            <button key={id} onClick={()=>setTab(id)} style={{padding:"7px 16px",background:tab===id?C.accentLt:"transparent",border:"none",borderBottom:`2px solid ${tab===id?C.accent:"transparent"}`,color:tab===id?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:tab===id?600:400,cursor:"pointer",transition:"all 0.18s"}}>{label}</button>
+          ))}
+        </nav>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <button onClick={()=>setShowAdmin(!showAdmin)} style={{background:"none",border:"none",color:C.dim,cursor:"pointer",fontSize:14,padding:"4px 6px"}}>⚙</button>
+          <button onClick={()=>setCartOpen(true)} style={{padding:"8px 16px",background:cart.length>0?C.accentLt:C.surface,border:`1px solid ${cart.length>0?C.accentMd:C.border}`,color:cart.length>0?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:500,cursor:"pointer",borderRadius:4,transition:"all 0.18s"}}>
+            Order{cart.length>0?` (${cart.length})`:""}
+          </button>
+        </div>
+      </header>
+
+      {showAdmin&&(
+        <div style={{position:"fixed",top:64,right:40,zIndex:200,background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:5,padding:14,display:"flex",gap:8,boxShadow:"0 4px 20px rgba(26,28,30,0.12)"}}>
+          <input type="password" placeholder="Admin code" value={adminInput} onChange={e=>setAdminInput(e.target.value)}
+            onKeyDown={e=>{if(e.key==="Enter"&&adminInput===ADMIN_PW){setAdminOpen(true);setShowAdmin(false);setAdminInput("");}}}
+            style={{padding:"8px 12px",background:C.surface2,border:`1px solid ${C.border}`,borderRadius:3,color:C.ink,fontFamily:mono,fontSize:11,outline:"none"}}/>
+          <button onClick={()=>{if(adminInput===ADMIN_PW){setAdminOpen(true);setShowAdmin(false);setAdminInput("");}}} style={{padding:"8px 14px",background:C.accentLt,border:`1px solid ${C.accentMd}`,color:C.accent,fontFamily:mono,fontSize:10,cursor:"pointer",borderRadius:3}}>→</button>
+        </div>
+      )}
+
+      <div style={{position:"relative",zIndex:1}}>
+        {/* HERO */}
+        <div style={{padding:"64px 40px 48px",borderBottom:`1px solid ${C.border}`,background:C.surface}}>
+          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"flex-end",justifyContent:"space-between",flexWrap:"wrap",gap:24}}>
+            <div>
+              <div style={{fontSize:8,letterSpacing:"0.38em",color:C.accent,fontFamily:mono,marginBottom:18,textTransform:"uppercase"}}>Research Compounds · EU Compliant</div>
+              <h1 style={{fontFamily:serif,fontWeight:700,fontSize:"clamp(30px,4vw,56px)",lineHeight:1.1,color:C.ink,margin:"0 0 18px",maxWidth:620}}>
+                Premium Peptide<br/>Research Compounds<br/><em style={{color:C.accent,fontStyle:"italic"}}>for Europe.</em>
+              </h1>
+              <p style={{color:C.ink2,maxWidth:460,lineHeight:1.9,fontSize:14,marginBottom:22,fontFamily:sans}}>
+                Pharmaceutical-grade research peptides for serious scientific protocols. Available as kits or individual vials, with EU-wide delivery. Strictly for in-vitro and laboratory use only.
+              </p>
+              <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"7px 13px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:3,fontSize:9,color:C.red,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>
+                ⚠ Not for human use · Research purposes only · 18+
+              </div>
+            </div>
+            <div style={{display:"flex",gap:32,flexShrink:0}}>
+              {[["15","Peptide Kits"],["7","Single Vials"],["4","Research Protocols"]].map(([n,l])=>(
+                <div key={l} style={{textAlign:"center"}}>
+                  <div style={{fontFamily:serif,fontSize:32,fontWeight:700,color:C.ink,lineHeight:1}}>{n}</div>
+                  <div style={{fontSize:9,color:C.muted,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.18em",marginTop:4}}>{l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* FILTER BAR */}
+        <div style={{borderBottom:`1px solid ${C.border}`,background:C.surface,padding:"0 40px"}}>
+          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:0}}>
+            {CATS.map(c=>(
+              <button key={c} onClick={()=>setCatFilter(c)} style={{padding:"14px 18px",background:"transparent",border:"none",borderBottom:`2px solid ${catFilter===c?(CAT[c]||C.accent):"transparent"}`,color:catFilter===c?(CAT[c]||C.accent):C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",transition:"all 0.18s",textTransform:"uppercase"}}>{c}</button>
+            ))}
+          </div>
+        </div>
+
+        {/* KITS */}
+        {tab==="kits"&&(
+          <div style={{maxWidth:1200,margin:"0 auto",padding:"36px 40px 64px"}}>
+            <div style={{display:"flex",alignItems:"baseline",gap:14,marginBottom:26}}>
+              <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Research Kits</h2>
+              <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>10 vials per kit · best value · click any card for full details</span>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(308px,1fr))",gap:14}}>
+              {fKits.map(p=><KitCard key={p.id} item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/>)}
+            </div>
+          </div>
+        )}
+
+        {/* SINGLES */}
+        {tab==="singles"&&(
+          <div style={{maxWidth:1200,margin:"0 auto",padding:"36px 40px 64px"}}>
+            <div style={{display:"flex",alignItems:"baseline",gap:14,marginBottom:26}}>
+              <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Single Vials</h2>
+              <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>individual compounds · click any row for full details</span>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {fSingles.map(p=><SingleRow key={p.id} item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/>)}
+            </div>
+            <div style={{height:1,background:C.border,margin:"36px 0"}}/>
+            <h2 style={{fontFamily:serif,fontSize:20,fontWeight:700,color:C.ink,marginBottom:20}}>Tablets</h2>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {TABLETS.map(p=><SingleRow key={p.id} item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/>)}
+            </div>
+          </div>
+        )}
+
+        {/* STACKS */}
+        {tab==="stacks"&&(
+          <div style={{maxWidth:1200,margin:"0 auto",padding:"36px 40px 64px"}}>
+            <div style={{display:"flex",alignItems:"baseline",gap:14,marginBottom:26}}>
+              <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Research Protocols</h2>
+              <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>curated combinations · 15% bundle discount</span>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(310px,1fr))",gap:16}}>
+              {fStacks.map(s=><StackCard key={s.name} stack={s} onAddStack={addStack} cartIds={cartIds}/>)}
+            </div>
+          </div>
+        )}
+
+        {/* FOOTER */}
+        <footer style={{borderTop:`1px solid ${C.border}`,background:C.surface,padding:"28px 40px",textAlign:"center"}}>
+          <Logo size={13}/>
+          <p style={{fontSize:9,color:C.dim,lineHeight:2,maxWidth:600,margin:"14px auto 0",fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.08em"}}>
+            All products sold by Vantagen are intended for laboratory and in-vitro research only. Not for human or veterinary use. 18+ only. Compliant with applicable EU regulations. © 2025 Vantagen.
+          </p>
+        </footer>
+      </div>
+
+      {/* PRODUCT MODAL */}
+      {modalItem && <ProductModal item={modalItem} onClose={()=>setModalItem(null)} onAdd={addToCart} cartIds={cartIds}/>}
+
+      {/* CART */}
+      {cartOpen&&<CartDrawer cart={cart} onRemove={i=>setCart(p=>p.filter((_,j)=>j!==i))} onClose={()=>setCartOpen(false)} onCheckout={()=>{setCartOpen(false);setCheckoutOpen(true);}}/>}
+
+      {/* CHECKOUT */}
+      {checkoutOpen&&<CheckoutModal cart={cart} onClose={()=>setCheckoutOpen(false)} onSuccess={handleSuccess}/>}
+
+      {/* ADMIN */}
+      {adminOpen&&<AdminPanel orders={orders} onClose={()=>setAdminOpen(false)}/>}
+
+      {/* SUCCESS */}
+      {successMsg&&(
+        <div style={{position:"fixed",bottom:32,left:"50%",transform:"translateX(-50%)",background:C.surface,border:`1px solid ${C.accentMd}`,padding:"16px 28px",borderRadius:5,zIndex:4000,fontFamily:sans,fontSize:13,color:C.ink,textAlign:"center",lineHeight:1.8,boxShadow:"0 8px 40px rgba(26,28,30,0.18)"}}>
+          <span style={{color:C.accent,fontWeight:700}}>✓ Order received</span><br/>
+          <span style={{color:C.muted,fontSize:12}}>Check your email — we confirm within 24 hours.</span>
+        </div>
+      )}
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&family=Courier+Prime:wght@400;700&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0;}
+        ::-webkit-scrollbar{width:4px;}
+        ::-webkit-scrollbar-track{background:${C.bg};}
+        ::-webkit-scrollbar-thumb{background:${C.borderMd};border-radius:2px;}
+      `}</style>
+    </div>
+  );
+}
