@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import React from "react";
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 const C = {
@@ -280,10 +281,273 @@ const METHODS = [
   {id:"paypal", label:"PayPal",                  sub:"Friends & Family only",                icon:"P", color:"#003087",        note:"Send as Friends & Family to payments@vantagen.com to avoid transaction fees."},
 ];
 
+// ─── COMPOUND GLYPHS ─────────────────────────────────────────────────────────
+const GLYPHS = {
+  "Retatrutide": ({size=100}) => (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+      <circle cx="34" cy="56" r="22" stroke={C.accent} strokeWidth="0.9" opacity="0.45"/>
+      <circle cx="66" cy="56" r="22" stroke={C.accent} strokeWidth="0.9" opacity="0.45"/>
+      <circle cx="50" cy="30" r="22" stroke={C.accent} strokeWidth="0.9" opacity="0.45"/>
+      <circle cx="50" cy="47" r="6" stroke={C.accent} strokeWidth="0.8" opacity="0.6" fill={C.accentLt}/>
+      <circle cx="50" cy="47" r="2" fill={C.accent} opacity="0.55"/>
+    </svg>
+  ),
+  "BPC-157": ({size=100}) => {
+    const top = [12,24,36,48,60,72,84,88].map((x,i)=>({x,y:36+Math.sin(i*0.9)*4}));
+    const bot = [18,30,42,54,66,78,88].map((x,i)=>({x,y:60+Math.sin(i*0.9)*4}));
+    const all = [...top,...bot];
+    return (
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+        {top.slice(0,-1).map((n,i)=><line key={`t${i}`} x1={n.x} y1={n.y} x2={top[i+1].x} y2={top[i+1].y} stroke={C.accent} strokeWidth="0.8" opacity="0.45"/>)}
+        {bot.slice(0,-1).map((n,i)=><line key={`b${i}`} x1={n.x} y1={n.y} x2={bot[i+1].x} y2={bot[i+1].y} stroke={C.accent} strokeWidth="0.8" opacity="0.45"/>)}
+        {top.map((n,i)=>i<7&&<line key={`c${i}`} x1={n.x} y1={n.y} x2={bot[i].x} y2={bot[i].y} stroke={C.accent} strokeWidth="0.5" opacity="0.22"/>)}
+        {all.map((n,i)=><circle key={i} cx={n.x} cy={n.y} r={i===7?3.5:2} fill={i===7?C.accent:"#fff"} stroke={C.accent} strokeWidth="0.8" opacity={i===7?0.65:0.6}/>)}
+      </svg>
+    );
+  },
+  "GHK-Cu": ({size=100}) => (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+      <polygon points="50,16 80,66 20,66" stroke={C.accent} strokeWidth="0.9" opacity="0.5" fill="none"/>
+      <line x1="50" y1="16" x2="50" y2="44" stroke={C.accent} strokeWidth="0.7" strokeDasharray="3,4" opacity="0.32"/>
+      <line x1="80" y1="66" x2="58" y2="52" stroke={C.accent} strokeWidth="0.7" strokeDasharray="3,4" opacity="0.32"/>
+      <line x1="20" y1="66" x2="42" y2="52" stroke={C.accent} strokeWidth="0.7" strokeDasharray="3,4" opacity="0.32"/>
+      <circle cx="50" cy="50" r="10" stroke={C.gold} strokeWidth="0.9" opacity="0.65"/>
+      <circle cx="50" cy="50" r="3.5" fill={C.gold} opacity="0.45"/>
+      <circle cx="50" cy="16" r="3" fill={C.accent} opacity="0.5"/>
+      <circle cx="80" cy="66" r="3" fill={C.accent} opacity="0.5"/>
+      <circle cx="20" cy="66" r="3" fill={C.accent} opacity="0.5"/>
+    </svg>
+  ),
+  "MOTS-c": ({size=100}) => (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="36" stroke={C.accent} strokeWidth="0.7" opacity="0.22"/>
+      <circle cx="50" cy="50" r="26" stroke={C.accent} strokeWidth="0.8" opacity="0.38"/>
+      <circle cx="50" cy="50" r="16" stroke={C.accent} strokeWidth="0.9" opacity="0.55"/>
+      <circle cx="50" cy="50" r="5"  fill={C.accent} opacity="0.38"/>
+      {[0,45,90,135,180,225,270,315].map(deg=>{
+        const r=36, rad=deg*Math.PI/180;
+        return <circle key={deg} cx={50+r*Math.cos(rad)} cy={50+r*Math.sin(rad)} r="2.2" fill={C.accent} opacity="0.42"/>;
+      })}
+      {[22.5,67.5,112.5,157.5,202.5,247.5,292.5,337.5].map(deg=>{
+        const r=26, rad=deg*Math.PI/180;
+        return <circle key={`i${deg}`} cx={50+r*Math.cos(rad)} cy={50+r*Math.sin(rad)} r="1.5" fill={C.accent} opacity="0.28"/>;
+      })}
+    </svg>
+  ),
+  "CJC + Ipamorelin": ({size=100}) => (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+      <circle cx="37" cy="50" r="22" stroke={C.accent} strokeWidth="0.9" opacity="0.5"/>
+      <circle cx="63" cy="50" r="22" stroke={C.accent} strokeWidth="0.9" opacity="0.5"/>
+      <path d="M50 30 C56 38 56 62 50 70 C44 62 44 38 50 30 Z" fill={C.accent} opacity="0.07" stroke={C.accent} strokeWidth="0.6" opacity="0.3"/>
+      <circle cx="37" cy="50" r="2.5" fill={C.accent} opacity="0.45"/>
+      <circle cx="63" cy="50" r="2.5" fill={C.accent} opacity="0.45"/>
+      <circle cx="50" cy="50" r="2"   fill={C.accent} opacity="0.7"/>
+    </svg>
+  ),
+};
+
+const FEATURED = [
+  { glyphKey:"Retatrutide",       item: null },
+  { glyphKey:"BPC-157",           item: null },
+  { glyphKey:"GHK-Cu",            item: null },
+  { glyphKey:"MOTS-c",            item: null },
+  { glyphKey:"CJC + Ipamorelin",  item: null },
+];
+// items resolved after arrays defined:
+FEATURED[0].item = KITS.find(k=>k.id==="k1");
+FEATURED[1].item = KITS.find(k=>k.id==="k7");
+FEATURED[2].item = SINGLES.find(s=>s.id==="s5");
+FEATURED[3].item = KITS.find(k=>k.id==="k14");
+FEATURED[4].item = KITS.find(k=>k.id==="k11");
+
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 const Tag = ({label, color}) => (
   <span style={{display:"inline-block",padding:"2px 8px",background:`${color||C.accent}15`,border:`1px solid ${color||C.accent}40`,color:color||C.accent,fontSize:9,letterSpacing:"0.18em",fontFamily:mono,borderRadius:2}}>{label}</span>
 );
+
+// ─── FEATURED CARD ────────────────────────────────────────────────────────────
+function FeaturedCard({item, glyphKey, isLast, onOpenModal, inCart}) {
+  const [hov, setHov] = useState(false);
+  const Glyph = GLYPHS[glyphKey];
+  const cc = CAT[item?.category] || C.accent;
+  if (!item) return null;
+  return (
+    <div
+      onMouseEnter={()=>setHov(true)}
+      onMouseLeave={()=>setHov(false)}
+      onClick={()=>onOpenModal(item)}
+      style={{
+        padding:"36px 28px 32px",
+        borderRight: isLast ? "none" : `1px solid ${C.border}`,
+        cursor:"pointer",
+        transition:"transform 0.38s cubic-bezier(0.22,1,0.36,1), box-shadow 0.38s ease, background 0.22s ease",
+        transform: hov ? "translateY(-8px)" : "translateY(0)",
+        background: hov ? C.surface : "rgba(255,255,255,0.62)",
+        boxShadow: hov ? "0 12px 40px rgba(26,28,30,0.10), 0 2px 8px rgba(26,28,30,0.05)" : "0 1px 6px rgba(26,28,30,0.05), inset 0 0 0 1px rgba(255,255,255,0.7)",
+        borderRadius: 2,
+        display:"flex", flexDirection:"column",
+        position:"relative",
+      }}
+    >
+      {/* Glyph */}
+      <div style={{
+        height:108, display:"flex", alignItems:"center", justifyContent:"center",
+        marginBottom:22,
+        transition:"transform 0.4s ease",
+        transform: hov ? "scale(1.07)" : "scale(1)",
+      }}>
+        {Glyph && <Glyph size={88}/>}
+      </div>
+
+      {/* Thin rule — animates colour on hover */}
+      <div style={{
+        height:1,
+        background: hov ? cc : C.border,
+        marginBottom:18,
+        transition:"background 0.3s ease",
+      }}/>
+
+      {/* Category */}
+      <div style={{
+        fontSize:8, letterSpacing:"0.34em", color:cc,
+        fontFamily:mono, marginBottom:9, textTransform:"uppercase",
+      }}>{item.category}</div>
+
+      {/* Name */}
+      <div style={{
+        fontFamily:serif, fontSize:19, fontWeight:700,
+        color:C.ink, lineHeight:1.2, marginBottom:11,
+        transition:"color 0.2s",
+      }}>{item.name}</div>
+
+      {/* Short desc — 3 lines max */}
+      <p style={{
+        fontSize:12, color:C.ink2, lineHeight:1.85,
+        marginBottom:22, fontFamily:sans, flex:1,
+        display:"-webkit-box", WebkitLineClamp:3,
+        WebkitBoxOrient:"vertical", overflow:"hidden",
+      }}>{item.desc}</p>
+
+      {/* Price + CTA row */}
+      <div style={{display:"flex", alignItems:"baseline", justifyContent:"space-between"}}>
+        <span style={{fontFamily:serif, fontSize:17, fontWeight:700, color:C.ink}}>€{item.sellPrice}</span>
+        <span style={{
+          fontSize:10, color: hov ? cc : C.dim,
+          fontFamily:mono, letterSpacing:"0.12em",
+          borderBottom:`1px solid ${hov ? cc : "transparent"}`,
+          paddingBottom:1,
+          transition:"all 0.22s",
+        }}>Explore →</span>
+      </div>
+
+      {/* In-cart badge */}
+      {inCart && (
+        <div style={{
+          position:"absolute", top:12, right:12,
+          background:C.accentLt, border:`1px solid ${C.accentMd}`,
+          borderRadius:2, padding:"2px 7px",
+          fontSize:8, color:C.accent, fontFamily:mono, letterSpacing:"0.16em",
+        }}>IN ORDER</div>
+      )}
+    </div>
+  );
+}
+
+// ─── FEATURED SECTION ─────────────────────────────────────────────────────────
+function FeaturedSection({onOpenModal, cartIds}) {
+  return (
+    <div style={{
+      background:"#ECEAE4",
+      borderBottom:`1px solid ${C.border}`,
+      padding:"72px 40px 68px",
+      position:"relative", overflow:"hidden",
+    }}>
+      {/* Faint large background letter */}
+      <div style={{
+        position:"absolute", right:-40, top:-20,
+        fontFamily:serif, fontSize:380, fontWeight:700,
+        color:C.border, lineHeight:1, pointerEvents:"none",
+        userSelect:"none", opacity:0.55, letterSpacing:"-0.05em",
+      }}>V</div>
+
+      <div style={{maxWidth:1200, margin:"0 auto", position:"relative", zIndex:1}}>
+        {/* Section header */}
+        <div style={{
+          display:"flex", alignItems:"flex-end",
+          justifyContent:"space-between", marginBottom:52,
+          flexWrap:"wrap", gap:24,
+        }}>
+          <div>
+            <div style={{
+              fontSize:8, letterSpacing:"0.46em", color:C.muted,
+              fontFamily:mono, marginBottom:18, textTransform:"uppercase",
+              display:"flex", alignItems:"center", gap:12,
+            }}>
+              <div style={{width:24, height:"1px", background:C.accentMd}}/>
+              Researcher's Selection · 2025
+            </div>
+            <h2 style={{
+              fontFamily:serif, fontSize:"clamp(28px,3.2vw,46px)",
+              fontWeight:700, color:C.ink, lineHeight:1.08, margin:0,
+            }}>
+              Five compounds<br/>
+              <em style={{fontStyle:"italic", color:C.accent}}>worth knowing.</em>
+            </h2>
+          </div>
+
+          <p style={{
+            fontSize:13, color:C.muted, fontFamily:sans,
+            maxWidth:260, lineHeight:1.85, textAlign:"right",
+          }}>
+            A curated selection of our most-studied research compounds, chosen for breadth of application and depth of published research.
+          </p>
+        </div>
+
+        {/* Full-width divider */}
+        <div style={{
+          height:1,
+          background:`linear-gradient(90deg, ${C.accent}50, ${C.accentMd}, ${C.border}80)`,
+          marginBottom:0,
+        }}/>
+
+        {/* Products grid */}
+        <div style={{
+          display:"grid",
+          gridTemplateColumns:"repeat(5,1fr)",
+        }}>
+          {FEATURED.map(({item, glyphKey}, i) => (
+            <FeaturedCard
+              key={glyphKey}
+              item={item}
+              glyphKey={glyphKey}
+              isLast={i===FEATURED.length-1}
+              onOpenModal={onOpenModal}
+              inCart={item && cartIds.includes(item.name)}
+            />
+          ))}
+        </div>
+
+        {/* Bottom divider */}
+        <div style={{
+          height:1,
+          background:`linear-gradient(90deg, ${C.border}80, ${C.accentMd}, ${C.accent}50)`,
+        }}/>
+
+        {/* Footer note */}
+        <div style={{
+          display:"flex", justifyContent:"flex-end", marginTop:20,
+        }}>
+          <div style={{
+            fontSize:9, color:C.dim, fontFamily:mono,
+            letterSpacing:"0.22em", textTransform:"uppercase",
+          }}>
+            Explore all compounds in the catalogue above ↑
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── LOGO ─────────────────────────────────────────────────────────────────────
 function Logo({size=20}) {
@@ -315,12 +579,13 @@ function ProductModal({item, onClose, onAdd, cartIds}) {
   const cc = CAT[item.category] || C.accent;
 
   return (
-    <div style={{position:"fixed",inset:0,zIndex:3000,background:"rgba(244,242,237,0.9)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={onClose}>
+    <div style={{position:"fixed",inset:0,zIndex:3000,background:"rgba(244,242,237,0.9)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"fadeIn 0.28s ease"}} onClick={onClose}>
       <div onClick={e=>e.stopPropagation()} style={{
         background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:10,
         width:"100%",maxWidth:620,maxHeight:"90vh",overflowY:"auto",
         boxShadow:"0 20px 80px rgba(26,28,30,0.2)",
         display:"flex",flexDirection:"column",
+        animation:"scaleIn 0.32s cubic-bezier(0.22,1,0.36,1)",
       }}>
         {/* Top colour bar */}
         <div style={{height:4,background:`linear-gradient(90deg, ${cc}, ${cc}80)`,borderRadius:"10px 10px 0 0"}}/>
@@ -534,8 +799,8 @@ function CheckoutModal({cart, onClose, onSuccess}) {
   );
 
   return (
-    <div style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(244,242,237,0.88)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-      <div style={{background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:8,width:"100%",maxWidth:520,maxHeight:"92vh",overflowY:"auto",boxShadow:"0 16px 64px rgba(26,28,30,0.18)"}}>
+    <div style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(244,242,237,0.88)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"fadeIn 0.28s ease"}}>
+      <div style={{background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:8,width:"100%",maxWidth:520,maxHeight:"92vh",overflowY:"auto",boxShadow:"0 16px 64px rgba(26,28,30,0.18)",animation:"scaleIn 0.34s cubic-bezier(0.22,1,0.36,1)"}}>
         <div style={{padding:"18px 26px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,background:C.surface,zIndex:1}}>
           <div>
             <div style={{fontFamily:serif,fontSize:15,fontWeight:700,color:C.ink}}>Place Order</div>
@@ -656,12 +921,23 @@ function CheckoutModal({cart, onClose, onSuccess}) {
 }
 
 // ─── CART DRAWER ─────────────────────────────────────────────────────────────
-function CartDrawer({cart, onRemove, onClose, onCheckout}) {
+function CartDrawer({cart, onRemove, onClose, onCheckout, visible}) {
   const total = cart.reduce((s,p)=>s+p.sellPrice,0);
   return (
     <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex"}}>
-      <div onClick={onClose} style={{flex:1,background:"rgba(244,242,237,0.7)",backdropFilter:"blur(4px)"}}/>
-      <div style={{width:340,background:C.surface,borderLeft:`1px solid ${C.border}`,display:"flex",flexDirection:"column",boxShadow:"-4px 0 24px rgba(26,28,30,0.12)"}}>
+      <div onClick={onClose} style={{
+        flex:1, background:"rgba(244,242,237,0.7)", backdropFilter:"blur(4px)",
+        opacity: visible ? 1 : 0,
+        transition:"opacity 0.34s ease",
+      }}/>
+      <div style={{
+        width:340, background:C.surface,
+        borderLeft:`1px solid ${C.border}`,
+        display:"flex", flexDirection:"column",
+        boxShadow:"-4px 0 32px rgba(26,28,30,0.14)",
+        transform: visible ? "translateX(0)" : "translateX(100%)",
+        transition:"transform 0.38s cubic-bezier(0.22,1,0.36,1)",
+      }}>
         <div style={{padding:"18px 22px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <div>
             <div style={{fontFamily:serif,fontSize:15,fontWeight:700,color:C.ink}}>Your Order</div>
@@ -809,20 +1085,36 @@ function AdminPanel({orders, onClose}) {
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function App() {
-  const [unlocked, setUnlocked]       = useState(false);
-  const [tab, setTab]                 = useState("kits");
-  const [catFilter, setCatFilter]     = useState("All");
-  const [cart, setCart]               = useState([]);
-  const [cartOpen, setCartOpen]       = useState(false);
+  const [unlocked, setUnlocked]         = useState(false);
+  const [tab, setTab]                   = useState("kits");
+  const [catFilter, setCatFilter]       = useState("All");
+  const [cart, setCart]                 = useState([]);
+  const [cartOpen, setCartOpen]         = useState(false);
+  const [cartVisible, setCartVisible]   = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [orders, setOrders]           = useState([]);
-  const [adminOpen, setAdminOpen]     = useState(false);
-  const [showAdmin, setShowAdmin]     = useState(false);
-  const [adminInput, setAdminInput]   = useState("");
-  const [successMsg, setSuccessMsg]   = useState(false);
-  const [modalItem, setModalItem]     = useState(null);
+  const [orders, setOrders]             = useState([]);
+  const [adminOpen, setAdminOpen]       = useState(false);
+  const [showAdmin, setShowAdmin]       = useState(false);
+  const [adminInput, setAdminInput]     = useState("");
+  const [successMsg, setSuccessMsg]     = useState(false);
+  const [modalItem, setModalItem]       = useState(null);
+  const catalogueRef = useRef(null);
 
   if (!unlocked) return <PasswordGate onUnlock={()=>setUnlocked(true)}/>;
+
+  const scrollToCatalogue = () => {
+    setTimeout(()=>{
+      catalogueRef.current?.scrollIntoView({behavior:"smooth", block:"start"});
+    }, 60);
+  };
+
+  const handleTabClick = (id) => {
+    setTab(id);
+    if (id !== "kits") scrollToCatalogue();
+  };
+
+  const openCart = () => { setCartOpen(true); setTimeout(()=>setCartVisible(true),20); };
+  const closeCart = () => { setCartVisible(false); setTimeout(()=>setCartOpen(false),340); };
 
   const cartIds   = cart.map(p=>p.name);
   const addToCart = item => { if(!cartIds.includes(item.name)) setCart(p=>[...p,item]); };
@@ -850,12 +1142,12 @@ export default function App() {
         <Logo size={16}/>
         <nav style={{display:"flex",gap:2}}>
           {[["kits","Kits"],["singles","Singles"],["stacks","Stacks"]].map(([id,label])=>(
-            <button key={id} onClick={()=>setTab(id)} style={{padding:"7px 16px",background:tab===id?C.accentLt:"transparent",border:"none",borderBottom:`2px solid ${tab===id?C.accent:"transparent"}`,color:tab===id?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:tab===id?600:400,cursor:"pointer",transition:"all 0.18s"}}>{label}</button>
+            <button key={id} onClick={()=>handleTabClick(id)} style={{padding:"7px 16px",background:tab===id?C.accentLt:"transparent",border:"none",borderBottom:`2px solid ${tab===id?C.accent:"transparent"}`,color:tab===id?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:tab===id?600:400,cursor:"pointer",transition:"all 0.24s"}}>{label}</button>
           ))}
         </nav>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
           <button onClick={()=>setShowAdmin(!showAdmin)} style={{background:"none",border:"none",color:C.dim,cursor:"pointer",fontSize:14,padding:"4px 6px"}}>⚙</button>
-          <button onClick={()=>setCartOpen(true)} style={{padding:"8px 16px",background:cart.length>0?C.accentLt:C.surface,border:`1px solid ${cart.length>0?C.accentMd:C.border}`,color:cart.length>0?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:500,cursor:"pointer",borderRadius:4,transition:"all 0.18s"}}>
+          <button onClick={openCart} style={{padding:"8px 16px",background:cart.length>0?C.accentLt:C.surface,border:`1px solid ${cart.length>0?C.accentMd:C.border}`,color:cart.length>0?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:500,cursor:"pointer",borderRadius:4,transition:"all 0.24s"}}>
             Order{cart.length>0?` (${cart.length})`:""}
           </button>
         </div>
@@ -872,39 +1164,70 @@ export default function App() {
 
       <div style={{position:"relative",zIndex:1}}>
         {/* HERO */}
-        <div style={{padding:"64px 40px 48px",borderBottom:`1px solid ${C.border}`,background:C.surface}}>
-          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"flex-end",justifyContent:"space-between",flexWrap:"wrap",gap:24}}>
-            <div>
-              <div style={{fontSize:8,letterSpacing:"0.38em",color:C.accent,fontFamily:mono,marginBottom:18,textTransform:"uppercase"}}>Research Compounds · EU Compliant</div>
-              <h1 style={{fontFamily:serif,fontWeight:700,fontSize:"clamp(30px,4vw,56px)",lineHeight:1.1,color:C.ink,margin:"0 0 18px",maxWidth:620}}>
+        <div style={{padding:"72px 40px 60px",borderBottom:`1px solid ${C.border}`,background:C.surface,position:"relative",overflow:"hidden"}}>
+          {/* Faint background grid lines — editorial texture */}
+          <div style={{position:"absolute",inset:0,backgroundImage:`linear-gradient(${C.border}40 1px,transparent 1px)`,backgroundSize:"100% 64px",pointerEvents:"none",opacity:0.6}}/>
+
+          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"flex-end",justifyContent:"space-between",flexWrap:"wrap",gap:32,position:"relative",zIndex:1}}>
+
+            {/* Left text column with editorial rule */}
+            <div style={{borderLeft:`2px solid ${C.accent}`,paddingLeft:32,maxWidth:580}}>
+              <div style={{fontSize:8,letterSpacing:"0.42em",color:C.accent,fontFamily:mono,marginBottom:20,textTransform:"uppercase",display:"flex",alignItems:"center",gap:10}}>
+                Research Compounds · EU Compliant
+              </div>
+
+              <h1 style={{fontFamily:serif,fontWeight:700,fontSize:"clamp(32px,4vw,58px)",lineHeight:1.06,color:C.ink,margin:"0 0 0"}}>
                 Premium Peptide<br/>Research Compounds<br/><em style={{color:C.accent,fontStyle:"italic"}}>for Europe.</em>
               </h1>
-              <p style={{color:C.ink2,maxWidth:460,lineHeight:1.9,fontSize:14,marginBottom:22,fontFamily:sans}}>
+
+              {/* Diamond divider */}
+              <div style={{display:"flex",alignItems:"center",gap:10,margin:"22px 0",opacity:0.5}}>
+                <div style={{flex:1,height:1,background:C.accentMd}}/>
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                  <rect x="1" y="1" width="6" height="6" stroke={C.accent} strokeWidth="0.9" transform="rotate(45 4 4)"/>
+                </svg>
+                <div style={{flex:1,height:1,background:C.accentMd}}/>
+              </div>
+
+              <p style={{color:C.ink2,lineHeight:1.95,fontSize:14,marginBottom:26,fontFamily:sans}}>
                 Pharmaceutical-grade research peptides for serious scientific protocols. Available as kits or individual vials, with EU-wide delivery. Strictly for in-vitro and laboratory use only.
               </p>
-              <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"7px 13px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:3,fontSize:9,color:C.red,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>
+
+              <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"7px 14px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:2,fontSize:9,color:C.red,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>
                 ⚠ Not for human use · Research purposes only · 18+
               </div>
             </div>
-            <div style={{display:"flex",gap:32,flexShrink:0}}>
-              {[["15","Peptide Kits"],["7","Single Vials"],["4","Research Protocols"]].map(([n,l])=>(
-                <div key={l} style={{textAlign:"center"}}>
-                  <div style={{fontFamily:serif,fontSize:32,fontWeight:700,color:C.ink,lineHeight:1}}>{n}</div>
-                  <div style={{fontSize:9,color:C.muted,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.18em",marginTop:4}}>{l}</div>
+
+            {/* Stats — editorial column style */}
+            <div style={{display:"flex",flexDirection:"column",gap:0,flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:40}}>
+              {[["15","Peptide Kits"],["07","Single Vials"],["04","Research Protocols"]].map(([n,l],i,arr)=>(
+                <div key={l} style={{
+                  padding:"18px 0",
+                  borderBottom: i<arr.length-1 ? `1px solid ${C.border}` : "none",
+                  minWidth:160,
+                }}>
+                  <div style={{fontFamily:serif,fontSize:36,fontWeight:700,color:C.ink,lineHeight:1,letterSpacing:"-0.02em"}}>{n}</div>
+                  <div style={{fontSize:9,color:C.muted,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.22em",marginTop:5}}>{l}</div>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* FILTER BAR */}
-        <div style={{borderBottom:`1px solid ${C.border}`,background:C.surface,padding:"0 40px"}}>
+        {/* FEATURED SELECTION */}
+        <FeaturedSection onOpenModal={setModalItem} cartIds={cartIds}/>
+
+        {/* FILTER BAR — catalogue anchor */}
+        <div ref={catalogueRef} style={{borderBottom:`1px solid ${C.border}`,background:C.surface,padding:"0 40px"}}>
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:0}}>
             {CATS.map(c=>(
-              <button key={c} onClick={()=>setCatFilter(c)} style={{padding:"14px 18px",background:"transparent",border:"none",borderBottom:`2px solid ${catFilter===c?(CAT[c]||C.accent):"transparent"}`,color:catFilter===c?(CAT[c]||C.accent):C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",transition:"all 0.18s",textTransform:"uppercase"}}>{c}</button>
+              <button key={c} onClick={()=>setCatFilter(c)} style={{padding:"14px 18px",background:"transparent",border:"none",borderBottom:`2px solid ${catFilter===c?(CAT[c]||C.accent):"transparent"}`,color:catFilter===c?(CAT[c]||C.accent):C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",transition:"all 0.24s",textTransform:"uppercase"}}>{c}</button>
             ))}
           </div>
         </div>
+
+        {/* ANIMATED CATALOGUE CONTENT */}
+        <div key={tab} className="tab-enter">
 
         {/* KITS */}
         {tab==="kits"&&(
@@ -913,7 +1236,7 @@ export default function App() {
               <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Research Kits</h2>
               <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>10 vials per kit · best value · click any card for full details</span>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(308px,1fr))",gap:14}}>
+            <div key={catFilter} className="filter-enter" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(308px,1fr))",gap:14}}>
               {fKits.map(p=><KitCard key={p.id} item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/>)}
             </div>
           </div>
@@ -926,7 +1249,7 @@ export default function App() {
               <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Single Vials</h2>
               <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>individual compounds · click any row for full details</span>
             </div>
-            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            <div key={catFilter} className="filter-enter" style={{display:"flex",flexDirection:"column",gap:10}}>
               {fSingles.map(p=><SingleRow key={p.id} item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/>)}
             </div>
             <div style={{height:1,background:C.border,margin:"36px 0"}}/>
@@ -944,11 +1267,13 @@ export default function App() {
               <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Research Protocols</h2>
               <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>curated combinations · 15% bundle discount</span>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(310px,1fr))",gap:16}}>
+            <div key={catFilter} className="filter-enter" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(310px,1fr))",gap:16}}>
               {fStacks.map(s=><StackCard key={s.name} stack={s} onAddStack={addStack} cartIds={cartIds}/>)}
             </div>
           </div>
         )}
+
+        </div>{/* end animated catalogue content */}
 
         {/* FOOTER */}
         <footer style={{borderTop:`1px solid ${C.border}`,background:C.surface,padding:"28px 40px",textAlign:"center"}}>
@@ -963,7 +1288,7 @@ export default function App() {
       {modalItem && <ProductModal item={modalItem} onClose={()=>setModalItem(null)} onAdd={addToCart} cartIds={cartIds}/>}
 
       {/* CART */}
-      {cartOpen&&<CartDrawer cart={cart} onRemove={i=>setCart(p=>p.filter((_,j)=>j!==i))} onClose={()=>setCartOpen(false)} onCheckout={()=>{setCartOpen(false);setCheckoutOpen(true);}}/>}
+      {cartOpen&&<CartDrawer cart={cart} onRemove={i=>setCart(p=>p.filter((_,j)=>j!==i))} onClose={closeCart} onCheckout={()=>{closeCart();setTimeout(()=>setCheckoutOpen(true),360);}} visible={cartVisible}/>}
 
       {/* CHECKOUT */}
       {checkoutOpen&&<CheckoutModal cart={cart} onClose={()=>setCheckoutOpen(false)} onSuccess={handleSuccess}/>}
@@ -973,7 +1298,7 @@ export default function App() {
 
       {/* SUCCESS */}
       {successMsg&&(
-        <div style={{position:"fixed",bottom:32,left:"50%",transform:"translateX(-50%)",background:C.surface,border:`1px solid ${C.accentMd}`,padding:"16px 28px",borderRadius:5,zIndex:4000,fontFamily:sans,fontSize:13,color:C.ink,textAlign:"center",lineHeight:1.8,boxShadow:"0 8px 40px rgba(26,28,30,0.18)"}}>
+        <div className="success-toast" style={{position:"fixed",bottom:32,left:"50%",transform:"translateX(-50%)",background:C.surface,border:`1px solid ${C.accentMd}`,padding:"16px 28px",borderRadius:5,zIndex:4000,fontFamily:sans,fontSize:13,color:C.ink,textAlign:"center",lineHeight:1.8,boxShadow:"0 8px 40px rgba(26,28,30,0.18)"}}>
           <span style={{color:C.accent,fontWeight:700}}>✓ Order received</span><br/>
           <span style={{color:C.muted,fontSize:12}}>Check your email — we confirm within 24 hours.</span>
         </div>
@@ -985,6 +1310,50 @@ export default function App() {
         ::-webkit-scrollbar{width:4px;}
         ::-webkit-scrollbar-track{background:${C.bg};}
         ::-webkit-scrollbar-thumb{background:${C.borderMd};border-radius:2px;}
+
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+        @keyframes fadeIn{
+          from{opacity:0}
+          to{opacity:1}
+        }
+        @keyframes scaleIn{
+          from{opacity:0;transform:scale(0.94) translateY(12px)}
+          to{opacity:1;transform:scale(1) translateY(0)}
+        }
+        @keyframes slideUp{
+          from{opacity:0;transform:translateY(20px)}
+          to{opacity:1;transform:translateY(0)}
+        }
+        @keyframes slideInRight{
+          from{transform:translateX(100%)}
+          to{transform:translateX(0)}
+        }
+
+        .tab-enter{
+          animation: slideUp 0.38s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .filter-enter{
+          animation: filterSwitch 0.52s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        @keyframes filterSwitch{
+          from{opacity:0;transform:translateY(16px);filter:blur(4px)}
+          to{opacity:1;transform:translateY(0);filter:blur(0)}
+        }
+
+        button{transition:all 0.22s ease;}
+        button:active{transform:scale(0.97);}
+
+        input:focus{outline:none;}
+
+        @keyframes successPop{
+          0%{opacity:0;transform:translateX(-50%) translateY(16px) scale(0.95)}
+          60%{transform:translateX(-50%) translateY(-3px) scale(1.02)}
+          100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+        }
+        .success-toast{
+          animation: successPop 0.44s cubic-bezier(0.22,1,0.36,1) both;
+        }
       `}</style>
     </div>
   );
