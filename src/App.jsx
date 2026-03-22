@@ -1473,7 +1473,7 @@ export default function App() {
         </div>
       )}
 
-      <div style={{position:"relative",zIndex:1,background:C.bg,paddingTop:64}}>
+      <div className="main-content" style={{position:"relative",zIndex:1,background:C.bg,paddingTop:64}}>
         {/* HERO */}
         <div style={{position:"relative",overflow:"hidden",borderBottom:`1px solid ${C.border}`,minHeight:520}}>
           <WaveCanvas/>
@@ -1496,6 +1496,14 @@ export default function App() {
               </p>
               <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"7px 14px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:R.xs,fontSize:10,color:C.red,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>
                 ⚠ Not for human use · Research purposes only · 18+
+              </div>
+              <div className="hero-stats-mobile" style={{display:"none",borderTop:`1px solid ${C.border}`,marginTop:16,paddingTop:14,gap:0}}>
+                {[["15","Kits"],["07","Singles"],["04","Protocols"],["EU","Delivery"]].map(([n,l],i,arr)=>(
+                  <div key={l} style={{flex:1,textAlign:"center",paddingTop:2,borderRight:i<arr.length-1?`1px solid ${C.border}`:"none"}}>
+                    <div style={{fontFamily:serif,fontSize:20,fontWeight:700,color:C.ink,lineHeight:1}}>{n}</div>
+                    <div style={{fontSize:7,color:C.muted,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em",marginTop:3}}>{l}</div>
+                  </div>
+                ))}
               </div>
             </div>
             <div style={{flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:52,minWidth:280}}>
@@ -1601,19 +1609,21 @@ export default function App() {
       {adminOpen&&<AdminPanel orders={orders} onClose={()=>setAdminOpen(false)}/>}
 
       {/* MOBILE BOTTOM NAV */}
-      <div className="mobile-bottom-bar" style={{display:"none",position:"fixed",bottom:0,left:0,right:0,zIndex:500,background:"rgba(255,255,255,0.95)",backdropFilter:"blur(16px)",borderTop:`1px solid ${C.border}`,height:64,alignItems:"center",justifyContent:"space-around",padding:"0 8px"}}>
-        {[["kits","Kits"],["singles","Singles"],["stacks","Stacks"]].map(([id,label])=>(
-          <button key={id} onClick={()=>handleTabClick(id)} style={{flex:1,height:"100%",background:"none",border:"none",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,cursor:"pointer",color:tab===id?C.accent:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",borderTop:tab===id?`2px solid ${C.accent}`:"2px solid transparent",transition:"all 0.2s"}}>
-            <span style={{fontSize:18}}>
-              {id==="kits"?"◫":id==="singles"?"◎":"◱"}
-            </span>
-            {label}
+      <div className="mobile-bottom-bar" style={{display:"none",position:"fixed",bottom:0,left:0,right:0,zIndex:500,background:"rgba(255,255,255,0.96)",borderTop:`1px solid ${C.border}`,height:68,alignItems:"stretch",justifyContent:"space-around",padding:"0"}}>
+        {[
+          {id:"kits",label:"Kits",icon:<svg viewBox="0 0 20 20" fill="none" width="20" height="20"><rect x="3" y="6" width="14" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.4"/><path d="M7 6V5a3 3 0 0 1 6 0v1" stroke="currentColor" strokeWidth="1.4"/><line x1="7" y1="11" x2="13" y2="11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>},
+          {id:"singles",label:"Singles",icon:<svg viewBox="0 0 20 20" fill="none" width="20" height="20"><circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.4"/><line x1="10" y1="6" x2="10" y2="14" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><line x1="6" y1="10" x2="14" y2="10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>},
+          {id:"stacks",label:"Stacks",icon:<svg viewBox="0 0 20 20" fill="none" width="20" height="20"><rect x="3" y="13" width="14" height="3" rx="1" stroke="currentColor" strokeWidth="1.4"/><rect x="5" y="8.5" width="10" height="3" rx="1" stroke="currentColor" strokeWidth="1.4"/><rect x="7" y="4" width="6" height="3" rx="1" stroke="currentColor" strokeWidth="1.4"/></svg>},
+        ].map(({id,label,icon})=>(
+          <button key={id} onClick={()=>handleTabClick(id)} style={{flex:1,background:"none",border:"none",borderTop:tab===id?`2px solid ${C.accent}`:"2px solid transparent",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,cursor:"pointer",color:tab===id?C.accent:C.muted,transition:"all 0.2s",padding:0}}>
+            {icon}
+            <span style={{fontSize:9,fontFamily:mono,letterSpacing:"0.08em",textTransform:"uppercase"}}>{label}</span>
           </button>
         ))}
-        <button onClick={openCart} style={{flex:1,height:"100%",background:"none",border:"none",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,cursor:"pointer",color:cart.length>0?C.accent:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",borderTop:cart.length>0?`2px solid ${C.accent}`:"2px solid transparent",transition:"all 0.2s",position:"relative"}}>
-          {cart.length>0&&<div style={{position:"absolute",top:10,right:"calc(50% - 14px)",width:16,height:16,background:C.accent,borderRadius:"50%",fontSize:9,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>{cart.length}</div>}
-          <span style={{fontSize:18}}>◳</span>
-          Order
+        <button onClick={openCart} style={{flex:1,background:"none",border:"none",borderTop:cart.length>0?`2px solid ${C.accent}`:"2px solid transparent",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,cursor:"pointer",color:cart.length>0?C.accent:C.muted,transition:"all 0.2s",padding:0,position:"relative"}}>
+          {cart.length>0&&<div style={{position:"absolute",top:8,right:"calc(50% - 16px)",width:16,height:16,background:C.accent,borderRadius:"50%",fontSize:9,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontFamily:mono}}>{cart.length}</div>}
+          <svg viewBox="0 0 20 20" fill="none" width="20" height="20"><path d="M3 4h2l2.5 8h7l2-5H6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="15.5" r="1.2" fill="currentColor"/><circle cx="14" cy="15.5" r="1.2" fill="currentColor"/></svg>
+          <span style={{fontSize:9,fontFamily:mono,letterSpacing:"0.08em",textTransform:"uppercase"}}>{cart.length>0?`(${cart.length})`:"Order"}</span>
         </button>
       </div>
 
@@ -1678,19 +1688,68 @@ export default function App() {
         }
 
         @media (max-width: 768px) {
-          header { padding: 0 16px !important; height: 56px !important; }
+          header { padding: 0 16px !important; height: 52px !important; }
           header > div:nth-child(2) { display: none !important; }
           .mobile-bottom-bar { display: flex !important; }
-          div[style*="paddingTop:64"] { padding-top: 56px !important; padding-bottom: 80px !important; }
-          .hero-content { flex-direction: column !important; padding: 40px 20px 36px !important; }
-          .hero-content > div:first-child { border-left: 2px solid #2C5F54; padding-left: 20px !important; max-width: 100% !important; }
-          .hero-content > div:last-child { border-left: none !important; border-top: 1px solid #E2DFD9; padding-left: 0 !important; padding-top: 24px !important; min-width: unset !important; width: 100% !important; }
-          .featured-grid { grid-template-columns: repeat(5,1fr) !important; overflow-x: auto !important; }
+
+          .main-content { padding-top: 52px !important; padding-bottom: 80px !important; }
+
+          .hero-content {
+            flex-direction: column !important;
+            padding: 24px 18px 20px !important;
+            gap: 0 !important;
+          }
+          .hero-content > div:first-child {
+            border-left: 2px solid #2C5F54 !important;
+            padding-left: 16px !important;
+            max-width: 100% !important;
+          }
+          .hero-content > div:last-child { display: none !important; }
+          .hero-stats-mobile { display: flex !important; }
+
+          .hero-content h1 { font-size: clamp(26px, 7vw, 36px) !important; }
+          .hero-content p { font-size: 13px !important; }
+
+          .featured-grid {
+            grid-template-columns: repeat(5, 200px) !important;
+            overflow-x: auto !important;
+            padding-bottom: 8px !important;
+          }
+
           .catalogue-grid { grid-template-columns: 1fr !important; }
-          .filter-bar { overflow-x: auto !important; white-space: nowrap !important; }
-          .cart-drawer { width: 100% !important; }
-          .modal-panel { max-width: 100% !important; max-height: 100vh !important; border-radius: 0 !important; margin: 0 !important; }
-          .checkout-panel { max-width: 100% !important; border-radius: 0 !important; }
+
+          .filter-bar { overflow-x: auto !important; white-space: nowrap !important; -webkit-overflow-scrolling: touch !important; }
+
+          .catalogue-grid .card-padding { padding: 16px !important; }
+
+          .cart-drawer {
+            width: 100% !important;
+            max-height: 85vh !important;
+            top: auto !important;
+            border-left: none !important;
+            border-top: 1px solid #E2DFD9 !important;
+            border-radius: 16px 16px 0 0 !important;
+          }
+
+          .modal-panel {
+            max-width: 100% !important;
+            max-height: 100dvh !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            height: 100dvh !important;
+          }
+          .checkout-panel {
+            max-width: 100% !important;
+            border-radius: 0 !important;
+            height: 100dvh !important;
+            max-height: 100dvh !important;
+          }
+
+          div[style*="maxWidth:1200"] { padding-left: 16px !important; padding-right: 16px !important; }
+
+          div[style*="72px 40px 68px"] { padding: 40px 16px 36px !important; }
+
+          footer { padding: 24px 16px 90px !important; }
         }
       `}</style>
     </div>
