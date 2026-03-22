@@ -784,19 +784,19 @@ function AnimatedStats() {
   }, []);
   const s = stats[idx];
   return (
-    <div style={{display:"flex",flexDirection:"column",justifyContent:"center",minHeight:140}}>
-      <div style={{fontSize:8,letterSpacing:"0.36em",color:"rgba(122,126,132,0.8)",fontFamily:"'Courier Prime','Courier New',monospace",marginBottom:10,textTransform:"uppercase",opacity:visible?1:0,transition:"opacity 0.28s ease"}}>
+    <div style={{display:"flex",flexDirection:"column",justifyContent:"center",minHeight:180}}>
+      <div style={{fontSize:10,letterSpacing:"0.36em",color:"rgba(122,126,132,0.8)",fontFamily:"'Courier Prime','Courier New',monospace",marginBottom:10,textTransform:"uppercase",opacity:visible?1:0,transition:"opacity 0.28s ease"}}>
         What we offer
       </div>
-      <div style={{fontFamily:"'Libre Baskerville',Georgia,serif",fontSize:60,fontWeight:700,color:"#1A1C1E",lineHeight:1,letterSpacing:"-0.03em",transform:visible?"translateY(0)":"translateY(-14px)",opacity:visible?1:0,transition:"all 0.32s cubic-bezier(0.22,1,0.36,1)"}}>
+      <div style={{fontFamily:"'Libre Baskerville',Georgia,serif",fontSize:80,fontWeight:700,color:"#1A1C1E",lineHeight:1,letterSpacing:"-0.03em",transform:visible?"translateY(0)":"translateY(-14px)",opacity:visible?1:0,transition:"all 0.32s cubic-bezier(0.22,1,0.36,1)"}}>
         {s.n}
       </div>
-      <div style={{fontSize:10,color:"#2C5F54",fontFamily:"'Courier Prime','Courier New',monospace",textTransform:"uppercase",letterSpacing:"0.22em",marginTop:10,transform:visible?"translateY(0)":"translateY(10px)",opacity:visible?1:0,transition:"all 0.36s cubic-bezier(0.22,1,0.36,1) 0.06s"}}>
+      <div style={{fontSize:12,color:"#2C5F54",fontFamily:"'Courier Prime','Courier New',monospace",textTransform:"uppercase",letterSpacing:"0.22em",marginTop:10,transform:visible?"translateY(0)":"translateY(10px)",opacity:visible?1:0,transition:"all 0.36s cubic-bezier(0.22,1,0.36,1) 0.06s"}}>
         {s.label}
       </div>
       <div style={{display:"flex",gap:5,marginTop:16}}>
         {stats.map((_,i)=>(
-          <div key={i} style={{width:i===idx?18:5,height:5,borderRadius:3,background:i===idx?"#2C5F54":"#C2D9D5",transition:"all 0.4s ease"}}/>
+          <div key={i} style={{width:i===idx?24:6,height:6,borderRadius:3,background:i===idx?"#2C5F54":"#C2D9D5",transition:"all 0.4s ease"}}/>
         ))}
       </div>
     </div>
@@ -1473,14 +1473,14 @@ export default function App() {
       <div style={{position:"relative",zIndex:1}}>
         {/* HERO */}
         <div style={{position:"relative",overflow:"hidden",borderBottom:`1px solid ${C.border}`,minHeight:520}}>
-          <SpiralCanvas/>
-          <div style={{position:"absolute",inset:0,background:"rgba(244,242,237,0.52)",pointerEvents:"none"}}/>
+          <WaveCanvas/>
+          <div style={{position:"absolute",inset:0,background:"rgba(244,242,237,0.72)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",pointerEvents:"none"}}/>
           <div style={{position:"relative",zIndex:2,maxWidth:1200,margin:"0 auto",padding:"80px 40px 72px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:40}}>
             <div style={{borderLeft:`2px solid ${C.accent}`,paddingLeft:32,maxWidth:580}}>
-              <div style={{fontSize:8,letterSpacing:"0.42em",color:C.accent,fontFamily:mono,marginBottom:20,textTransform:"uppercase"}}>
+              <div style={{fontSize:10,letterSpacing:"0.42em",color:C.accent,fontFamily:mono,marginBottom:20,textTransform:"uppercase"}}>
                 Research Compounds · EU Compliant
               </div>
-              <h1 style={{fontFamily:serif,fontWeight:700,fontSize:"clamp(32px,4vw,58px)",lineHeight:1.06,color:C.ink,margin:0}}>
+              <h1 style={{fontFamily:serif,fontWeight:700,fontSize:"clamp(38px,5vw,72px)",lineHeight:1.06,color:C.ink,margin:0}}>
                 Premium Peptide<br/>Research Compounds<br/><em style={{color:C.accent,fontStyle:"italic"}}>for Europe.</em>
               </h1>
               <div style={{display:"flex",alignItems:"center",gap:10,margin:"22px 0",opacity:0.5}}>
@@ -1488,14 +1488,14 @@ export default function App() {
                 <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><rect x="1" y="1" width="6" height="6" stroke={C.accent} strokeWidth="0.9" transform="rotate(45 4 4)"/></svg>
                 <div style={{flex:1,height:1,background:C.accentMd}}/>
               </div>
-              <p style={{color:C.ink2,lineHeight:1.95,fontSize:14,marginBottom:26,fontFamily:sans}}>
+              <p style={{color:C.ink2,lineHeight:1.95,fontSize:16,marginBottom:26,fontFamily:sans}}>
                 Pharmaceutical-grade research peptides for serious scientific protocols. Available as kits or individual vials, with EU-wide delivery. Strictly for in-vitro and laboratory use only.
               </p>
-              <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"7px 14px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:R.xs,fontSize:9,color:C.red,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>
+              <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"7px 14px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:R.xs,fontSize:10,color:C.red,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>
                 ⚠ Not for human use · Research purposes only · 18+
               </div>
             </div>
-            <div style={{flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:40,minWidth:200}}>
+            <div style={{flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:48,minWidth:240}}>
               <AnimatedStats/>
             </div>
           </div>
