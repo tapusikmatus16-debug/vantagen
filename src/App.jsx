@@ -465,6 +465,61 @@ function ScrollTiltSection({children}) {
   );
 }
 
+// ─── SCROLL REVEAL ITEM ──────────────────────────────────────────────────────
+function ScrollRevealItem({ children, index = 0 }) {
+  const ref = useRef(null);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.opacity = "0";
+    el.style.transform = "translateY(28px)";
+    el.style.transition = `opacity 0.55s ease ${index * 0.07}s, transform 0.55s cubic-bezier(0.22,1,0.36,1) ${index * 0.07}s`;
+    const onScroll = () => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 120) {
+        el.style.opacity = "1";
+        el.style.transform = "translateY(0)";
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive:true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return <div ref={ref}>{children}</div>;
+}
+
+// ─── TUBELIGHT NAV ───────────────────────────────────────────────────────────
+function TubelightNav({ tab, onTabChange }) {
+  const items = [{ id:"kits",label:"Kits" },{ id:"singles",label:"Singles" },{ id:"stacks",label:"Stacks" }];
+  const containerRef = useRef(null);
+  const itemRefs = useRef([]);
+  const [ind, setInd] = React.useState({ left:0, width:0 });
+  const [mounted, setMounted] = React.useState(false);
+  const updateInd = () => {
+    const idx = items.findIndex(i=>i.id===tab);
+    const el = itemRefs.current[idx];
+    const box = containerRef.current;
+    if (!el||!box) return;
+    const cr=box.getBoundingClientRect(); const er=el.getBoundingClientRect();
+    setInd({ left:er.left-cr.left, width:er.width });
+  };
+  React.useEffect(()=>{ const t=setTimeout(()=>{setMounted(true);updateInd();},30); return()=>clearTimeout(t); },[]);
+  React.useEffect(()=>{ if(mounted) updateInd(); },[tab,mounted]);
+  const glowX = ind.left + ind.width/2;
+  return (
+    <div ref={containerRef} style={{ display:"flex", alignItems:"center", background:"rgba(255,255,255,0.72)", border:`1px solid ${C.border}`, backdropFilter:"blur(18px)", WebkitBackdropFilter:"blur(18px)", padding:"4px", borderRadius:100, position:"relative", boxShadow:`0 2px 20px rgba(44,95,84,0.10)` }}>
+      <div style={{ position:"absolute", top:4, bottom:4, left:ind.left, width:ind.width, background:C.accentLt, border:`1px solid ${C.accentMd}`, borderRadius:100, transition:mounted?"left 0.44s cubic-bezier(0.22,1,0.36,1),width 0.44s cubic-bezier(0.22,1,0.36,1)":"none", pointerEvents:"none", zIndex:0 }}/>
+      <div style={{ position:"absolute", top:0, left:glowX-16, width:32, height:3, background:C.accent, borderRadius:"0 0 8px 8px", transition:mounted?"left 0.44s cubic-bezier(0.22,1,0.36,1)":"none", boxShadow:`0 0 8px ${C.accent}AA,0 0 20px ${C.accent}66,0 0 40px ${C.accent}33`, pointerEvents:"none", zIndex:2 }}/>
+      {items.map((item,i)=>(
+        <button key={item.id} ref={el=>{itemRefs.current[i]=el;}} onClick={()=>onTabChange(item.id)}
+          style={{ position:"relative", padding:"8px 24px", background:"transparent", border:"none", borderRadius:100, cursor:"pointer", color:tab===item.id?C.accent:C.muted, fontFamily:sans, fontSize:13, fontWeight:tab===item.id?600:400, transition:"color 0.28s", zIndex:1 }}>
+          {item.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 const Tag = ({label, color}) => (
   <span style={{display:"inline-block",padding:"2px 8px",background:`${color||C.accent}15`,border:`1px solid ${color||C.accent}40`,color:color||C.accent,fontSize:9,letterSpacing:"0.18em",fontFamily:mono,borderRadius:R.xs}}>{label}</span>
@@ -649,6 +704,67 @@ function FeaturedSection({onOpenModal, cartIds}) {
             Explore all compounds in the catalogue above ↑
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── ANIMATED STATS ───────────────────────────────────────────────────────────
+function AnimatedStats() {
+  const stats = [
+    { n:"15", label:"Peptide Kits" },
+    { n:"07", label:"Single Vials" },
+    { n:"04", label:"Research Protocols" },
+    { n:"EU", label:"Compliant Delivery" },
+    { n:"5",  label:"Payment Methods" },
+  ];
+  const [idx, setIdx] = React.useState(0);
+  const [visible, setVisible] = React.useState(true);
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIdx(i => (i + 1) % stats.length);
+        setVisible(true);
+      }, 320);
+    }, 2200);
+    return () => clearInterval(interval);
+  }, []);
+  const s = stats[idx];
+  return (
+    <div style={{ display:"flex", flexDirection:"column", justifyContent:"center", minHeight:160 }}>
+      <div style={{
+        fontSize:8, letterSpacing:"0.36em", color:C.muted,
+        fontFamily:mono, marginBottom:14, textTransform:"uppercase",
+        opacity: visible ? 1 : 0,
+        transition:"opacity 0.3s ease",
+      }}>
+        What we offer
+      </div>
+      <div style={{
+        fontFamily:serif, fontSize:64, fontWeight:700, color:C.ink,
+        lineHeight:1, letterSpacing:"-0.03em",
+        transform: visible ? "translateY(0)" : "translateY(-12px)",
+        opacity: visible ? 1 : 0,
+        transition:"all 0.32s cubic-bezier(0.22,1,0.36,1)",
+      }}>{s.n}</div>
+      <div style={{
+        fontSize:10, color:C.accent, fontFamily:mono,
+        textTransform:"uppercase", letterSpacing:"0.22em", marginTop:10,
+        transform: visible ? "translateY(0)" : "translateY(8px)",
+        opacity: visible ? 1 : 0,
+        transition:"all 0.36s cubic-bezier(0.22,1,0.36,1) 0.06s",
+      }}>{s.label}</div>
+      {/* Dot indicators */}
+      <div style={{ display:"flex", gap:5, marginTop:18 }}>
+        {stats.map((_,i) => (
+          <div key={i} style={{
+            width: i===idx ? 16 : 5, height:5,
+            borderRadius:3,
+            background: i===idx ? C.accent : C.accentMd,
+            transition:"all 0.38s ease",
+          }}/>
+        ))}
       </div>
     </div>
   );
@@ -1086,88 +1202,73 @@ function CartDrawer({cart, onRemove, onClose, onCheckout, visible}) {
   );
 }
 
-// ─── WEBGL WAVE BACKGROUND ───────────────────────────────────────────────────
+// ─── WEBGL SPIRAL BACKGROUND ─────────────────────────────────────────────────
 function WaveCanvas() {
   const canvasRef = useRef(null);
   React.useEffect(() => {
     const canvas = canvasRef.current;
     const gl = canvas.getContext("webgl");
     if (!gl) return;
-
-    const vert = `
-      attribute vec2 a_pos;
-      void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
-    `;
+    const vert = `attribute vec2 a_pos; void main(){gl_Position=vec4(a_pos,0.0,1.0);}`;
     const frag = `
-      precision mediump float;
+      precision highp float;
       uniform float u_time;
       uniform vec2  u_res;
-
-      vec3 wave(vec2 uv, float amp, float freq, float speed, float phase) {
-        float y = amp * sin(freq * uv.x + speed * u_time + phase);
-        float dist = abs(uv.y - y);
-        float glow = smoothstep(0.025, 0.0, dist);
-        return glow * vec3(1.0);
-      }
-
-      void main() {
+      void main(){
         vec2 uv = (gl_FragCoord.xy / u_res) * 2.0 - 1.0;
         uv.x *= u_res.x / u_res.y;
-
-        // bg: #F4F2ED
-        vec3 col = vec3(0.957, 0.949, 0.929);
-
-        // teal strong: #2C5F54
-        col += wave(uv, 0.18, 2.2, 0.28, 0.0)   * vec3(0.173, 0.373, 0.329);
-        // teal light:  #C2D9D5
-        col += wave(uv, 0.12, 3.4, 0.18, 2.1)   * vec3(0.761, 0.851, 0.835);
-        // teal strong again, slower offset
-        col += wave(uv, 0.09, 1.7, 0.14, 4.4)   * vec3(0.173, 0.373, 0.329);
-
-        gl_FragColor = vec4(col, 1.0);
+        vec3 bg = vec3(0.957, 0.949, 0.929);
+        vec3 col = bg;
+        float alpha = 0.0;
+        // Many small spiral lines
+        for(int k = 0; k < 18; k++){
+          float fk = float(k);
+          float angle = fk * 0.37 + u_time * (0.12 + fk * 0.008);
+          float r = 0.05 + fk * 0.055;
+          // spiral centre drifts slowly
+          vec2 centre = vec2(
+            sin(u_time * 0.07 + fk * 0.8) * 0.25,
+            cos(u_time * 0.05 + fk * 0.6) * 0.22
+          );
+          // convert uv to polar around centre
+          vec2 d = uv - centre;
+          float dist = length(d);
+          float theta = atan(d.y, d.x);
+          // spiral equation: dist ~ r + spiral arm offset
+          float arm = mod(theta - angle - dist * 4.5, 6.2832);
+          float armDist = min(arm, 6.2832 - arm);
+          float ringDist = abs(dist - r);
+          // thin line glow
+          float line = smoothstep(0.025, 0.0, armDist * dist + ringDist * 0.4);
+          // teal strong for inner spirals, teal light for outer
+          float t = fk / 17.0;
+          vec3 teal = mix(vec3(0.173,0.373,0.329), vec3(0.761,0.851,0.835), t);
+          col += teal * line * (0.55 - t * 0.2);
+        }
+        gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
       }
     `;
-
-    const compile = (type, src) => {
-      const s = gl.createShader(type);
-      gl.shaderSource(s, src); gl.compileShader(s); return s;
-    };
+    const compile = (type,src)=>{ const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s); return s; };
     const prog = gl.createProgram();
     gl.attachShader(prog, compile(gl.VERTEX_SHADER, vert));
     gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, frag));
     gl.linkProgram(prog); gl.useProgram(prog);
-
     const buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(prog, "a_pos");
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog,"a_pos");
     gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-
-    const uTime = gl.getUniformLocation(prog, "u_time");
-    const uRes  = gl.getUniformLocation(prog, "u_res");
-
+    gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    const uTime=gl.getUniformLocation(prog,"u_time");
+    const uRes=gl.getUniformLocation(prog,"u_res");
     let raf;
-    const resize = () => {
-      canvas.width  = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-      gl.viewport(0, 0, canvas.width, canvas.height);
-    };
-    window.addEventListener("resize", resize); resize();
-
-    const draw = (t) => {
-      gl.uniform1f(uTime, t * 0.001);
-      gl.uniform2f(uRes, canvas.width, canvas.height);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      raf = requestAnimationFrame(draw);
-    };
-    raf = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
-  }, []);
-
-  return (
-    <canvas ref={canvasRef} style={{position:"absolute",inset:0,width:"100%",height:"100%",display:"block"}}/>
-  );
+    const resize=()=>{ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; gl.viewport(0,0,canvas.width,canvas.height); };
+    window.addEventListener("resize",resize); resize();
+    const draw=(t)=>{ gl.uniform1f(uTime,t*0.001); gl.uniform2f(uRes,canvas.width,canvas.height); gl.drawArrays(gl.TRIANGLE_STRIP,0,4); raf=requestAnimationFrame(draw); };
+    raf=requestAnimationFrame(draw);
+    return()=>{ cancelAnimationFrame(raf); window.removeEventListener("resize",resize); };
+  },[]);
+  return <canvas ref={canvasRef} style={{position:"absolute",inset:0,width:"100%",height:"100%",display:"block"}}/>;
 }
 
 // ─── PASSWORD GATE ─────────────────────────────────────────────────────────────
@@ -1335,11 +1436,7 @@ export default function App() {
       {/* HEADER */}
       <header style={{position:"sticky",top:0,zIndex:100,background:"rgba(244,242,237,0.95)",backdropFilter:"blur(12px)",borderBottom:`1px solid ${C.border}`,padding:"0 40px",height:60,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <Logo size={16}/>
-        <nav style={{display:"flex",gap:2}}>
-          {[["kits","Kits"],["singles","Singles"],["stacks","Stacks"]].map(([id,label])=>(
-            <button key={id} onClick={()=>handleTabClick(id)} style={{padding:"7px 16px",background:tab===id?C.accentLt:"transparent",border:"none",borderBottom:`2px solid ${tab===id?C.accent:"transparent"}`,color:tab===id?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:tab===id?600:400,cursor:"pointer",transition:"all 0.24s"}}>{label}</button>
-          ))}
-        </nav>
+        <TubelightNav tab={tab} onTabChange={handleTabClick}/>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
           <button onClick={()=>setShowAdmin(!showAdmin)} style={{background:"none",border:"none",color:C.dim,cursor:"pointer",fontSize:14,padding:"4px 6px"}}>⚙</button>
           <button onClick={openCart} style={{padding:"8px 16px",background:cart.length>0?C.accentLt:C.surface,border:`1px solid ${cart.length>0?C.accentMd:C.border}`,color:cart.length>0?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:500,cursor:"pointer",borderRadius:100,transition:"all 0.24s"}}>
@@ -1393,18 +1490,9 @@ export default function App() {
               </div>
             </div>
 
-            {/* Stats — editorial column style */}
-            <div style={{display:"flex",flexDirection:"column",gap:0,flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:40}}>
-              {[["15","Peptide Kits"],["07","Single Vials"],["04","Research Protocols"]].map(([n,l],i,arr)=>(
-                <div key={l} style={{
-                  padding:"18px 0",
-                  borderBottom: i<arr.length-1 ? `1px solid ${C.border}` : "none",
-                  minWidth:160,
-                }}>
-                  <div style={{fontFamily:serif,fontSize:36,fontWeight:700,color:C.ink,lineHeight:1,letterSpacing:"-0.02em"}}>{n}</div>
-                  <div style={{fontSize:9,color:C.muted,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.22em",marginTop:5}}>{l}</div>
-                </div>
-              ))}
+            {/* Animated cycling stats */}
+            <div style={{flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:40,minWidth:220}}>
+              <AnimatedStats/>
             </div>
           </div>
         </div>
@@ -1438,7 +1526,7 @@ export default function App() {
               <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>10 vials per kit · best value · click any card for full details</span>
             </div>
             <div key={catFilter} className="filter-enter" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(308px,1fr))",gap:14}}>
-              {fKits.map(p=><KitCard key={p.id} item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/>)}
+              {fKits.map((p,i)=><ScrollRevealItem key={p.id} index={i}><KitCard item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/></ScrollRevealItem>)}
             </div>
           </div>
           </ScrollTiltSection>
@@ -1453,7 +1541,7 @@ export default function App() {
               <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>individual compounds · click any row for full details</span>
             </div>
             <div key={catFilter} className="filter-enter" style={{display:"flex",flexDirection:"column",gap:10}}>
-              {fSingles.map(p=><SingleRow key={p.id} item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/>)}
+              {fSingles.map((p,i)=><ScrollRevealItem key={p.id} index={i}><SingleRow item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/></ScrollRevealItem>)}
             </div>
             <div style={{height:1,background:C.border,margin:"36px 0"}}/>
             <h2 style={{fontFamily:serif,fontSize:20,fontWeight:700,color:C.ink,marginBottom:20}}>Tablets</h2>
@@ -1473,7 +1561,7 @@ export default function App() {
               <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>curated combinations · 15% bundle discount</span>
             </div>
             <div key={catFilter} className="filter-enter" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(310px,1fr))",gap:16}}>
-              {fStacks.map(s=><StackCard key={s.name} stack={s} onAddStack={addStack} cartIds={cartIds}/>)}
+              {fStacks.map((s,i)=><ScrollRevealItem key={s.name} index={i}><StackCard stack={s} onAddStack={addStack} cartIds={cartIds}/></ScrollRevealItem>)}
             </div>
           </div>
           </ScrollTiltSection>
