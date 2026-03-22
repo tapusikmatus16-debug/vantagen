@@ -1202,71 +1202,54 @@ function CartDrawer({cart, onRemove, onClose, onCheckout, visible}) {
   );
 }
 
-// ─── WEBGL SPIRAL BACKGROUND ─────────────────────────────────────────────────
+// ─── WEBGL WAVE BACKGROUND ───────────────────────────────────────────────────
 function WaveCanvas() {
   const canvasRef = useRef(null);
   React.useEffect(() => {
     const canvas = canvasRef.current;
     const gl = canvas.getContext("webgl");
     if (!gl) return;
-    const vert = `attribute vec2 a_pos; void main(){gl_Position=vec4(a_pos,0.0,1.0);}`;
+    const vert = `attribute vec3 position; void main(){ gl_Position=vec4(position,1.0); }`;
     const frag = `
       precision highp float;
-      uniform float u_time;
-      uniform vec2  u_res;
+      uniform vec2 resolution; uniform float time;
+      uniform float xScale; uniform float yScale; uniform float distortion;
       void main(){
-        vec2 uv = (gl_FragCoord.xy / u_res) * 2.0 - 1.0;
-        uv.x *= u_res.x / u_res.y;
-        vec3 bg = vec3(0.957, 0.949, 0.929);
-        vec3 col = bg;
-        float alpha = 0.0;
-        // Many small spiral lines
-        for(int k = 0; k < 18; k++){
-          float fk = float(k);
-          float angle = fk * 0.37 + u_time * (0.12 + fk * 0.008);
-          float r = 0.05 + fk * 0.055;
-          // spiral centre drifts slowly
-          vec2 centre = vec2(
-            sin(u_time * 0.07 + fk * 0.8) * 0.25,
-            cos(u_time * 0.05 + fk * 0.6) * 0.22
-          );
-          // convert uv to polar around centre
-          vec2 d = uv - centre;
-          float dist = length(d);
-          float theta = atan(d.y, d.x);
-          // spiral equation: dist ~ r + spiral arm offset
-          float arm = mod(theta - angle - dist * 4.5, 6.2832);
-          float armDist = min(arm, 6.2832 - arm);
-          float ringDist = abs(dist - r);
-          // thin line glow
-          float line = smoothstep(0.025, 0.0, armDist * dist + ringDist * 0.4);
-          // teal strong for inner spirals, teal light for outer
-          float t = fk / 17.0;
-          vec3 teal = mix(vec3(0.173,0.373,0.329), vec3(0.761,0.851,0.835), t);
-          col += teal * line * (0.55 - t * 0.2);
-        }
-        gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+        vec2 p=(gl_FragCoord.xy*2.0-resolution)/min(resolution.x,resolution.y);
+        float d=length(p)*distortion;
+        float rx=p.x*(1.0+d); float gx=p.x; float bx=p.x*(1.0-d);
+        float r=0.05/abs(p.y+sin((rx+time)*xScale)*yScale);
+        float g=0.05/abs(p.y+sin((gx+time)*xScale)*yScale);
+        float b=0.05/abs(p.y+sin((bx+time)*xScale)*yScale);
+        r=clamp(r,0.0,0.95); g=clamp(g,0.0,0.95); b=clamp(b,0.0,0.95);
+        vec3 bg=vec3(0.957,0.949,0.929);
+        vec3 col=bg;
+        col=mix(col,vec3(0.173,0.373,0.329),r*0.82);
+        col=mix(col,vec3(0.240,0.501,0.329),g*0.78);
+        col=mix(col,vec3(0.761,0.851,0.835),b*0.65);
+        gl_FragColor=vec4(clamp(col,0.0,1.0),1.0);
       }
     `;
-    const compile = (type,src)=>{ const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s); return s; };
-    const prog = gl.createProgram();
-    gl.attachShader(prog, compile(gl.VERTEX_SHADER, vert));
-    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, frag));
-    gl.linkProgram(prog); gl.useProgram(prog);
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(prog,"a_pos");
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-    const uTime=gl.getUniformLocation(prog,"u_time");
-    const uRes=gl.getUniformLocation(prog,"u_res");
-    let raf;
-    const resize=()=>{ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; gl.viewport(0,0,canvas.width,canvas.height); };
-    window.addEventListener("resize",resize); resize();
-    const draw=(t)=>{ gl.uniform1f(uTime,t*0.001); gl.uniform2f(uRes,canvas.width,canvas.height); gl.drawArrays(gl.TRIANGLE_STRIP,0,4); raf=requestAnimationFrame(draw); };
-    raf=requestAnimationFrame(draw);
-    return()=>{ cancelAnimationFrame(raf); window.removeEventListener("resize",resize); };
+    const mk=(type,src)=>{const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;};
+    const prog=gl.createProgram();
+    gl.attachShader(prog,mk(gl.VERTEX_SHADER,vert));
+    gl.attachShader(prog,mk(gl.FRAGMENT_SHADER,frag));
+    gl.linkProgram(prog);gl.useProgram(prog);
+    const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,0,1,-1,0,-1,1,0,1,-1,0,-1,1,0,1,1,0]),gl.STATIC_DRAW);
+    const loc=gl.getAttribLocation(prog,"position");
+    gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);
+    const uRes=gl.getUniformLocation(prog,"resolution");
+    const uTime=gl.getUniformLocation(prog,"time");
+    gl.uniform1f(gl.getUniformLocation(prog,"xScale"),1.0);
+    gl.uniform1f(gl.getUniformLocation(prog,"yScale"),0.5);
+    gl.uniform1f(gl.getUniformLocation(prog,"distortion"),0.05);
+    let t=0; let raf;
+    const resize=()=>{canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;gl.viewport(0,0,canvas.width,canvas.height);};
+    window.addEventListener("resize",resize);resize();
+    const draw=()=>{gl.uniform2f(uRes,canvas.width,canvas.height);gl.uniform1f(uTime,t);t+=0.01;gl.drawArrays(gl.TRIANGLES,0,6);raf=requestAnimationFrame(draw);};
+    draw();
+    return()=>{cancelAnimationFrame(raf);window.removeEventListener("resize",resize);};
   },[]);
   return <canvas ref={canvasRef} style={{position:"absolute",inset:0,width:"100%",height:"100%",display:"block"}}/>;
 }
