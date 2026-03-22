@@ -1284,7 +1284,7 @@ function WaveCanvas() {
     draw();
     return()=>{cancelAnimationFrame(raf);window.removeEventListener("resize",resize);};
   },[]);
-  return <canvas ref={canvasRef} style={{position:"absolute",inset:0,width:"100%",height:"100%",display:"block"}}/>;
+  return <canvas ref={canvasRef} style={{position:"fixed",top:"-10px",left:"-10px",width:"calc(100% + 20px)",height:"calc(100% + 20px)",display:"block"}}/>;
 }
 
 // ─── PASSWORD GATE ─────────────────────────────────────────────────────────────
@@ -1307,20 +1307,20 @@ function PasswordGate({onUnlock}) {
   const inpCls = {width:"100%",padding:"12px 15px",background:"rgba(255,255,255,0.8)",border:`1px solid ${C.border}`,borderRadius:R.sm,color:C.ink,fontFamily:mono,fontSize:12,outline:"none",boxSizing:"border-box",marginBottom:8,transition:"border-color 0.18s"};
 
   return (
-    <div style={{minHeight:"100vh",display:"flex",background:C.bg,position:"relative",overflow:"hidden",margin:0,padding:0}}>
+    <div style={{minHeight:"100vh",display:"flex",background:C.bg,position:"relative",overflow:"hidden",margin:0,padding:0,boxSizing:"border-box"}}>
       <WaveCanvas/>
       <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:0,position:"relative",zIndex:2}}>
         <div style={{width:"100%",maxWidth:420,textAlign:"center",background:"rgba(255,255,255,0.55)",backdropFilter:"blur(18px)",WebkitBackdropFilter:"blur(18px)",border:`1px solid rgba(255,255,255,0.7)`,borderRadius:R.card,padding:"44px 40px 36px",boxShadow:"0 8px 48px rgba(44,95,84,0.10)"}}>
           <div style={{marginBottom:44}}>
             <div style={{fontSize:8,letterSpacing:"0.4em",color:C.muted,fontFamily:mono,marginBottom:28,textTransform:"uppercase"}}>Research Compounds · EU</div>
             <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:14}}>
-              <svg width="56" height="56" viewBox="0 0 48 48" fill="none">
+              <svg width="64" height="64" viewBox="0 0 48 48" fill="none">
                 <circle cx="24" cy="24" r="22" stroke={C.accent} strokeWidth="1.5"/>
                 <path d="M24 7 L39 37 L9 37 Z" stroke={C.accent} strokeWidth="2" fill="none"/>
                 <path d="M24 17 L34 37 L14 37 Z" fill={C.accent} opacity="0.18"/>
                 <line x1="24" y1="7" x2="24" y2="37" stroke={C.accent} strokeWidth="1" opacity="0.35"/>
               </svg>
-              <span style={{fontFamily:serif,fontWeight:700,fontSize:42,letterSpacing:"0.18em",color:C.ink,lineHeight:1,marginTop:4}}>VANTAGEN</span>
+              <span style={{fontFamily:serif,fontWeight:700,fontSize:52,letterSpacing:"0.22em",color:C.ink,lineHeight:1}}>VANTAGEN</span>
             </div>
             <div style={{width:40,height:1,background:C.accentMd,margin:"22px auto 0"}}/>
           </div>
@@ -1331,22 +1331,22 @@ function PasswordGate({onUnlock}) {
           </div>
 
           {mode==="gate"?(
-            <div>
-              <p style={{color:C.ink2,fontSize:13,marginBottom:26,lineHeight:1.85,fontFamily:sans}}>Platform currently in private beta. Enter your access code or request early access below.</p>
+            <div key="gate" className="gate-panel">
+              <p style={{color:C.ink2,fontSize:13,marginBottom:26,lineHeight:1.85,fontFamily:sans,animation:"panelIn 0.52s cubic-bezier(0.22,1,0.36,1)"}}>Platform currently in private beta. Enter your access code or request early access below.</p>
               <input type="password" placeholder="Access code" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&tryUnlock()} style={inpCls} onFocus={e=>e.target.style.borderColor=C.accentMd} onBlur={e=>e.target.style.borderColor=C.border}/>
               {error&&<div style={{color:C.red,fontSize:11,marginBottom:8,fontFamily:mono,textAlign:"left"}}>{error}</div>}
-              <button onClick={tryUnlock} onMouseDown={e=>e.currentTarget.style.transform="scale(0.97)"} onMouseUp={e=>e.currentTarget.style.transform="scale(1)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"} onTouchStart={e=>e.currentTarget.style.transform="scale(0.97)"} onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"} style={{width:"100%",padding:"13px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.18em",cursor:"pointer",borderRadius:R.sm,marginBottom:12,transition:"all 0.18s"}}>Access Platform →</button>
-              <button onClick={()=>setMode("early")} onMouseDown={e=>e.currentTarget.style.transform="scale(0.97)"} onMouseUp={e=>e.currentTarget.style.transform="scale(1)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"} onTouchStart={e=>e.currentTarget.style.transform="scale(0.97)"} onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"} style={{width:"100%",padding:"12px",background:C.surface,border:`1px solid ${C.borderMd}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>No code? Request early access →</button>
+              <button onClick={tryUnlock} onMouseDown={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.boxShadow="0 2px 8px rgba(44,95,84,0.15)";}} onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.boxShadow="none";}} onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.boxShadow="none";}} onTouchStart={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.boxShadow="0 2px 8px rgba(44,95,84,0.15)";}} onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.boxShadow="none";}} style={{width:"100%",padding:"13px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.18em",cursor:"pointer",borderRadius:R.sm,marginBottom:12,transition:"all 0.18s cubic-bezier(0.22,1,0.36,1)"}}>Access Platform →</button>
+              <button onClick={()=>setMode("early")} onMouseDown={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.opacity="0.75";}} onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} onTouchStart={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.opacity="0.75";}} onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} style={{width:"100%",padding:"12px",background:C.surface,border:`1px solid ${C.borderMd}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s cubic-bezier(0.22,1,0.36,1)"}}>No code? Request early access →</button>
             </div>
           ):(
-            <div>
+            <div key="early" className="gate-panel">
               {!joined?(
                 <>
-                  <p style={{color:C.ink2,fontSize:13,marginBottom:26,lineHeight:1.85,fontFamily:sans}}>Join the VANTAGEN research community and receive early access with exclusive launch pricing.</p>
+                  <p style={{color:C.ink2,fontSize:13,marginBottom:26,lineHeight:1.85,fontFamily:sans,animation:"panelIn 0.52s cubic-bezier(0.22,1,0.36,1)"}}>Join the VANTAGEN research community and receive early access with exclusive launch pricing.</p>
                   <input type="email" placeholder="Email address" value={email} onChange={e=>setEmail(e.target.value)} style={inpCls} onFocus={e=>e.target.style.borderColor=C.accentMd} onBlur={e=>e.target.style.borderColor=C.border}/>
                   {error&&<div style={{color:C.red,fontSize:11,marginBottom:8}}>{error}</div>}
-                  <button onClick={joinEarly} onMouseDown={e=>e.currentTarget.style.transform="scale(0.97)"} onMouseUp={e=>e.currentTarget.style.transform="scale(1)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"} onTouchStart={e=>e.currentTarget.style.transform="scale(0.97)"} onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"} style={{width:"100%",padding:"13px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.18em",cursor:"pointer",borderRadius:R.sm,marginBottom:12}}>Join Early Access →</button>
-                  <button onClick={()=>setMode("gate")} onMouseDown={e=>e.currentTarget.style.transform="scale(0.97)"} onMouseUp={e=>e.currentTarget.style.transform="scale(1)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"} onTouchStart={e=>e.currentTarget.style.transform="scale(0.97)"} onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"} style={{width:"100%",padding:"12px",background:C.surface,border:`1px solid ${C.borderMd}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm}}>← Have an access code?</button>
+                  <button onClick={joinEarly} onMouseDown={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.boxShadow="0 2px 8px rgba(44,95,84,0.15)";}} onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.boxShadow="none";}} onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.boxShadow="none";}} onTouchStart={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.boxShadow="0 2px 8px rgba(44,95,84,0.15)";}} onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.boxShadow="none";}} style={{width:"100%",padding:"13px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.18em",cursor:"pointer",borderRadius:R.sm,marginBottom:12,transition:"all 0.18s cubic-bezier(0.22,1,0.36,1)"}}>Join Early Access →</button>
+                  <button onClick={()=>setMode("gate")} onMouseDown={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.opacity="0.75";}} onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} onTouchStart={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.opacity="0.75";}} onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} style={{width:"100%",padding:"12px",background:C.surface,border:`1px solid ${C.borderMd}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s cubic-bezier(0.22,1,0.36,1)"}}>← Have an access code?</button>
                 </>
               ):(
                 <div style={{padding:28,border:`1px solid ${C.accentMd}`,borderRadius:R.card,background:C.accentLt}}>
@@ -1360,7 +1360,7 @@ function PasswordGate({onUnlock}) {
           <p style={{marginTop:44,fontSize:9,color:C.dim,letterSpacing:"0.1em",lineHeight:2.1,fontFamily:mono,textTransform:"uppercase",opacity:0.7}}>For research purposes only · Not for human use<br/>Vantagen © 2025 · EU Regulation Compliant</p>
         </div>
       </div>
-      <style>{`@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}`}</style>
+      <style>{`@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}.gate-panel{animation:panelIn 0.52s cubic-bezier(0.22,1,0.36,1);}@keyframes panelIn{from{opacity:0;transform:translateY(10px);filter:blur(4px);}to{opacity:1;transform:translateY(0);filter:blur(0);}}`}</style>
     </div>
   );
 }
@@ -1601,7 +1601,7 @@ export default function App() {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&family=Courier+Prime:wght@400;700&display=swap');
-        html,body{margin:0;padding:0;}
+        html,body,#root{margin:0;padding:0;overflow-x:hidden;}
         *{box-sizing:border-box;margin:0;padding:0;}
         ::-webkit-scrollbar{width:4px;}
         ::-webkit-scrollbar-track{background:${C.bg};}
