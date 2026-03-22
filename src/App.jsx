@@ -784,11 +784,11 @@ function AnimatedStats() {
   }, []);
   const s = stats[idx];
   return (
-    <div style={{display:"flex",flexDirection:"column",justifyContent:"center",minHeight:180}}>
-      <div style={{fontSize:10,letterSpacing:"0.36em",color:"rgba(122,126,132,0.8)",fontFamily:"'Courier Prime','Courier New',monospace",marginBottom:10,textTransform:"uppercase",opacity:visible?1:0,transition:"opacity 0.28s ease"}}>
+    <div style={{display:"flex",flexDirection:"column",justifyContent:"center",minHeight:200}}>
+      <div style={{fontSize:10,letterSpacing:"0.36em",color:"rgba(122,126,132,0.8)",fontFamily:"'Courier Prime','Courier New',monospace",marginBottom:10,textTransform:"uppercase",opacity:1}}>
         What we offer
       </div>
-      <div style={{fontFamily:"'Libre Baskerville',Georgia,serif",fontSize:80,fontWeight:700,color:"#1A1C1E",lineHeight:1,letterSpacing:"-0.03em",transform:visible?"translateY(0)":"translateY(-14px)",opacity:visible?1:0,transition:"all 0.32s cubic-bezier(0.22,1,0.36,1)"}}>
+      <div style={{fontFamily:"'Libre Baskerville',Georgia,serif",fontSize:96,fontWeight:700,color:"#1A1C1E",lineHeight:1,letterSpacing:"-0.03em",transform:visible?"translateY(0)":"translateY(-14px)",opacity:visible?1:0,transition:"all 0.32s cubic-bezier(0.22,1,0.36,1)"}}>
         {s.n}
       </div>
       <div style={{fontSize:12,color:"#2C5F54",fontFamily:"'Courier Prime','Courier New',monospace",textTransform:"uppercase",letterSpacing:"0.22em",marginTop:10,transform:visible?"translateY(0)":"translateY(10px)",opacity:visible?1:0,transition:"all 0.36s cubic-bezier(0.22,1,0.36,1) 0.06s"}}>
@@ -1334,7 +1334,7 @@ function PasswordGate({onUnlock}) {
             <div key="gate" className="gate-panel">
               <p style={{color:C.ink2,fontSize:13,marginBottom:26,lineHeight:1.85,fontFamily:sans,animation:"panelIn 0.52s cubic-bezier(0.22,1,0.36,1) 0.08s both"}}>Platform currently in private beta. Enter your access code or request early access below.</p>
               <input type="password" placeholder="Access code" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&tryUnlock()} style={inpCls} onFocus={e=>e.target.style.borderColor=C.accentMd} onBlur={e=>e.target.style.borderColor=C.border}/>
-              {error&&<div style={{color:C.red,fontSize:11,marginBottom:8,fontFamily:mono,textAlign:"left"}}>{error}</div>}
+              {error&&<div style={{color:C.red,fontSize:11,marginBottom:8,fontFamily:mono,textAlign:"center",letterSpacing:"0.08em"}}>{error}</div>}
               <button onClick={tryUnlock} onMouseDown={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.boxShadow="0 2px 8px rgba(44,95,84,0.15)";}} onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.boxShadow="0 4px 16px rgba(44,95,84,0.28)";}} onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.boxShadow="0 4px 16px rgba(44,95,84,0.28)";}} onTouchStart={e=>{e.currentTarget.style.transform="scale(0.94)";}} onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}} style={{width:"100%",padding:"13px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.18em",cursor:"pointer",borderRadius:R.sm,marginBottom:12,transition:"all 0.18s cubic-bezier(0.22,1,0.36,1)"}}>Access Platform →</button>
               <button onClick={()=>setMode("early")} onMouseDown={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.opacity="0.75";}} onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} onTouchStart={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.opacity="0.75";}} onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} style={{width:"100%",padding:"12px",background:C.surface,border:`1px solid ${C.borderMd}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s cubic-bezier(0.22,1,0.36,1)"}}>No code? Request early access →</button>
             </div>
@@ -1344,7 +1344,7 @@ function PasswordGate({onUnlock}) {
                 <>
                   <p style={{color:C.ink2,fontSize:13,marginBottom:26,lineHeight:1.85,fontFamily:sans,animation:"panelIn 0.52s cubic-bezier(0.22,1,0.36,1) 0.08s both"}}>Join the VANTAGEN research community and receive early access with exclusive launch pricing.</p>
                   <input type="email" placeholder="Email address" value={email} onChange={e=>setEmail(e.target.value)} style={inpCls} onFocus={e=>e.target.style.borderColor=C.accentMd} onBlur={e=>e.target.style.borderColor=C.border}/>
-                  {error&&<div style={{color:C.red,fontSize:11,marginBottom:8}}>{error}</div>}
+                  {error&&<div style={{color:C.red,fontSize:11,marginBottom:8,fontFamily:mono,textAlign:"center",letterSpacing:"0.08em"}}>{error}</div>}
                   <button onClick={joinEarly} onMouseDown={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.opacity="0.75";}} onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} onTouchStart={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.opacity="0.75";}} onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} style={{width:"100%",padding:"13px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.18em",cursor:"pointer",borderRadius:R.sm,marginBottom:12,transition:"all 0.18s cubic-bezier(0.22,1,0.36,1)"}}>Join Early Access →</button>
                   <button onClick={()=>setMode("gate")} onMouseDown={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.opacity="0.75";}} onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} onTouchStart={e=>{e.currentTarget.style.transform="scale(0.94)";e.currentTarget.style.opacity="0.75";}} onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.opacity="1";}} style={{width:"100%",padding:"12px",background:C.surface,border:`1px solid ${C.borderMd}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s cubic-bezier(0.22,1,0.36,1)"}}>← Have an access code?</button>
                 </>
@@ -1419,7 +1419,7 @@ export default function App() {
 
   const handleTabClick = (id) => {
     setTab(id);
-    if (id !== "kits") scrollToCatalogue();
+    scrollToCatalogue();
   };
 
   const openCart = () => { setCartOpen(true); setTimeout(()=>setCartVisible(true),20); };
@@ -1447,10 +1447,10 @@ export default function App() {
 
   return (
     <div style={{minHeight:"100vh",background:C.bg,color:C.ink,fontFamily:sans}}>
-      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,backgroundImage:`radial-gradient(${C.border} 1px,transparent 1px)`,backgroundSize:"28px 28px"}}/>
+      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,background:C.bg}}/>
 
       {/* HEADER */}
-      <header style={{position:"sticky",top:0,zIndex:100,background:"rgba(244,242,237,0.95)",backdropFilter:"blur(12px)",borderBottom:`1px solid ${C.border}`,padding:"0 40px",height:60,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <header style={{position:"sticky",top:0,zIndex:100,background:"rgba(244,242,237,0.97)",backdropFilter:"blur(12px)",borderBottom:`1px solid ${C.border}`,padding:"0 40px",height:64,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <Logo size={16}/>
         <TubelightNav tab={tab} onTabChange={handleTabClick}/>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
@@ -1470,7 +1470,7 @@ export default function App() {
         </div>
       )}
 
-      <div style={{position:"relative",zIndex:1}}>
+      <div style={{position:"relative",zIndex:1,background:C.bg}}>
         {/* HERO */}
         <div style={{position:"relative",overflow:"hidden",borderBottom:`1px solid ${C.border}`,minHeight:520}}>
           <WaveCanvas/>
@@ -1495,7 +1495,7 @@ export default function App() {
                 ⚠ Not for human use · Research purposes only · 18+
               </div>
             </div>
-            <div style={{flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:48,minWidth:240}}>
+            <div style={{flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:52,minWidth:280}}>
               <AnimatedStats/>
             </div>
           </div>
@@ -1520,6 +1520,7 @@ export default function App() {
 
         {/* KITS */}
         {tab==="kits"&&(
+          <div style={{background:C.bg,minHeight:"60vh"}}>
           <ScrollTiltSection>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"36px 40px 64px"}}>
             <div style={{display:"flex",alignItems:"baseline",gap:14,marginBottom:26}}>
@@ -1531,10 +1532,12 @@ export default function App() {
             </div>
           </div>
           </ScrollTiltSection>
+          </div>
         )}
 
         {/* SINGLES */}
         {tab==="singles"&&(
+          <div style={{background:C.bg,minHeight:"60vh"}}>
           <ScrollTiltSection>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"36px 40px 64px"}}>
             <div style={{display:"flex",alignItems:"baseline",gap:14,marginBottom:26}}>
@@ -1551,10 +1554,12 @@ export default function App() {
             </div>
           </div>
           </ScrollTiltSection>
+          </div>
         )}
 
         {/* STACKS */}
         {tab==="stacks"&&(
+          <div style={{background:C.bg,minHeight:"60vh"}}>
           <ScrollTiltSection>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"36px 40px 64px"}}>
             <div style={{display:"flex",alignItems:"baseline",gap:14,marginBottom:26}}>
@@ -1566,6 +1571,7 @@ export default function App() {
             </div>
           </div>
           </ScrollTiltSection>
+          </div>
         )}
 
         </div>{/* end animated catalogue content */}
