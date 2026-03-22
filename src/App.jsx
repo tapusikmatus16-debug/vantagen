@@ -485,7 +485,7 @@ function ScrollRevealItem({ children, index = 0 }) {
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  return <div ref={ref}>{children}</div>;
+  return <div ref={ref} style={{display:"flex",flexDirection:"column",height:"100%"}}>{children}</div>;
 }
 
 // ─── TUBELIGHT NAV ───────────────────────────────────────────────────────────
@@ -895,7 +895,7 @@ function KitCard({item, onAdd, inCart, onOpenModal}) {
   const cc = CAT[item.category] || C.accent;
   return (
     <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-      style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:R.card,padding:"24px",transition:"all 0.22s",boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",display:"flex",flexDirection:"column",position:"relative",overflow:"hidden",cursor:"pointer"}}
+      style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:R.card,padding:"24px",transition:"all 0.22s",boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",display:"flex",flexDirection:"column",position:"relative",overflow:"hidden",cursor:"pointer",flex:1}}
       onClick={()=>onOpenModal(item)}
     >
       <div style={{position:"absolute",left:0,top:16,bottom:16,width:3,background:cc,borderRadius:"0 2px 2px 0",opacity:hov?1:0.5,transition:"opacity 0.22s"}}/>
@@ -1525,7 +1525,7 @@ export default function App() {
               <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Research Kits</h2>
               <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>10 vials per kit · best value · click any card for full details</span>
             </div>
-            <div key={catFilter} className="filter-enter" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(308px,1fr))",gap:14}}>
+            <div key={catFilter} className="filter-enter" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(308px,1fr))",gap:14,alignItems:"stretch"}}>
               {fKits.map((p,i)=><ScrollRevealItem key={p.id} index={i}><KitCard item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/></ScrollRevealItem>)}
             </div>
           </div>
