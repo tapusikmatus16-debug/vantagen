@@ -671,7 +671,7 @@ function FeaturedSection({onOpenModal, cartIds}) {
         }}/>
 
         {/* Products grid */}
-        <div style={{
+        <div className="featured-grid" style={{
           display:"grid",
           gridTemplateColumns:"repeat(5,1fr)",
         }}>
@@ -834,7 +834,7 @@ function ProductModal({item, onClose, onAdd, cartIds}) {
 
   return (
     <div style={{position:"fixed",inset:0,zIndex:3000,background:"rgba(244,242,237,0.9)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"fadeIn 0.28s ease"}} onClick={onClose}>
-      <div onClick={e=>e.stopPropagation()} style={{
+      <div onClick={e=>e.stopPropagation()} className="modal-panel" style={{
         background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:R.card,
         width:"100%",maxWidth:620,maxHeight:"90vh",overflowY:"auto",
         boxShadow:"0 20px 80px rgba(26,28,30,0.2)",
@@ -1054,7 +1054,7 @@ function CheckoutModal({cart, onClose, onSuccess}) {
 
   return (
     <div style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(244,242,237,0.88)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"fadeIn 0.28s ease"}}>
-      <div style={{background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:R.card,width:"100%",maxWidth:520,maxHeight:"92vh",overflowY:"auto",boxShadow:"0 16px 64px rgba(26,28,30,0.18)",animation:"scaleIn 0.34s cubic-bezier(0.22,1,0.36,1)"}}>
+      <div className="checkout-panel" style={{background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:R.card,width:"100%",maxWidth:520,maxHeight:"92vh",overflowY:"auto",boxShadow:"0 16px 64px rgba(26,28,30,0.18)",animation:"scaleIn 0.34s cubic-bezier(0.22,1,0.36,1)"}}>
         <div style={{padding:"18px 26px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,background:C.surface,zIndex:1}}>
           <div>
             <div style={{fontFamily:serif,fontSize:15,fontWeight:700,color:C.ink}}>Place Order</div>
@@ -1184,7 +1184,7 @@ function CartDrawer({cart, onRemove, onClose, onCheckout, visible}) {
         opacity: visible ? 1 : 0,
         transition:"opacity 0.34s ease",
       }}/>
-      <div style={{
+      <div className="cart-drawer" style={{
         width:340, background:C.surface,
         borderLeft:`1px solid ${C.border}`,
         display:"flex", flexDirection:"column",
@@ -1412,8 +1412,11 @@ export default function App() {
   if (!unlocked) return <PasswordGate onUnlock={()=>setUnlocked(true)}/>;
 
   const scrollToCatalogue = () => {
-    setTimeout(()=>{
-      catalogueRef.current?.scrollIntoView({behavior:"smooth", block:"start"});
+    setTimeout(() => {
+      const el = catalogueRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.pageYOffset - 64;
+      window.scrollTo({ top, behavior: "smooth" });
     }, 60);
   };
 
@@ -1450,7 +1453,7 @@ export default function App() {
       <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,background:C.bg}}/>
 
       {/* HEADER */}
-      <header style={{position:"sticky",top:0,zIndex:100,background:"rgba(244,242,237,0.97)",backdropFilter:"blur(12px)",borderBottom:`1px solid ${C.border}`,padding:"0 40px",height:64,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <header style={{position:"fixed",top:0,left:0,right:0,zIndex:500,background:"rgba(244,242,237,0.97)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderBottom:`1px solid ${C.border}`,padding:"0 40px",height:64,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <Logo size={16}/>
         <TubelightNav tab={tab} onTabChange={handleTabClick}/>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
@@ -1470,12 +1473,12 @@ export default function App() {
         </div>
       )}
 
-      <div style={{position:"relative",zIndex:1,background:C.bg}}>
+      <div style={{position:"relative",zIndex:1,background:C.bg,paddingTop:64}}>
         {/* HERO */}
         <div style={{position:"relative",overflow:"hidden",borderBottom:`1px solid ${C.border}`,minHeight:520}}>
           <WaveCanvas/>
           <div style={{position:"absolute",inset:0,background:"rgba(244,242,237,0.72)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",pointerEvents:"none"}}/>
-          <div style={{position:"relative",zIndex:2,maxWidth:1200,margin:"0 auto",padding:"80px 40px 72px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:40}}>
+          <div className="hero-content" style={{position:"relative",zIndex:2,maxWidth:1200,margin:"0 auto",padding:"80px 40px 72px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:40}}>
             <div style={{borderLeft:`2px solid ${C.accent}`,paddingLeft:32,maxWidth:580}}>
               <div style={{fontSize:10,letterSpacing:"0.42em",color:C.accent,fontFamily:mono,marginBottom:20,textTransform:"uppercase"}}>
                 Research Compounds · EU Compliant
@@ -1508,7 +1511,7 @@ export default function App() {
 
         {/* FILTER BAR — catalogue anchor */}
         <div ref={catalogueRef} style={{borderBottom:`1px solid ${C.border}`,background:C.surface,padding:"0 40px"}}>
-          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:0}}>
+          <div className="filter-bar" style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:0}}>
             {CATS.map(c=>(
               <button key={c} onClick={()=>setCatFilter(c)} style={{padding:"14px 18px",background:"transparent",border:"none",borderBottom:`2px solid ${catFilter===c?(CAT[c]||C.accent):"transparent"}`,color:catFilter===c?(CAT[c]||C.accent):C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",transition:"all 0.24s",textTransform:"uppercase"}}>{c}</button>
             ))}
@@ -1527,7 +1530,7 @@ export default function App() {
               <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Research Kits</h2>
               <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>10 vials per kit · best value · click any card for full details</span>
             </div>
-            <div key={catFilter} className="filter-enter" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(308px,1fr))",gap:14,alignItems:"stretch"}}>
+            <div key={catFilter} className="filter-enter catalogue-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(308px,1fr))",gap:14,alignItems:"stretch"}}>
               {fKits.map((p,i)=><ScrollRevealItem key={p.id} index={i}><KitCard item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/></ScrollRevealItem>)}
             </div>
           </div>
@@ -1566,7 +1569,7 @@ export default function App() {
               <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Research Protocols</h2>
               <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>curated combinations · 15% bundle discount</span>
             </div>
-            <div key={catFilter} className="filter-enter" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(310px,1fr))",gap:16}}>
+            <div key={catFilter} className="filter-enter catalogue-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(310px,1fr))",gap:16}}>
               {fStacks.map((s,i)=><ScrollRevealItem key={s.name} index={i}><StackCard stack={s} onAddStack={addStack} cartIds={cartIds}/></ScrollRevealItem>)}
             </div>
           </div>
@@ -1596,6 +1599,23 @@ export default function App() {
 
       {/* ADMIN */}
       {adminOpen&&<AdminPanel orders={orders} onClose={()=>setAdminOpen(false)}/>}
+
+      {/* MOBILE BOTTOM NAV */}
+      <div className="mobile-bottom-bar" style={{display:"none",position:"fixed",bottom:0,left:0,right:0,zIndex:500,background:"rgba(255,255,255,0.95)",backdropFilter:"blur(16px)",borderTop:`1px solid ${C.border}`,height:64,alignItems:"center",justifyContent:"space-around",padding:"0 8px"}}>
+        {[["kits","Kits"],["singles","Singles"],["stacks","Stacks"]].map(([id,label])=>(
+          <button key={id} onClick={()=>handleTabClick(id)} style={{flex:1,height:"100%",background:"none",border:"none",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,cursor:"pointer",color:tab===id?C.accent:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",borderTop:tab===id?`2px solid ${C.accent}`:"2px solid transparent",transition:"all 0.2s"}}>
+            <span style={{fontSize:18}}>
+              {id==="kits"?"◫":id==="singles"?"◎":"◱"}
+            </span>
+            {label}
+          </button>
+        ))}
+        <button onClick={openCart} style={{flex:1,height:"100%",background:"none",border:"none",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,cursor:"pointer",color:cart.length>0?C.accent:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",borderTop:cart.length>0?`2px solid ${C.accent}`:"2px solid transparent",transition:"all 0.2s",position:"relative"}}>
+          {cart.length>0&&<div style={{position:"absolute",top:10,right:"calc(50% - 14px)",width:16,height:16,background:C.accent,borderRadius:"50%",fontSize:9,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>{cart.length}</div>}
+          <span style={{fontSize:18}}>◳</span>
+          Order
+        </button>
+      </div>
 
       {/* SUCCESS */}
       {successMsg&&(
@@ -1655,6 +1675,22 @@ export default function App() {
         }
         .success-toast{
           animation: successPop 0.44s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        @media (max-width: 768px) {
+          header { padding: 0 16px !important; height: 56px !important; }
+          header > div:nth-child(2) { display: none !important; }
+          .mobile-bottom-bar { display: flex !important; }
+          div[style*="paddingTop:64"] { padding-top: 56px !important; padding-bottom: 80px !important; }
+          .hero-content { flex-direction: column !important; padding: 40px 20px 36px !important; }
+          .hero-content > div:first-child { border-left: 2px solid #2C5F54; padding-left: 20px !important; max-width: 100% !important; }
+          .hero-content > div:last-child { border-left: none !important; border-top: 1px solid #E2DFD9; padding-left: 0 !important; padding-top: 24px !important; min-width: unset !important; width: 100% !important; }
+          .featured-grid { grid-template-columns: repeat(5,1fr) !important; overflow-x: auto !important; }
+          .catalogue-grid { grid-template-columns: 1fr !important; }
+          .filter-bar { overflow-x: auto !important; white-space: nowrap !important; }
+          .cart-drawer { width: 100% !important; }
+          .modal-panel { max-width: 100% !important; max-height: 100vh !important; border-radius: 0 !important; margin: 0 !important; }
+          .checkout-panel { max-width: 100% !important; border-radius: 0 !important; }
         }
       `}</style>
     </div>
