@@ -14,6 +14,7 @@ const CAT = {
   "Weight Loss":"#4A6FA5","Performance":"#2C5F54",
   "Recovery":"#7B5EA7","Longevity":"#9A7B3F","Supplies":"#7A7E84",
 };
+const R = { card:8, sm:5, xs:3 };
 const LAUNCH_PW = "vantagen2025";
 const ADMIN_PW  = "vtadmin2025";
 const mono  = "'Courier Prime','Courier New',monospace";
@@ -360,9 +361,113 @@ FEATURED[2].item = SINGLES.find(s=>s.id==="s5");
 FEATURED[3].item = KITS.find(k=>k.id==="k14");
 FEATURED[4].item = KITS.find(k=>k.id==="k11");
 
+// ─── CONTAINER SCROLL ────────────────────────────────────────────────────────
+function ContainerScroll({onOpenModal, cartIds}) {
+  const ref = useRef(null);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onScroll = () => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const progress = Math.min(1, Math.max(0, (vh - rect.top) / (vh * 0.7)));
+      const rotateX = 24 - progress * 24;   // 24deg → 0deg
+      const scale   = 1.04 - progress * 0.04; // 1.04 → 1.0
+      el.style.transform = `perspective(1400px) rotateX(${rotateX}deg) scale(${scale})`;
+      el.style.opacity = 0.4 + progress * 0.6;
+    };
+    window.addEventListener("scroll", onScroll, {passive:true});
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <div style={{padding:"0 32px 0", background:C.bg, overflow:"hidden"}}>
+      <div
+        ref={ref}
+        style={{
+          willChange:"transform, opacity",
+          transformOrigin:"top center",
+          background:C.surface,
+          border:`1px solid ${C.borderMd}`,
+          borderRadius:R.card,
+          boxShadow:"0 24px 80px rgba(26,28,30,0.13)",
+          overflow:"hidden",
+        }}
+      >
+        {/* Header strip */}
+        <div style={{padding:"16px 28px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{fontSize:8,letterSpacing:"0.38em",color:C.muted,fontFamily:mono,textTransform:"uppercase"}}>Featured Compounds</div>
+          <div style={{fontSize:8,letterSpacing:"0.2em",color:C.dim,fontFamily:mono,textTransform:"uppercase"}}>Click to explore →</div>
+        </div>
+
+        {/* Horizontally scrollable compound row */}
+        <div style={{display:"flex",overflowX:"auto",padding:"28px 24px",gap:16,scrollbarWidth:"none"}}>
+          {FEATURED.map(({item, glyphKey}) => {
+            if (!item) return null;
+            const Glyph = GLYPHS[glyphKey];
+            const cc = CAT[item.category] || C.accent;
+            const inCart = cartIds.includes(item.name);
+            return (
+              <div
+                key={glyphKey}
+                onClick={()=>onOpenModal(item)}
+                style={{
+                  flexShrink:0, width:180,
+                  background:C.surface2, border:`1px solid ${C.border}`,
+                  borderRadius:R.card, padding:"20px 18px",
+                  cursor:"pointer", transition:"all 0.22s",
+                  position:"relative",
+                }}
+                onMouseEnter={e=>{e.currentTarget.style.background=C.surface;e.currentTarget.style.borderColor=C.borderMd;e.currentTarget.style.transform="translateY(-4px)";}}
+                onMouseLeave={e=>{e.currentTarget.style.background=C.surface2;e.currentTarget.style.borderColor=C.border;e.currentTarget.style.transform="translateY(0)";}}
+              >
+                {inCart&&<div style={{position:"absolute",top:8,right:8,width:7,height:7,borderRadius:"50%",background:C.accent}}/>}
+                <div style={{display:"flex",justifyContent:"center",marginBottom:14}}>
+                  {Glyph&&<Glyph size={56}/>}
+                </div>
+                <div style={{fontSize:7,letterSpacing:"0.28em",color:cc,fontFamily:mono,textTransform:"uppercase",marginBottom:5}}>{item.category}</div>
+                <div style={{fontFamily:serif,fontSize:14,fontWeight:700,color:C.ink,lineHeight:1.2,marginBottom:8}}>{item.name}</div>
+                <div style={{fontFamily:serif,fontSize:15,fontWeight:700,color:C.ink}}>€{item.sellPrice}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCROLL TILT SECTION ─────────────────────────────────────────────────────
+function ScrollTiltSection({children}) {
+  const ref = useRef(null);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onScroll = () => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // progress 0 when top of section is at bottom of viewport, 1 when top reaches viewport center
+      const progress = Math.min(1, Math.max(0, (vh - rect.top) / (vh * 0.6)));
+      const rotateX = 10 - progress * 10;       // 10deg → 0deg
+      const opacity  = 0.3 + progress * 0.7;    // 0.3 → 1
+      el.style.opacity = opacity;
+      el.style.transform = `perspective(1200px) rotateX(${rotateX}deg)`;
+    };
+    window.addEventListener("scroll", onScroll, {passive:true});
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <div ref={ref} style={{willChange:"transform, opacity", transformOrigin:"top center"}}>
+      {children}
+    </div>
+  );
+}
+
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 const Tag = ({label, color}) => (
-  <span style={{display:"inline-block",padding:"2px 8px",background:`${color||C.accent}15`,border:`1px solid ${color||C.accent}40`,color:color||C.accent,fontSize:9,letterSpacing:"0.18em",fontFamily:mono,borderRadius:2}}>{label}</span>
+  <span style={{display:"inline-block",padding:"2px 8px",background:`${color||C.accent}15`,border:`1px solid ${color||C.accent}40`,color:color||C.accent,fontSize:9,letterSpacing:"0.18em",fontFamily:mono,borderRadius:R.xs}}>{label}</span>
 );
 
 // ─── FEATURED CARD ────────────────────────────────────────────────────────────
@@ -384,7 +489,7 @@ function FeaturedCard({item, glyphKey, isLast, onOpenModal, inCart}) {
         transform: hov ? "translateY(-8px)" : "translateY(0)",
         background: hov ? C.surface : "rgba(255,255,255,0.62)",
         boxShadow: hov ? "0 12px 40px rgba(26,28,30,0.10), 0 2px 8px rgba(26,28,30,0.05)" : "0 1px 6px rgba(26,28,30,0.05), inset 0 0 0 1px rgba(255,255,255,0.7)",
-        borderRadius: 2,
+        borderRadius: R.card,
         display:"flex", flexDirection:"column",
         position:"relative",
       }}
@@ -445,7 +550,7 @@ function FeaturedCard({item, glyphKey, isLast, onOpenModal, inCart}) {
         <div style={{
           position:"absolute", top:12, right:12,
           background:C.accentLt, border:`1px solid ${C.accentMd}`,
-          borderRadius:2, padding:"2px 7px",
+          borderRadius:R.xs, padding:"2px 7px",
           fontSize:8, color:C.accent, fontFamily:mono, letterSpacing:"0.16em",
         }}>IN ORDER</div>
       )}
@@ -581,14 +686,14 @@ function ProductModal({item, onClose, onAdd, cartIds}) {
   return (
     <div style={{position:"fixed",inset:0,zIndex:3000,background:"rgba(244,242,237,0.9)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"fadeIn 0.28s ease"}} onClick={onClose}>
       <div onClick={e=>e.stopPropagation()} style={{
-        background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:10,
+        background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:R.card,
         width:"100%",maxWidth:620,maxHeight:"90vh",overflowY:"auto",
         boxShadow:"0 20px 80px rgba(26,28,30,0.2)",
         display:"flex",flexDirection:"column",
         animation:"scaleIn 0.32s cubic-bezier(0.22,1,0.36,1)",
       }}>
         {/* Top colour bar */}
-        <div style={{height:4,background:`linear-gradient(90deg, ${cc}, ${cc}80)`,borderRadius:"10px 10px 0 0"}}/>
+        <div style={{height:4,background:`linear-gradient(90deg, ${cc}, ${cc}80)`,borderRadius:`${R.card}px ${R.card}px 0 0`}}/>
 
         {/* Header */}
         <div style={{padding:"24px 28px 20px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
@@ -597,7 +702,7 @@ function ProductModal({item, onClose, onAdd, cartIds}) {
             <h2 style={{fontFamily:serif,fontSize:24,fontWeight:700,color:C.ink,lineHeight:1.1,marginBottom:6}}>{item.name}</h2>
             {item.badge && <Tag label={item.badge} color={cc}/>}
           </div>
-          <button onClick={onClose} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,cursor:"pointer",padding:"6px 11px",borderRadius:3,fontSize:15,flexShrink:0,marginLeft:16}}>✕</button>
+          <button onClick={onClose} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,cursor:"pointer",padding:"6px 11px",borderRadius:R.sm,fontSize:15,flexShrink:0,marginLeft:16}}>✕</button>
         </div>
 
         {/* Body */}
@@ -612,7 +717,7 @@ function ProductModal({item, onClose, onAdd, cartIds}) {
                     flex:1, padding:"11px 16px",
                     background: selected===val ? C.accentLt : C.surface2,
                     border:`1px solid ${selected===val ? C.accentMd : C.border}`,
-                    borderRadius:4,cursor:"pointer",transition:"all 0.18s",
+                    borderRadius:R.sm,cursor:"pointer",transition:"all 0.18s",
                     textAlign:"left",
                   }}>
                     <div style={{fontSize:12,fontWeight:600,color:selected===val?C.accent:C.ink,fontFamily:sans,marginBottom:3}}>{label}</div>
@@ -641,7 +746,7 @@ function ProductModal({item, onClose, onAdd, cartIds}) {
           </div>
 
           {/* Research disclaimer */}
-          <div style={{padding:"12px 14px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:4,marginBottom:24,fontSize:11,color:C.red,fontFamily:mono,lineHeight:1.7,letterSpacing:"0.02em"}}>
+          <div style={{padding:"12px 14px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:R.sm,marginBottom:24,fontSize:11,color:C.red,fontFamily:mono,lineHeight:1.7,letterSpacing:"0.02em"}}>
             ⚠ This compound is supplied strictly for in-vitro and laboratory research purposes only. It is not intended for human or veterinary use. For use by qualified scientific professionals in regulated environments only.
           </div>
         </div>
@@ -657,7 +762,7 @@ function ProductModal({item, onClose, onAdd, cartIds}) {
               color: inCart ? C.muted : "#fff",
               fontFamily:mono,fontSize:11,letterSpacing:"0.18em",
               cursor: inCart ? "default" : "pointer",
-              borderRadius:4,transition:"all 0.18s",
+              borderRadius:R.sm,transition:"all 0.18s",
             }}
           >
             {inCart ? "✓  Already in your order" : `Add to order  ·  €${activeItem.sellPrice}`}
@@ -674,7 +779,7 @@ function KitCard({item, onAdd, inCart, onOpenModal}) {
   const cc = CAT[item.category] || C.accent;
   return (
     <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-      style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:6,padding:"24px",transition:"all 0.22s",boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",display:"flex",flexDirection:"column",position:"relative",overflow:"hidden",cursor:"pointer"}}
+      style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:R.card,padding:"24px",transition:"all 0.22s",boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",display:"flex",flexDirection:"column",position:"relative",overflow:"hidden",cursor:"pointer"}}
       onClick={()=>onOpenModal(item)}
     >
       <div style={{position:"absolute",left:0,top:16,bottom:16,width:3,background:cc,borderRadius:"0 2px 2px 0",opacity:hov?1:0.5,transition:"opacity 0.22s"}}/>
@@ -692,8 +797,8 @@ function KitCard({item, onAdd, inCart, onOpenModal}) {
       </div>
       <p style={{fontSize:13,color:C.ink2,lineHeight:1.8,flex:1,marginBottom:18,paddingLeft:8}}>{item.desc}</p>
       <div style={{paddingLeft:8,display:"flex",gap:8}}>
-        <button onClick={e=>{e.stopPropagation();onOpenModal(item);}} style={{flex:1,padding:"9px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3,transition:"all 0.18s"}}>View details</button>
-        <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{flex:2,padding:"9px",background:inCart?C.accentLt:C.surface2,border:`1px solid ${inCart?C.accentMd:C.border}`,color:inCart?C.accent:C.ink2,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3,transition:"all 0.18s"}}>
+        <button onClick={e=>{e.stopPropagation();onOpenModal(item);}} style={{flex:1,padding:"9px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>View details</button>
+        <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{flex:2,padding:"9px",background:inCart?C.accentLt:C.surface2,border:`1px solid ${inCart?C.accentMd:C.border}`,color:inCart?C.accent:C.ink2,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>
           {inCart?"✓ Added":"Add to order"}
         </button>
       </div>
@@ -707,10 +812,10 @@ function SingleRow({item, onAdd, inCart, onOpenModal}) {
   const cc = CAT[item.category] || C.muted;
   return (
     <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-      style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:5,padding:"16px 20px",transition:"all 0.2s",display:"flex",alignItems:"center",gap:18,boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",cursor:"pointer"}}
+      style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:R.sm,padding:"16px 20px",transition:"all 0.2s",display:"flex",alignItems:"center",gap:18,boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",cursor:"pointer"}}
       onClick={()=>onOpenModal(item)}
     >
-      <div style={{width:3,height:36,background:cc,borderRadius:2,flexShrink:0,opacity:0.6}}/>
+      <div style={{width:3,height:36,background:cc,borderRadius:R.xs,flexShrink:0,opacity:0.6}}/>
       <div style={{flex:1}}>
         <div style={{fontSize:8,letterSpacing:"0.26em",color:cc,fontFamily:mono,marginBottom:4,textTransform:"uppercase"}}>{item.category}</div>
         <div style={{fontSize:15,fontWeight:700,color:C.ink,fontFamily:serif}}>{item.name}</div>
@@ -721,8 +826,8 @@ function SingleRow({item, onAdd, inCart, onOpenModal}) {
       <div style={{textAlign:"right",flexShrink:0}}>
         <div style={{fontSize:18,fontWeight:700,color:C.ink,fontFamily:serif,marginBottom:8}}>€{item.sellPrice}</div>
         <div style={{display:"flex",gap:6,justifyContent:"flex-end"}}>
-          <button onClick={e=>{e.stopPropagation();onOpenModal(item);}} style={{padding:"6px 10px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:8,letterSpacing:"0.12em",cursor:"pointer",borderRadius:3}}>Details</button>
-          <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{padding:"6px 12px",background:inCart?C.accentLt:C.surface2,border:`1px solid ${inCart?C.accentMd:C.border}`,color:inCart?C.accent:C.ink2,fontFamily:mono,fontSize:8,letterSpacing:"0.12em",cursor:"pointer",borderRadius:3,transition:"all 0.18s"}}>{inCart?"✓ Added":"+ Add"}</button>
+          <button onClick={e=>{e.stopPropagation();onOpenModal(item);}} style={{padding:"6px 10px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:8,letterSpacing:"0.12em",cursor:"pointer",borderRadius:R.sm}}>Details</button>
+          <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{padding:"6px 12px",background:inCart?C.accentLt:C.surface2,border:`1px solid ${inCart?C.accentMd:C.border}`,color:inCart?C.accent:C.ink2,fontFamily:mono,fontSize:8,letterSpacing:"0.12em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>{inCart?"✓ Added":"+ Add"}</button>
         </div>
       </div>
     </div>
@@ -737,7 +842,7 @@ function StackCard({stack, onAddStack, cartIds}) {
   const disc = Math.round(tot*0.85);
   const allIn = stack.peptides.every(n=>cartIds.includes(n));
   return (
-    <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:6,padding:"24px",transition:"all 0.22s",boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",position:"relative",overflow:"hidden"}}>
+    <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:R.card,padding:"24px",transition:"all 0.22s",boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",position:"relative",overflow:"hidden"}}>
       <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:stack.color,opacity:0.7,borderRadius:"6px 6px 0 0"}}/>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14,marginTop:8}}>
         <div>
@@ -747,7 +852,7 @@ function StackCard({stack, onAddStack, cartIds}) {
         <Tag label="15% OFF" color={stack.color}/>
       </div>
       <p style={{fontSize:13,color:C.ink2,lineHeight:1.8,marginBottom:16}}>{stack.desc}</p>
-      <div style={{marginBottom:18,padding:"12px 14px",background:C.surface2,borderRadius:4,border:`1px solid ${C.border}`}}>
+      <div style={{marginBottom:18,padding:"12px 14px",background:C.surface2,borderRadius:R.sm,border:`1px solid ${C.border}`}}>
         {stack.peptides.map(n=>(
           <div key={n} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
             <div style={{width:4,height:4,borderRadius:"50%",background:stack.color,flexShrink:0}}/>
@@ -760,7 +865,7 @@ function StackCard({stack, onAddStack, cartIds}) {
           <span style={{fontSize:11,color:C.dim,textDecoration:"line-through",marginRight:8,fontFamily:mono}}>€{tot}</span>
           <span style={{fontSize:22,fontWeight:700,color:C.ink,fontFamily:serif}}>€{disc}</span>
         </div>
-        <button onClick={()=>onAddStack(stack)} style={{padding:"9px 18px",background:allIn?C.accentLt:C.surface2,border:`1px solid ${allIn?C.accentMd:C.border}`,color:allIn?C.accent:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3,transition:"all 0.18s"}}>
+        <button onClick={()=>onAddStack(stack)} style={{padding:"9px 18px",background:allIn?C.accentLt:C.surface2,border:`1px solid ${allIn?C.accentMd:C.border}`,color:allIn?C.accent:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>
           {allIn?"✓ In order":"Add protocol"}
         </button>
       </div>
@@ -793,14 +898,14 @@ function CheckoutModal({cart, onClose, onSuccess}) {
     <div style={{marginBottom:14}}>
       <label style={{display:"block",fontSize:8,letterSpacing:"0.24em",color:C.muted,marginBottom:5,fontFamily:mono,textTransform:"uppercase"}}>{label}</label>
       <input type={type} placeholder={ph} value={form[k]} onChange={e=>setForm(p=>({...p,[k]:e.target.value}))}
-        style={{width:"100%",padding:"10px 13px",background:C.surface2,border:`1px solid ${C.border}`,borderRadius:3,color:C.ink,fontFamily:mono,fontSize:12,outline:"none",boxSizing:"border-box",transition:"border-color 0.18s"}}
+        style={{width:"100%",padding:"10px 13px",background:C.surface2,border:`1px solid ${C.border}`,borderRadius:R.sm,color:C.ink,fontFamily:mono,fontSize:12,outline:"none",boxSizing:"border-box",transition:"border-color 0.18s"}}
         onFocus={e=>e.target.style.borderColor=C.accentMd} onBlur={e=>e.target.style.borderColor=C.border}/>
     </div>
   );
 
   return (
     <div style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(244,242,237,0.88)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"fadeIn 0.28s ease"}}>
-      <div style={{background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:8,width:"100%",maxWidth:520,maxHeight:"92vh",overflowY:"auto",boxShadow:"0 16px 64px rgba(26,28,30,0.18)",animation:"scaleIn 0.34s cubic-bezier(0.22,1,0.36,1)"}}>
+      <div style={{background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:R.card,width:"100%",maxWidth:520,maxHeight:"92vh",overflowY:"auto",boxShadow:"0 16px 64px rgba(26,28,30,0.18)",animation:"scaleIn 0.34s cubic-bezier(0.22,1,0.36,1)"}}>
         <div style={{padding:"18px 26px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,background:C.surface,zIndex:1}}>
           <div>
             <div style={{fontFamily:serif,fontSize:15,fontWeight:700,color:C.ink}}>Place Order</div>
@@ -810,7 +915,7 @@ function CheckoutModal({cart, onClose, onSuccess}) {
           </div>
           <div style={{display:"flex",alignItems:"center",gap:14}}>
             <span style={{fontFamily:serif,fontSize:18,fontWeight:700,color:C.ink}}>€{total}</span>
-            <button onClick={onClose} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,cursor:"pointer",padding:"5px 9px",borderRadius:2,fontSize:14}}>✕</button>
+            <button onClick={onClose} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,cursor:"pointer",padding:"5px 9px",borderRadius:R.sm,fontSize:14}}>✕</button>
           </div>
         </div>
 
@@ -819,7 +924,7 @@ function CheckoutModal({cart, onClose, onSuccess}) {
             <div>
               <p style={{fontSize:13,color:C.ink2,marginBottom:20,lineHeight:1.8}}>Select your preferred payment method. All options are available to EU customers.</p>
               {METHODS.map(m=>(
-                <div key={m.id} onClick={()=>setMethod(m.id)} style={{display:"flex",alignItems:"center",gap:14,padding:"14px 16px",marginBottom:8,border:`1px solid ${method===m.id?C.accentMd:C.border}`,borderRadius:4,cursor:"pointer",background:method===m.id?C.accentLt:C.surface2,transition:"all 0.18s"}}>
+                <div key={m.id} onClick={()=>setMethod(m.id)} style={{display:"flex",alignItems:"center",gap:14,padding:"14px 16px",marginBottom:8,border:`1px solid ${method===m.id?C.accentMd:C.border}`,borderRadius:R.sm,cursor:"pointer",background:method===m.id?C.accentLt:C.surface2,transition:"all 0.18s"}}>
                   <div style={{width:32,height:32,borderRadius:"50%",background:method===m.id?C.accentMd:C.border,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontFamily:mono,fontSize:12,color:method===m.id?C.accent:C.muted,transition:"all 0.18s"}}>{m.icon}</div>
                   <div style={{flex:1}}>
                     <div style={{color:C.ink,fontSize:13,fontWeight:600,marginBottom:2,fontFamily:sans}}>{m.label}</div>
@@ -828,8 +933,8 @@ function CheckoutModal({cart, onClose, onSuccess}) {
                   <div style={{width:16,height:16,borderRadius:"50%",flexShrink:0,border:`2px solid ${method===m.id?C.accent:C.dim}`,background:method===m.id?C.accent:"transparent",transition:"all 0.18s"}}/>
                 </div>
               ))}
-              {method&&<div style={{padding:"12px 14px",marginTop:8,marginBottom:18,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:3,fontSize:12,color:C.accent,lineHeight:1.75,fontFamily:sans}}>{METHODS.find(m=>m.id===method)?.note}</div>}
-              <button disabled={!method} onClick={()=>setStep("details")} style={{width:"100%",padding:"12px",background:method?C.accentLt:C.surface2,border:`1px solid ${method?C.accentMd:C.border}`,color:method?C.accent:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:method?"pointer":"not-allowed",borderRadius:3,opacity:method?1:0.5}}>Continue →</button>
+              {method&&<div style={{padding:"12px 14px",marginTop:8,marginBottom:18,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:R.sm,fontSize:12,color:C.accent,lineHeight:1.75,fontFamily:sans}}>{METHODS.find(m=>m.id===method)?.note}</div>}
+              <button disabled={!method} onClick={()=>setStep("details")} style={{width:"100%",padding:"12px",background:method?C.accentLt:C.surface2,border:`1px solid ${method?C.accentMd:C.border}`,color:method?C.accent:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:method?"pointer":"not-allowed",borderRadius:R.sm,opacity:method?1:0.5}}>Continue →</button>
             </div>
           )}
 
@@ -845,15 +950,15 @@ function CheckoutModal({cart, onClose, onSuccess}) {
               <Inp k="country" label="Country" ph="e.g. Germany"/>
               <Inp k="phone" label="Phone Number" ph="+49 30 0000000" type="tel"/>
               <Inp k="email" label="Email Address" ph="jan@example.com" type="email"/>
-              <div onClick={()=>setAgreed(!agreed)} style={{display:"flex",alignItems:"flex-start",gap:12,padding:13,marginTop:4,marginBottom:18,border:`1px solid ${agreed?C.accentMd:"#d4a59a"}`,borderRadius:4,cursor:"pointer",background:agreed?C.accentLt:"#fdf5f4",transition:"all 0.18s"}}>
-                <div style={{width:15,height:15,borderRadius:2,flexShrink:0,marginTop:1,border:`2px solid ${agreed?C.accent:"#c0392b"}`,background:agreed?C.accent:"transparent",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.18s"}}>
+              <div onClick={()=>setAgreed(!agreed)} style={{display:"flex",alignItems:"flex-start",gap:12,padding:13,marginTop:4,marginBottom:18,border:`1px solid ${agreed?C.accentMd:"#d4a59a"}`,borderRadius:R.sm,cursor:"pointer",background:agreed?C.accentLt:"#fdf5f4",transition:"all 0.18s"}}>
+                <div style={{width:15,height:15,borderRadius:R.xs,flexShrink:0,marginTop:1,border:`2px solid ${agreed?C.accent:"#c0392b"}`,background:agreed?C.accent:"transparent",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.18s"}}>
                   {agreed&&<span style={{color:"#fff",fontSize:9,fontWeight:700}}>✓</span>}
                 </div>
                 <p style={{fontSize:11,color:C.ink2,lineHeight:1.8,margin:0}}>I confirm these compounds are purchased <strong style={{color:C.ink}}>strictly for in-vitro research purposes only</strong> and will not be used for human or veterinary consumption. I am 18+ and purchasing from a jurisdiction where such compounds are legal.</p>
               </div>
               <div style={{display:"flex",gap:10}}>
-                <button onClick={()=>setStep("method")} style={{padding:"11px 16px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3}}>← Back</button>
-                <button disabled={!canProceed||!agreed} onClick={()=>setStep("confirm")} style={{flex:1,padding:"11px",background:canProceed&&agreed?C.accentLt:C.surface2,border:`1px solid ${canProceed&&agreed?C.accentMd:C.border}`,color:canProceed&&agreed?C.accent:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:canProceed&&agreed?"pointer":"not-allowed",borderRadius:3,opacity:canProceed&&agreed?1:0.5}}>Review order →</button>
+                <button onClick={()=>setStep("method")} style={{padding:"11px 16px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm}}>← Back</button>
+                <button disabled={!canProceed||!agreed} onClick={()=>setStep("confirm")} style={{flex:1,padding:"11px",background:canProceed&&agreed?C.accentLt:C.surface2,border:`1px solid ${canProceed&&agreed?C.accentMd:C.border}`,color:canProceed&&agreed?C.accent:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:canProceed&&agreed?"pointer":"not-allowed",borderRadius:R.sm,opacity:canProceed&&agreed?1:0.5}}>Review order →</button>
               </div>
             </div>
           )}
@@ -862,7 +967,7 @@ function CheckoutModal({cart, onClose, onSuccess}) {
             <div>
               <div style={{marginBottom:22}}>
                 <div style={{fontSize:8,letterSpacing:"0.24em",color:C.muted,marginBottom:10,fontFamily:mono,textTransform:"uppercase"}}>Order Summary — Supplier Format</div>
-                <div style={{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:4,padding:"16px",fontFamily:mono,fontSize:11,color:C.ink2,lineHeight:2,whiteSpace:"pre-wrap"}}>
+                <div style={{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:R.sm,padding:"16px",fontFamily:mono,fontSize:11,color:C.ink2,lineHeight:2,whiteSpace:"pre-wrap"}}>
                   <span style={{color:C.accent,fontWeight:700}}>Items you want:</span>{"\n"}
                   {cart.map(p=>`  • ${p.name} (${p.mg})`).join("\n")}{"\n\n"}
                   <span style={{color:C.accent,fontWeight:700}}>Name:</span> {form.name}{"\n"}
@@ -875,16 +980,16 @@ function CheckoutModal({cart, onClose, onSuccess}) {
                   <span style={{color:C.accent,fontWeight:700}}>Payment method:</span> {METHODS.find(m=>m.id===method)?.label}
                 </div>
               </div>
-              {method==="crypto"&&<div style={{padding:16,background:C.goldLt,border:`1px solid ${C.gold}40`,borderRadius:4,marginBottom:18}}>
+              {method==="crypto"&&<div style={{padding:16,background:C.goldLt,border:`1px solid ${C.gold}40`,borderRadius:R.sm,marginBottom:18}}>
                 <div style={{fontSize:8,color:C.gold,letterSpacing:"0.22em",marginBottom:12,fontFamily:mono,textTransform:"uppercase"}}>Crypto Wallets</div>
                 {[["BTC","bc1q — replace-with-your-wallet"],["USDT TRC-20","T — replace-with-your-wallet"]].map(([k,v])=>(
                   <div key={k} style={{marginBottom:10}}>
                     <div style={{fontSize:8,color:C.muted,marginBottom:3,fontFamily:mono,textTransform:"uppercase"}}>{k}</div>
-                    <div style={{fontSize:11,color:C.ink,fontFamily:mono,background:C.surface,padding:"7px 10px",borderRadius:2,border:`1px solid ${C.border}`,wordBreak:"break-all"}}>{v}</div>
+                    <div style={{fontSize:11,color:C.ink,fontFamily:mono,background:C.surface,padding:"7px 10px",borderRadius:R.xs,border:`1px solid ${C.border}`,wordBreak:"break-all"}}>{v}</div>
                   </div>
                 ))}
               </div>}
-              {method==="bank"&&<div style={{padding:16,background:"#EEF2F9",border:`1px solid ${CAT["Weight Loss"]}30`,borderRadius:4,marginBottom:18}}>
+              {method==="bank"&&<div style={{padding:16,background:"#EEF2F9",border:`1px solid ${CAT["Weight Loss"]}30`,borderRadius:R.sm,marginBottom:18}}>
                 <div style={{fontSize:8,color:CAT["Weight Loss"],letterSpacing:"0.22em",marginBottom:12,fontFamily:mono,textTransform:"uppercase"}}>European Bank Transfer (SEPA)</div>
                 {[["Account Name","VANTAGEN s.r.o."],["IBAN","— replace with your IBAN —"],["BIC/SWIFT","— replace with your BIC —"],["Reference",`ORD-${Math.floor(Math.random()*90000)+10000}`]].map(([k,v])=>(
                   <div key={k} style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:`1px solid ${C.border}`}}>
@@ -893,24 +998,24 @@ function CheckoutModal({cart, onClose, onSuccess}) {
                   </div>
                 ))}
               </div>}
-              {method==="revolut"&&<div style={{padding:16,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:4,marginBottom:18}}>
+              {method==="revolut"&&<div style={{padding:16,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:R.sm,marginBottom:18}}>
                 <div style={{fontSize:8,color:C.accent,letterSpacing:"0.22em",marginBottom:8,fontFamily:mono,textTransform:"uppercase"}}>Revolut Pay</div>
                 <div style={{fontSize:15,color:C.ink,fontFamily:mono,marginBottom:6,fontWeight:600}}>@vantagen</div>
                 <p style={{fontSize:11,color:C.ink2,lineHeight:1.7}}>Send €{total} on Revolut to @vantagen. Include your name in the note.</p>
               </div>}
-              {method==="card"&&<div style={{padding:16,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:4,marginBottom:18,textAlign:"center"}}>
+              {method==="card"&&<div style={{padding:16,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:R.sm,marginBottom:18,textAlign:"center"}}>
                 <div style={{fontSize:8,color:C.accent,letterSpacing:"0.22em",marginBottom:8,fontFamily:mono,textTransform:"uppercase"}}>Card Payment</div>
                 <p style={{fontSize:12,color:C.ink2,lineHeight:1.8}}>After sending your order, we will email you a secure Revolut payment link. Visa & Mastercard accepted.</p>
               </div>}
-              {method==="paypal"&&<div style={{padding:16,background:"#EFF5FC",border:"1px solid #003087AA",borderRadius:4,marginBottom:18}}>
+              {method==="paypal"&&<div style={{padding:16,background:"#EFF5FC",border:"1px solid #003087AA",borderRadius:R.sm,marginBottom:18}}>
                 <div style={{fontSize:8,color:"#003087",letterSpacing:"0.22em",marginBottom:8,fontFamily:mono,textTransform:"uppercase"}}>PayPal — Friends & Family</div>
                 <div style={{fontSize:14,color:C.ink,fontFamily:mono,marginBottom:6,fontWeight:600}}>payments@vantagen.com</div>
                 <p style={{fontSize:11,color:C.ink2,lineHeight:1.7}}>Send as <strong>Friends & Family</strong> only. Include your name in the note.</p>
               </div>}
-              <div style={{fontSize:11,color:C.ink2,lineHeight:1.8,marginBottom:18,padding:"12px 14px",background:C.surface2,borderRadius:3,border:`1px solid ${C.border}`}}>Clicking "Send order" will open your email client with the full order pre-filled. Send the email to complete your purchase — we confirm within 24 hours.</div>
+              <div style={{fontSize:11,color:C.ink2,lineHeight:1.8,marginBottom:18,padding:"12px 14px",background:C.surface2,borderRadius:R.sm,border:`1px solid ${C.border}`}}>Clicking "Send order" will open your email client with the full order pre-filled. Send the email to complete your purchase — we confirm within 24 hours.</div>
               <div style={{display:"flex",gap:10}}>
-                <button onClick={()=>setStep("details")} style={{padding:"11px 16px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:9,cursor:"pointer",borderRadius:3}}>← Back</button>
-                <button onClick={placeOrder} style={{flex:1,padding:"12px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",borderRadius:3}}>Send order →</button>
+                <button onClick={()=>setStep("details")} style={{padding:"11px 16px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:9,cursor:"pointer",borderRadius:R.sm}}>← Back</button>
+                <button onClick={placeOrder} style={{flex:1,padding:"12px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",borderRadius:R.sm}}>Send order →</button>
               </div>
             </div>
           )}
@@ -943,7 +1048,7 @@ function CartDrawer({cart, onRemove, onClose, onCheckout, visible}) {
             <div style={{fontFamily:serif,fontSize:15,fontWeight:700,color:C.ink}}>Your Order</div>
             <div style={{fontSize:9,color:C.muted,marginTop:2,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.2em"}}>{cart.length} item{cart.length!==1?"s":""}</div>
           </div>
-          <button onClick={onClose} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,cursor:"pointer",padding:"5px 10px",borderRadius:2,fontSize:12,fontFamily:mono}}>Close</button>
+          <button onClick={onClose} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,cursor:"pointer",padding:"5px 10px",borderRadius:R.sm,fontSize:12,fontFamily:mono}}>Close</button>
         </div>
         <div style={{flex:1,overflowY:"auto",padding:"10px 22px"}}>
           {cart.length===0
@@ -953,7 +1058,10 @@ function CartDrawer({cart, onRemove, onClose, onCheckout, visible}) {
                 <div>
                   <div style={{color:C.ink,fontSize:13,fontWeight:600,fontFamily:serif}}>{item.name}</div>
                   <div style={{color:C.muted,fontSize:10,marginTop:2,fontFamily:mono}}>{item.mg}</div>
-                  {item.id?.startsWith("k")&&<div style={{marginTop:4}}><Tag label="KIT" color={C.accent}/></div>}
+                  <div style={{display:"flex",gap:4,marginTop:4,flexWrap:"wrap"}}>
+                    {item.id?.startsWith("k")&&<Tag label="KIT" color={C.accent}/>}
+                    {item.stackDiscount&&<Tag label="15% OFF" color={C.gold}/>}
+                  </div>
                 </div>
                 <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
                   <span style={{color:C.ink,fontFamily:serif,fontSize:14,fontWeight:700}}>€{item.sellPrice}</span>
@@ -965,16 +1073,100 @@ function CartDrawer({cart, onRemove, onClose, onCheckout, visible}) {
         </div>
         {cart.length>0&&(
           <div style={{padding:"18px 22px",borderTop:`1px solid ${C.border}`}}>
-            <div style={{display:"flex",justifyContent:"space-between",padding:"13px 14px",marginBottom:14,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:4}}>
+            <div style={{display:"flex",justifyContent:"space-between",padding:"13px 14px",marginBottom:14,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:R.sm}}>
               <span style={{color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.2em",textTransform:"uppercase",alignSelf:"center"}}>Total</span>
               <span style={{color:C.ink,fontFamily:serif,fontSize:20,fontWeight:700}}>€{total}</span>
             </div>
-            <button onClick={onCheckout} style={{width:"100%",padding:"12px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",borderRadius:3,marginBottom:10}}>Proceed to checkout →</button>
+            <button onClick={onCheckout} style={{width:"100%",padding:"12px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",borderRadius:R.sm,marginBottom:10}}>Proceed to checkout →</button>
             <p style={{textAlign:"center",fontSize:9,color:C.dim,lineHeight:1.8,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.1em"}}>For research purposes only · Not for human use</p>
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+// ─── WEBGL WAVE BACKGROUND ───────────────────────────────────────────────────
+function WaveCanvas() {
+  const canvasRef = useRef(null);
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    const gl = canvas.getContext("webgl");
+    if (!gl) return;
+
+    const vert = `
+      attribute vec2 a_pos;
+      void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
+    `;
+    const frag = `
+      precision mediump float;
+      uniform float u_time;
+      uniform vec2  u_res;
+
+      vec3 wave(vec2 uv, float amp, float freq, float speed, float phase) {
+        float y = amp * sin(freq * uv.x + speed * u_time + phase);
+        float dist = abs(uv.y - y);
+        float glow = smoothstep(0.025, 0.0, dist);
+        return glow * vec3(1.0);
+      }
+
+      void main() {
+        vec2 uv = (gl_FragCoord.xy / u_res) * 2.0 - 1.0;
+        uv.x *= u_res.x / u_res.y;
+
+        // bg: #F4F2ED
+        vec3 col = vec3(0.957, 0.949, 0.929);
+
+        // teal strong: #2C5F54
+        col += wave(uv, 0.18, 2.2, 0.28, 0.0)   * vec3(0.173, 0.373, 0.329);
+        // teal light:  #C2D9D5
+        col += wave(uv, 0.12, 3.4, 0.18, 2.1)   * vec3(0.761, 0.851, 0.835);
+        // teal strong again, slower offset
+        col += wave(uv, 0.09, 1.7, 0.14, 4.4)   * vec3(0.173, 0.373, 0.329);
+
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `;
+
+    const compile = (type, src) => {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src); gl.compileShader(s); return s;
+    };
+    const prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, vert));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, frag));
+    gl.linkProgram(prog); gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, "a_pos");
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    const uTime = gl.getUniformLocation(prog, "u_time");
+    const uRes  = gl.getUniformLocation(prog, "u_res");
+
+    let raf;
+    const resize = () => {
+      canvas.width  = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    };
+    window.addEventListener("resize", resize); resize();
+
+    const draw = (t) => {
+      gl.uniform1f(uTime, t * 0.001);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      raf = requestAnimationFrame(draw);
+    };
+    raf = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
+  }, []);
+
+  return (
+    <canvas ref={canvasRef} style={{position:"absolute",inset:0,width:"100%",height:"100%",display:"block"}}/>
   );
 }
 
@@ -995,13 +1187,13 @@ function PasswordGate({onUnlock}) {
     setJoined(true); setError("");
   };
 
-  const inpCls = {width:"100%",padding:"12px 15px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:4,color:C.ink,fontFamily:mono,fontSize:12,outline:"none",boxSizing:"border-box",marginBottom:8,transition:"border-color 0.18s"};
+  const inpCls = {width:"100%",padding:"12px 15px",background:"rgba(255,255,255,0.8)",border:`1px solid ${C.border}`,borderRadius:R.sm,color:C.ink,fontFamily:mono,fontSize:12,outline:"none",boxSizing:"border-box",marginBottom:8,transition:"border-color 0.18s"};
 
   return (
     <div style={{minHeight:"100vh",display:"flex",background:C.bg,position:"relative",overflow:"hidden"}}>
-      <div style={{position:"absolute",inset:0,backgroundImage:`radial-gradient(${C.borderMd} 1px,transparent 1px)`,backgroundSize:"28px 28px",opacity:0.5,pointerEvents:"none"}}/>
+      <WaveCanvas/>
       <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0 40px",position:"relative",zIndex:2}}>
-        <div style={{width:"100%",maxWidth:420,textAlign:"center"}}>
+        <div style={{width:"100%",maxWidth:420,textAlign:"center",background:"rgba(255,255,255,0.55)",backdropFilter:"blur(18px)",WebkitBackdropFilter:"blur(18px)",border:`1px solid rgba(255,255,255,0.7)`,borderRadius:R.card,padding:"44px 40px 36px",boxShadow:"0 8px 48px rgba(44,95,84,0.10)"}}>
           <div style={{marginBottom:44}}>
             <div style={{fontSize:8,letterSpacing:"0.4em",color:C.muted,fontFamily:mono,marginBottom:28,textTransform:"uppercase"}}>Research Compounds · EU</div>
             <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:14}}>
@@ -1026,8 +1218,8 @@ function PasswordGate({onUnlock}) {
               <p style={{color:C.ink2,fontSize:13,marginBottom:26,lineHeight:1.85,fontFamily:sans}}>Platform currently in private beta. Enter your access code or request early access below.</p>
               <input type="password" placeholder="Access code" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&tryUnlock()} style={inpCls} onFocus={e=>e.target.style.borderColor=C.accentMd} onBlur={e=>e.target.style.borderColor=C.border}/>
               {error&&<div style={{color:C.red,fontSize:11,marginBottom:8,fontFamily:mono,textAlign:"left"}}>{error}</div>}
-              <button onClick={tryUnlock} style={{width:"100%",padding:"13px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.18em",cursor:"pointer",borderRadius:3,marginBottom:12,transition:"all 0.18s"}}>Access Platform →</button>
-              <button onClick={()=>setMode("early")} style={{width:"100%",padding:"12px",background:C.surface,border:`1px solid ${C.borderMd}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3,transition:"all 0.18s"}}>No code? Request early access →</button>
+              <button onClick={tryUnlock} style={{width:"100%",padding:"13px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.18em",cursor:"pointer",borderRadius:R.sm,marginBottom:12,transition:"all 0.18s"}}>Access Platform →</button>
+              <button onClick={()=>setMode("early")} style={{width:"100%",padding:"12px",background:C.surface,border:`1px solid ${C.borderMd}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>No code? Request early access →</button>
             </div>
           ):(
             <div>
@@ -1036,11 +1228,11 @@ function PasswordGate({onUnlock}) {
                   <p style={{color:C.ink2,fontSize:13,marginBottom:26,lineHeight:1.85,fontFamily:sans}}>Join the VANTAGEN research community and receive early access with exclusive launch pricing.</p>
                   <input type="email" placeholder="Email address" value={email} onChange={e=>setEmail(e.target.value)} style={inpCls} onFocus={e=>e.target.style.borderColor=C.accentMd} onBlur={e=>e.target.style.borderColor=C.border}/>
                   {error&&<div style={{color:C.red,fontSize:11,marginBottom:8}}>{error}</div>}
-                  <button onClick={joinEarly} style={{width:"100%",padding:"13px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.18em",cursor:"pointer",borderRadius:3,marginBottom:12}}>Join Early Access →</button>
-                  <button onClick={()=>setMode("gate")} style={{width:"100%",padding:"12px",background:C.surface,border:`1px solid ${C.borderMd}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3}}>← Have an access code?</button>
+                  <button onClick={joinEarly} style={{width:"100%",padding:"13px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.18em",cursor:"pointer",borderRadius:R.sm,marginBottom:12}}>Join Early Access →</button>
+                  <button onClick={()=>setMode("gate")} style={{width:"100%",padding:"12px",background:C.surface,border:`1px solid ${C.borderMd}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm}}>← Have an access code?</button>
                 </>
               ):(
-                <div style={{padding:28,border:`1px solid ${C.accentMd}`,borderRadius:6,background:C.accentLt}}>
+                <div style={{padding:28,border:`1px solid ${C.accentMd}`,borderRadius:R.card,background:C.accentLt}}>
                   <div style={{width:36,height:36,borderRadius:"50%",background:C.accentMd,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 14px",fontSize:16,color:C.accent}}>✓</div>
                   <div style={{fontFamily:serif,fontWeight:700,fontSize:15,color:C.ink,marginBottom:10}}>You're on the list</div>
                   <p style={{color:C.ink2,fontSize:13,lineHeight:1.85,fontFamily:sans}}>We'll contact <strong style={{color:C.ink}}>{email}</strong> at launch with early access pricing and exclusive research protocols.</p>
@@ -1063,18 +1255,18 @@ function AdminPanel({orders, onClose}) {
       <div style={{maxWidth:800,margin:"0 auto",padding:40}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:32}}>
           <Logo size={16}/>
-          <button onClick={onClose} style={{padding:"8px 16px",background:C.surface,border:`1px solid ${C.border}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:3}}>← Exit admin</button>
+          <button onClick={onClose} style={{padding:"8px 16px",background:C.surface,border:`1px solid ${C.border}`,color:C.ink2,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm}}>← Exit admin</button>
         </div>
         <div style={{fontSize:8,letterSpacing:"0.28em",color:C.muted,marginBottom:24,fontFamily:mono,textTransform:"uppercase"}}>Order backend — {orders.length} order{orders.length!==1?"s":""}</div>
         {orders.length===0
           ?<div style={{textAlign:"center",padding:"80px 0",color:C.muted,fontFamily:sans}}>No orders yet.</div>
           :orders.map((o,i)=>(
-            <div key={i} style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:6,padding:24,marginBottom:14,boxShadow:"0 1px 8px rgba(26,28,30,0.06)"}}>
+            <div key={i} style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:R.card,padding:24,marginBottom:14,boxShadow:"0 1px 8px rgba(26,28,30,0.06)"}}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:14}}>
                 <div style={{fontFamily:serif,fontWeight:700,fontSize:15,color:C.ink}}>Order #{orders.length-i}</div>
                 <div style={{fontSize:9,color:C.muted,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>{new Date(o.timestamp).toLocaleString("en-GB")}</div>
               </div>
-              <pre style={{fontFamily:mono,fontSize:12,color:C.ink2,lineHeight:1.9,whiteSpace:"pre-wrap",background:C.surface2,padding:16,borderRadius:4,border:`1px solid ${C.border}`}}>{o.summary}</pre>
+              <pre style={{fontFamily:mono,fontSize:12,color:C.ink2,lineHeight:1.9,whiteSpace:"pre-wrap",background:C.surface2,padding:16,borderRadius:R.sm,border:`1px solid ${C.border}`}}>{o.summary}</pre>
             </div>
           ))
         }
@@ -1120,7 +1312,10 @@ export default function App() {
   const addToCart = item => { if(!cartIds.includes(item.name)) setCart(p=>[...p,item]); };
   const addStack  = stack => {
     const all   = [...KITS,...SINGLES];
-    const toAdd = stack.peptides.map(n=>all.find(p=>p.name===n)).filter(p=>p&&!cartIds.includes(p.name));
+    const toAdd = stack.peptides
+      .map(n=>all.find(p=>p.name===n))
+      .filter(p=>p&&!cartIds.includes(p.name))
+      .map(p=>({...p, sellPrice:Math.round(p.sellPrice*0.85), stackDiscount:true}));
     setCart(p=>[...p,...toAdd]);
   };
   const handleSuccess = summary => {
@@ -1147,18 +1342,18 @@ export default function App() {
         </nav>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
           <button onClick={()=>setShowAdmin(!showAdmin)} style={{background:"none",border:"none",color:C.dim,cursor:"pointer",fontSize:14,padding:"4px 6px"}}>⚙</button>
-          <button onClick={openCart} style={{padding:"8px 16px",background:cart.length>0?C.accentLt:C.surface,border:`1px solid ${cart.length>0?C.accentMd:C.border}`,color:cart.length>0?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:500,cursor:"pointer",borderRadius:4,transition:"all 0.24s"}}>
+          <button onClick={openCart} style={{padding:"8px 16px",background:cart.length>0?C.accentLt:C.surface,border:`1px solid ${cart.length>0?C.accentMd:C.border}`,color:cart.length>0?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:500,cursor:"pointer",borderRadius:100,transition:"all 0.24s"}}>
             Order{cart.length>0?` (${cart.length})`:""}
           </button>
         </div>
       </header>
 
       {showAdmin&&(
-        <div style={{position:"fixed",top:64,right:40,zIndex:200,background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:5,padding:14,display:"flex",gap:8,boxShadow:"0 4px 20px rgba(26,28,30,0.12)"}}>
+        <div style={{position:"fixed",top:64,right:40,zIndex:200,background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:R.sm,padding:14,display:"flex",gap:8,boxShadow:"0 4px 20px rgba(26,28,30,0.12)"}}>
           <input type="password" placeholder="Admin code" value={adminInput} onChange={e=>setAdminInput(e.target.value)}
             onKeyDown={e=>{if(e.key==="Enter"&&adminInput===ADMIN_PW){setAdminOpen(true);setShowAdmin(false);setAdminInput("");}}}
-            style={{padding:"8px 12px",background:C.surface2,border:`1px solid ${C.border}`,borderRadius:3,color:C.ink,fontFamily:mono,fontSize:11,outline:"none"}}/>
-          <button onClick={()=>{if(adminInput===ADMIN_PW){setAdminOpen(true);setShowAdmin(false);setAdminInput("");}}} style={{padding:"8px 14px",background:C.accentLt,border:`1px solid ${C.accentMd}`,color:C.accent,fontFamily:mono,fontSize:10,cursor:"pointer",borderRadius:3}}>→</button>
+            style={{padding:"8px 12px",background:C.surface2,border:`1px solid ${C.border}`,borderRadius:R.sm,color:C.ink,fontFamily:mono,fontSize:11,outline:"none"}}/>
+          <button onClick={()=>{if(adminInput===ADMIN_PW){setAdminOpen(true);setShowAdmin(false);setAdminInput("");}}} style={{padding:"8px 14px",background:C.accentLt,border:`1px solid ${C.accentMd}`,color:C.accent,fontFamily:mono,fontSize:10,cursor:"pointer",borderRadius:R.sm}}>→</button>
         </div>
       )}
 
@@ -1193,7 +1388,7 @@ export default function App() {
                 Pharmaceutical-grade research peptides for serious scientific protocols. Available as kits or individual vials, with EU-wide delivery. Strictly for in-vitro and laboratory use only.
               </p>
 
-              <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"7px 14px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:2,fontSize:9,color:C.red,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>
+              <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"7px 14px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:R.xs,fontSize:9,color:C.red,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>
                 ⚠ Not for human use · Research purposes only · 18+
               </div>
             </div>
@@ -1214,8 +1409,13 @@ export default function App() {
           </div>
         </div>
 
+        {/* CONTAINER SCROLL — between hero and featured */}
+        <ContainerScroll onOpenModal={setModalItem} cartIds={cartIds}/>
+
         {/* FEATURED SELECTION */}
-        <FeaturedSection onOpenModal={setModalItem} cartIds={cartIds}/>
+        <ScrollTiltSection>
+          <FeaturedSection onOpenModal={setModalItem} cartIds={cartIds}/>
+        </ScrollTiltSection>
 
         {/* FILTER BAR — catalogue anchor */}
         <div ref={catalogueRef} style={{borderBottom:`1px solid ${C.border}`,background:C.surface,padding:"0 40px"}}>
@@ -1231,6 +1431,7 @@ export default function App() {
 
         {/* KITS */}
         {tab==="kits"&&(
+          <ScrollTiltSection>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"36px 40px 64px"}}>
             <div style={{display:"flex",alignItems:"baseline",gap:14,marginBottom:26}}>
               <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Research Kits</h2>
@@ -1240,10 +1441,12 @@ export default function App() {
               {fKits.map(p=><KitCard key={p.id} item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/>)}
             </div>
           </div>
+          </ScrollTiltSection>
         )}
 
         {/* SINGLES */}
         {tab==="singles"&&(
+          <ScrollTiltSection>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"36px 40px 64px"}}>
             <div style={{display:"flex",alignItems:"baseline",gap:14,marginBottom:26}}>
               <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Single Vials</h2>
@@ -1258,10 +1461,12 @@ export default function App() {
               {TABLETS.map(p=><SingleRow key={p.id} item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/>)}
             </div>
           </div>
+          </ScrollTiltSection>
         )}
 
         {/* STACKS */}
         {tab==="stacks"&&(
+          <ScrollTiltSection>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"36px 40px 64px"}}>
             <div style={{display:"flex",alignItems:"baseline",gap:14,marginBottom:26}}>
               <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Research Protocols</h2>
@@ -1271,6 +1476,7 @@ export default function App() {
               {fStacks.map(s=><StackCard key={s.name} stack={s} onAddStack={addStack} cartIds={cartIds}/>)}
             </div>
           </div>
+          </ScrollTiltSection>
         )}
 
         </div>{/* end animated catalogue content */}
@@ -1298,7 +1504,7 @@ export default function App() {
 
       {/* SUCCESS */}
       {successMsg&&(
-        <div className="success-toast" style={{position:"fixed",bottom:32,left:"50%",transform:"translateX(-50%)",background:C.surface,border:`1px solid ${C.accentMd}`,padding:"16px 28px",borderRadius:5,zIndex:4000,fontFamily:sans,fontSize:13,color:C.ink,textAlign:"center",lineHeight:1.8,boxShadow:"0 8px 40px rgba(26,28,30,0.18)"}}>
+        <div className="success-toast" style={{position:"fixed",bottom:32,left:"50%",transform:"translateX(-50%)",background:C.surface,border:`1px solid ${C.accentMd}`,padding:"16px 28px",borderRadius:R.card,zIndex:4000,fontFamily:sans,fontSize:13,color:C.ink,textAlign:"center",lineHeight:1.8,boxShadow:"0 8px 40px rgba(26,28,30,0.18)"}}>
           <span style={{color:C.accent,fontWeight:700}}>✓ Order received</span><br/>
           <span style={{color:C.muted,fontSize:12}}>Check your email — we confirm within 24 hours.</span>
         </div>
