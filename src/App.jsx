@@ -1320,7 +1320,7 @@ function PasswordGate({onUnlock}) {
                 <path d="M24 17 L34 37 L14 37 Z" fill={C.accent} opacity="0.18"/>
                 <line x1="24" y1="7" x2="24" y2="37" stroke={C.accent} strokeWidth="1" opacity="0.35"/>
               </svg>
-              <span style={{fontFamily:serif,fontWeight:700,fontSize:52,letterSpacing:"0.22em",color:C.ink,lineHeight:1}}>VANTAGEN</span>
+              <span style={{fontFamily:serif,fontWeight:700,fontSize:52,letterSpacing:"0.06em",color:C.ink,lineHeight:1}}>VANTAGEN</span>
             </div>
             <div style={{width:40,height:1,background:C.accentMd,margin:"22px auto 0"}}/>
           </div>
