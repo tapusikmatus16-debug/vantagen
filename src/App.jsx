@@ -709,61 +709,94 @@ function FeaturedSection({onOpenModal, cartIds}) {
   );
 }
 
+// ─── SPIRAL CANVAS ────────────────────────────────────────────────────────────
+function SpiralCanvas() {
+  const canvasRef = useRef(null);
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    const gl = canvas.getContext("webgl");
+    if (!gl) return;
+    const vert = `attribute vec2 a_pos; void main(){gl_Position=vec4(a_pos,0.0,1.0);}`;
+    const frag = `
+      precision highp float;
+      uniform float u_time; uniform vec2 u_res;
+      void main(){
+        vec2 uv=(gl_FragCoord.xy/u_res)*2.0-1.0;
+        uv.x*=u_res.x/u_res.y;
+        vec3 bg=vec3(0.957,0.949,0.929);
+        vec3 col=bg;
+        for(int k=0;k<18;k++){
+          float fk=float(k);
+          float angle=fk*0.37+u_time*(0.12+fk*0.008);
+          float r=0.05+fk*0.055;
+          vec2 centre=vec2(sin(u_time*0.07+fk*0.8)*0.25,cos(u_time*0.05+fk*0.6)*0.22);
+          vec2 d=uv-centre; float dist=length(d);
+          float theta=atan(d.y,d.x);
+          float arm=mod(theta-angle-dist*4.5,6.2832);
+          float armDist=min(arm,6.2832-arm);
+          float ringDist=abs(dist-r);
+          float line=smoothstep(0.025,0.0,armDist*dist+ringDist*0.4);
+          float t=fk/17.0;
+          vec3 teal=mix(vec3(0.173,0.373,0.329),vec3(0.761,0.851,0.835),t);
+          col+=teal*line*(0.55-t*0.2);
+        }
+        gl_FragColor=vec4(clamp(col,0.0,1.0),1.0);
+      }
+    `;
+    const compile=(type,src)=>{const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;};
+    const prog=gl.createProgram();
+    gl.attachShader(prog,compile(gl.VERTEX_SHADER,vert));
+    gl.attachShader(prog,compile(gl.FRAGMENT_SHADER,frag));
+    gl.linkProgram(prog);gl.useProgram(prog);
+    const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+    const loc=gl.getAttribLocation(prog,"a_pos");
+    gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    const uTime=gl.getUniformLocation(prog,"u_time");
+    const uRes=gl.getUniformLocation(prog,"u_res");
+    let raf;
+    const resize=()=>{canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;gl.viewport(0,0,canvas.width,canvas.height);};
+    window.addEventListener("resize",resize);resize();
+    const draw=(t)=>{gl.uniform1f(uTime,t*0.001);gl.uniform2f(uRes,canvas.width,canvas.height);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);raf=requestAnimationFrame(draw);};
+    raf=requestAnimationFrame(draw);
+    return()=>{cancelAnimationFrame(raf);window.removeEventListener("resize",resize);};
+  },[]);
+  return <canvas ref={canvasRef} style={{position:"absolute",inset:0,width:"100%",height:"100%",display:"block"}}/>;
+}
+
 // ─── ANIMATED STATS ───────────────────────────────────────────────────────────
 function AnimatedStats() {
   const stats = [
-    { n:"15", label:"Peptide Kits" },
-    { n:"07", label:"Single Vials" },
-    { n:"04", label:"Research Protocols" },
-    { n:"EU", label:"Compliant Delivery" },
-    { n:"5",  label:"Payment Methods" },
+    {n:"15", label:"Peptide Kits"},
+    {n:"07", label:"Single Vials"},
+    {n:"04", label:"Research Protocols"},
+    {n:"EU", label:"Compliant Delivery"},
+    {n:"5",  label:"Payment Methods"},
   ];
   const [idx, setIdx] = React.useState(0);
   const [visible, setVisible] = React.useState(true);
   React.useEffect(() => {
     const interval = setInterval(() => {
       setVisible(false);
-      setTimeout(() => {
-        setIdx(i => (i + 1) % stats.length);
-        setVisible(true);
-      }, 320);
-    }, 2200);
+      setTimeout(() => { setIdx(i=>(i+1)%stats.length); setVisible(true); }, 320);
+    }, 2400);
     return () => clearInterval(interval);
   }, []);
   const s = stats[idx];
   return (
-    <div style={{ display:"flex", flexDirection:"column", justifyContent:"center", minHeight:160 }}>
-      <div style={{
-        fontSize:8, letterSpacing:"0.36em", color:C.muted,
-        fontFamily:mono, marginBottom:14, textTransform:"uppercase",
-        opacity: visible ? 1 : 0,
-        transition:"opacity 0.3s ease",
-      }}>
+    <div style={{display:"flex",flexDirection:"column",justifyContent:"center",minHeight:140}}>
+      <div style={{fontSize:8,letterSpacing:"0.36em",color:"rgba(122,126,132,0.8)",fontFamily:"'Courier Prime','Courier New',monospace",marginBottom:10,textTransform:"uppercase",opacity:visible?1:0,transition:"opacity 0.28s ease"}}>
         What we offer
       </div>
-      <div style={{
-        fontFamily:serif, fontSize:64, fontWeight:700, color:C.ink,
-        lineHeight:1, letterSpacing:"-0.03em",
-        transform: visible ? "translateY(0)" : "translateY(-12px)",
-        opacity: visible ? 1 : 0,
-        transition:"all 0.32s cubic-bezier(0.22,1,0.36,1)",
-      }}>{s.n}</div>
-      <div style={{
-        fontSize:10, color:C.accent, fontFamily:mono,
-        textTransform:"uppercase", letterSpacing:"0.22em", marginTop:10,
-        transform: visible ? "translateY(0)" : "translateY(8px)",
-        opacity: visible ? 1 : 0,
-        transition:"all 0.36s cubic-bezier(0.22,1,0.36,1) 0.06s",
-      }}>{s.label}</div>
-      {/* Dot indicators */}
-      <div style={{ display:"flex", gap:5, marginTop:18 }}>
-        {stats.map((_,i) => (
-          <div key={i} style={{
-            width: i===idx ? 16 : 5, height:5,
-            borderRadius:3,
-            background: i===idx ? C.accent : C.accentMd,
-            transition:"all 0.38s ease",
-          }}/>
+      <div style={{fontFamily:"'Libre Baskerville',Georgia,serif",fontSize:60,fontWeight:700,color:"#1A1C1E",lineHeight:1,letterSpacing:"-0.03em",transform:visible?"translateY(0)":"translateY(-14px)",opacity:visible?1:0,transition:"all 0.32s cubic-bezier(0.22,1,0.36,1)"}}>
+        {s.n}
+      </div>
+      <div style={{fontSize:10,color:"#2C5F54",fontFamily:"'Courier Prime','Courier New',monospace",textTransform:"uppercase",letterSpacing:"0.22em",marginTop:10,transform:visible?"translateY(0)":"translateY(10px)",opacity:visible?1:0,transition:"all 0.36s cubic-bezier(0.22,1,0.36,1) 0.06s"}}>
+        {s.label}
+      </div>
+      <div style={{display:"flex",gap:5,marginTop:16}}>
+        {stats.map((_,i)=>(
+          <div key={i} style={{width:i===idx?18:5,height:5,borderRadius:3,background:i===idx?"#2C5F54":"#C2D9D5",transition:"all 0.4s ease"}}/>
         ))}
       </div>
     </div>
@@ -1439,49 +1472,34 @@ export default function App() {
 
       <div style={{position:"relative",zIndex:1}}>
         {/* HERO */}
-        <div style={{padding:"72px 40px 60px",borderBottom:`1px solid ${C.border}`,background:C.surface,position:"relative",overflow:"hidden"}}>
-          {/* Faint background grid lines — editorial texture */}
-          <div style={{position:"absolute",inset:0,backgroundImage:`linear-gradient(${C.border}40 1px,transparent 1px)`,backgroundSize:"100% 64px",pointerEvents:"none",opacity:0.6}}/>
-
-          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"flex-end",justifyContent:"space-between",flexWrap:"wrap",gap:32,position:"relative",zIndex:1}}>
-
-            {/* Left text column with editorial rule */}
+        <div style={{position:"relative",overflow:"hidden",borderBottom:`1px solid ${C.border}`,minHeight:520}}>
+          <SpiralCanvas/>
+          <div style={{position:"absolute",inset:0,background:"rgba(244,242,237,0.52)",pointerEvents:"none"}}/>
+          <div style={{position:"relative",zIndex:2,maxWidth:1200,margin:"0 auto",padding:"80px 40px 72px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:40}}>
             <div style={{borderLeft:`2px solid ${C.accent}`,paddingLeft:32,maxWidth:580}}>
-              <div style={{fontSize:8,letterSpacing:"0.42em",color:C.accent,fontFamily:mono,marginBottom:20,textTransform:"uppercase",display:"flex",alignItems:"center",gap:10}}>
+              <div style={{fontSize:8,letterSpacing:"0.42em",color:C.accent,fontFamily:mono,marginBottom:20,textTransform:"uppercase"}}>
                 Research Compounds · EU Compliant
               </div>
-
-              <h1 style={{fontFamily:serif,fontWeight:700,fontSize:"clamp(32px,4vw,58px)",lineHeight:1.06,color:C.ink,margin:"0 0 0"}}>
+              <h1 style={{fontFamily:serif,fontWeight:700,fontSize:"clamp(32px,4vw,58px)",lineHeight:1.06,color:C.ink,margin:0}}>
                 Premium Peptide<br/>Research Compounds<br/><em style={{color:C.accent,fontStyle:"italic"}}>for Europe.</em>
               </h1>
-
-              {/* Diamond divider */}
               <div style={{display:"flex",alignItems:"center",gap:10,margin:"22px 0",opacity:0.5}}>
                 <div style={{flex:1,height:1,background:C.accentMd}}/>
-                <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                  <rect x="1" y="1" width="6" height="6" stroke={C.accent} strokeWidth="0.9" transform="rotate(45 4 4)"/>
-                </svg>
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><rect x="1" y="1" width="6" height="6" stroke={C.accent} strokeWidth="0.9" transform="rotate(45 4 4)"/></svg>
                 <div style={{flex:1,height:1,background:C.accentMd}}/>
               </div>
-
               <p style={{color:C.ink2,lineHeight:1.95,fontSize:14,marginBottom:26,fontFamily:sans}}>
                 Pharmaceutical-grade research peptides for serious scientific protocols. Available as kits or individual vials, with EU-wide delivery. Strictly for in-vitro and laboratory use only.
               </p>
-
               <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"7px 14px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:R.xs,fontSize:9,color:C.red,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>
                 ⚠ Not for human use · Research purposes only · 18+
               </div>
             </div>
-
-            {/* Animated cycling stats */}
-            <div style={{flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:40,minWidth:220}}>
+            <div style={{flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:40,minWidth:200}}>
               <AnimatedStats/>
             </div>
           </div>
         </div>
-
-        {/* CONTAINER SCROLL — between hero and featured */}
-        <ContainerScroll onOpenModal={setModalItem} cartIds={cartIds}/>
 
         {/* FEATURED SELECTION */}
         <ScrollTiltSection>
