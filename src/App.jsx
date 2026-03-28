@@ -823,7 +823,7 @@ function Logo({size=20}) {
 }
 
 // ─── PRODUCT DETAIL MODAL ────────────────────────────────────────────────────
-function ProductModal({item, onClose, onAdd, cartIds}) {
+function ProductModal({item, onClose, onAdd, cartIds, cart, setCart, onRemove}) {
   // Check if this compound has a counterpart (single ↔ kit)
   const kitVersion    = item.hasSingle ? item : KITS.find(k => k.id === item.kitId);
   const singleVersion = item.kitId    ? item : SINGLES.find(s => s.kitId === item.id);
@@ -933,20 +933,37 @@ function ProductModal({item, onClose, onAdd, cartIds}) {
 
         {/* Footer / Add button */}
         <div style={{padding:"0 28px 24px"}}>
-          <button
-            onClick={()=>{ onAdd(activeItem); onClose(); }}
-            style={{
-              width:"100%",padding:"14px",
-              background: inCart ? C.surface2 : C.accent,
-              border:`1px solid ${inCart ? C.borderMd : C.accent}`,
-              color: inCart ? C.muted : "#fff",
-              fontFamily:mono,fontSize:11,letterSpacing:"0.18em",
-              cursor: inCart ? "default" : "pointer",
-              borderRadius:R.sm,transition:"all 0.18s",
-            }}
-          >
-            {inCart ? "✓  Already in your order" : `Add to order  ·  €${activeItem.sellPrice}`}
-          </button>
+          <div style={{display:"flex",gap:10,alignItems:"center"}}>
+            <div style={{display:"flex",alignItems:"center",gap:0,border:`1px solid ${C.border}`,borderRadius:R.sm,overflow:"hidden",flexShrink:0}}>
+              <button
+                onClick={()=>{if(inCart){const q=(cart.find(p=>p.name===activeItem.name)?.qty||1)-1;if(q<=0)onRemove(activeItem.name);else setCart(prev=>prev.map(p=>p.name===activeItem.name?{...p,qty:q}:p));}}}
+                style={{width:40,height:48,background:C.surface2,border:"none",color:C.ink2,fontSize:18,cursor:"pointer",transition:"all 0.15s"}}
+                onMouseEnter={e=>e.currentTarget.style.background=C.border}
+                onMouseLeave={e=>e.currentTarget.style.background=C.surface2}
+              >−</button>
+              <span style={{width:40,textAlign:"center",fontFamily:mono,fontSize:14,fontWeight:700,color:C.ink}}>
+                {cart.find(p=>p.name===activeItem.name)?.qty||0}
+              </span>
+              <button
+                onClick={()=>onAdd(activeItem)}
+                style={{width:40,height:48,background:C.surface2,border:"none",color:C.ink2,fontSize:18,cursor:"pointer",transition:"all 0.15s"}}
+                onMouseEnter={e=>e.currentTarget.style.background=C.border}
+                onMouseLeave={e=>e.currentTarget.style.background=C.surface2}
+              >+</button>
+            </div>
+            <button
+              onClick={()=>onAdd(activeItem)}
+              style={{flex:1,padding:"14px",background:inCart?C.accentLt:C.accent,border:`1px solid ${inCart?C.accentMd:C.accent}`,color:inCart?C.accent:"#fff",fontFamily:mono,fontSize:11,letterSpacing:"0.18em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}
+              onMouseDown={e=>e.currentTarget.style.transform="scale(0.97)"}
+              onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}
+              onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
+            >
+              {inCart
+                ? `✓ In order (${cart.find(p=>p.name===activeItem.name)?.qty||1}) · €${activeItem.sellPrice*(cart.find(p=>p.name===activeItem.name)?.qty||1)}`
+                : `Add to order · €${activeItem.sellPrice}`
+              }
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -954,7 +971,7 @@ function ProductModal({item, onClose, onAdd, cartIds}) {
 }
 
 // ─── KIT CARD ────────────────────────────────────────────────────────────────
-function KitCard({item, onAdd, inCart, onOpenModal}) {
+function KitCard({item, onAdd, inCart, onOpenModal, cart, setCart, onRemove}) {
   const [hov, setHov] = useState(false);
   const cc = CAT[item.category] || C.accent;
   return (
@@ -983,18 +1000,40 @@ function KitCard({item, onAdd, inCart, onOpenModal}) {
         </div>
       </div>
       <p style={{fontSize:13,color:C.ink2,lineHeight:1.8,flex:1,marginBottom:18,paddingLeft:8}}>{item.desc}</p>
-      <div style={{paddingLeft:8,display:"flex",gap:8}}>
-        <button onClick={e=>{e.stopPropagation();onOpenModal(item);}} style={{flex:1,padding:"9px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>View details</button>
-        <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{flex:2,padding:"9px",background:inCart?C.accentLt:C.surface2,border:`1px solid ${inCart?C.accentMd:C.border}`,color:inCart?C.accent:C.ink2,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>
-          {inCart?"✓ Added":"Add to order"}
+      <div style={{paddingLeft:8,display:"flex",gap:8,alignItems:"center"}}>
+        <button onClick={e=>{e.stopPropagation();onOpenModal(item);}} style={{flex:1,padding:"9px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm}}>
+          Details
         </button>
+        {inCart ? (
+          <div style={{flex:2,display:"flex",alignItems:"center",gap:0,border:`1px solid ${C.accentMd}`,borderRadius:R.sm,overflow:"hidden",background:C.accentLt}}>
+            <button
+              onClick={e=>{e.stopPropagation();const current=cart.find(p=>p.name===item.name);const newQty=(current?.qty||1)-1;if(newQty<=0)onRemove(item.name);else setCart(prev=>prev.map(p=>p.name===item.name?{...p,qty:newQty}:p));}}
+              style={{width:32,height:36,background:"none",border:"none",color:C.accent,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"background 0.15s",flexShrink:0}}
+              onMouseEnter={e=>e.currentTarget.style.background=C.accentMd}
+              onMouseLeave={e=>e.currentTarget.style.background="none"}
+            >−</button>
+            <span style={{flex:1,textAlign:"center",fontFamily:mono,fontSize:11,color:C.accent,fontWeight:700,letterSpacing:"0.08em"}}>
+              {cart.find(p=>p.name===item.name)?.qty||1}
+            </span>
+            <button
+              onClick={e=>{e.stopPropagation();onAdd(item,1);}}
+              style={{width:32,height:36,background:"none",border:"none",color:C.accent,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"background 0.15s",flexShrink:0}}
+              onMouseEnter={e=>e.currentTarget.style.background=C.accentMd}
+              onMouseLeave={e=>e.currentTarget.style.background="none"}
+            >+</button>
+          </div>
+        ) : (
+          <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{flex:2,padding:"9px",background:C.surface2,border:`1px solid ${C.border}`,color:C.ink2,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>
+            Add to order
+          </button>
+        )}
       </div>
     </div>
   );
 }
 
 // ─── SINGLE ROW ──────────────────────────────────────────────────────────────
-function SingleRow({item, onAdd, inCart, onOpenModal}) {
+function SingleRow({item, onAdd, inCart, onOpenModal, cart, setCart, onRemove}) {
   const [hov, setHov] = useState(false);
   const cc = CAT[item.category] || C.muted;
   return (
@@ -1019,7 +1058,15 @@ function SingleRow({item, onAdd, inCart, onOpenModal}) {
         <div style={{fontSize:18,fontWeight:700,color:C.ink,fontFamily:serif,marginBottom:8}}>€{item.sellPrice}</div>
         <div style={{display:"flex",gap:6,justifyContent:"flex-end"}}>
           <button onClick={e=>{e.stopPropagation();onOpenModal(item);}} style={{padding:"6px 10px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:8,letterSpacing:"0.12em",cursor:"pointer",borderRadius:R.sm}}>Details</button>
-          <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{padding:"6px 12px",background:inCart?C.accentLt:C.surface2,border:`1px solid ${inCart?C.accentMd:C.border}`,color:inCart?C.accent:C.ink2,fontFamily:mono,fontSize:8,letterSpacing:"0.12em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>{inCart?"✓ Added":"+ Add"}</button>
+          {inCart ? (
+            <div style={{display:"flex",alignItems:"center",gap:0,border:`1px solid ${C.accentMd}`,borderRadius:R.sm,overflow:"hidden",background:C.accentLt,height:32}}>
+              <button onClick={e=>{e.stopPropagation();const current=cart.find(p=>p.name===item.name);const newQty=(current?.qty||1)-1;if(newQty<=0)onRemove(item.name);else setCart(prev=>prev.map(p=>p.name===item.name?{...p,qty:newQty}:p));}} style={{width:28,height:"100%",background:"none",border:"none",color:C.accent,fontSize:15,cursor:"pointer",flexShrink:0}}>−</button>
+              <span style={{width:24,textAlign:"center",fontFamily:mono,fontSize:11,color:C.accent,fontWeight:700}}>{cart.find(p=>p.name===item.name)?.qty||1}</span>
+              <button onClick={e=>{e.stopPropagation();onAdd(item,1);}} style={{width:28,height:"100%",background:"none",border:"none",color:C.accent,fontSize:15,cursor:"pointer",flexShrink:0}}>+</button>
+            </div>
+          ) : (
+            <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{padding:"6px 12px",background:C.surface2,border:`1px solid ${C.border}`,color:C.ink2,fontFamily:mono,fontSize:8,letterSpacing:"0.12em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>+ Add</button>
+          )}
         </div>
       </div>
     </div>
@@ -1071,11 +1118,11 @@ function CheckoutModal({cart, onClose, onSuccess}) {
   const [method, setMethod] = useState(null);
   const [form, setForm]     = useState({name:"",street:"",postCode:"",city:"",country:"",phone:"",email:""});
   const [agreed, setAgreed] = useState(false);
-  const total = cart.reduce((s,p)=>s+p.sellPrice,0);
+  const total = cart.reduce((s,p)=>s+(p.sellPrice*(p.qty||1)),0);
   const canProceed = form.name&&form.street&&form.postCode&&form.city&&form.email&&form.phone;
 
   const buildSummary = () => {
-    const items = cart.map(p=>`  • ${p.name} (${p.mg})`).join("\n");
+    const items = cart.map(p=>`  • ${p.name} (${p.mg}) × ${p.qty||1}`).join("\n");
     return `Items you want:\n${items}\n\nName: ${form.name}\nStreet: ${form.street}\nPost Code: ${form.postCode}\nCity: ${form.city}\nCountry: ${form.country}\nPhone number: ${form.phone}\nMail: ${form.email}\nPayment method: ${METHODS.find(m=>m.id===method)?.label||""}`;
   };
 
@@ -1161,7 +1208,7 @@ function CheckoutModal({cart, onClose, onSuccess}) {
                 <div style={{fontSize:8,letterSpacing:"0.24em",color:C.muted,marginBottom:10,fontFamily:mono,textTransform:"uppercase"}}>Order Summary — Supplier Format</div>
                 <div style={{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:R.sm,padding:"16px",fontFamily:mono,fontSize:11,color:C.ink2,lineHeight:2,whiteSpace:"pre-wrap"}}>
                   <span style={{color:C.accent,fontWeight:700}}>Items you want:</span>{"\n"}
-                  {cart.map(p=>`  • ${p.name} (${p.mg})`).join("\n")}{"\n\n"}
+                  {cart.map(p=>`  • ${p.name} (${p.mg}) × ${p.qty||1}`).join("\n")}{"\n\n"}
                   <span style={{color:C.accent,fontWeight:700}}>Name:</span> {form.name}{"\n"}
                   <span style={{color:C.accent,fontWeight:700}}>Street:</span> {form.street}{"\n"}
                   <span style={{color:C.accent,fontWeight:700}}>Post Code:</span> {form.postCode}{"\n"}
@@ -1218,8 +1265,8 @@ function CheckoutModal({cart, onClose, onSuccess}) {
 }
 
 // ─── CART DRAWER ─────────────────────────────────────────────────────────────
-function CartDrawer({cart, onRemove, onClose, onCheckout, visible}) {
-  const total = cart.reduce((s,p)=>s+p.sellPrice,0);
+function CartDrawer({cart, onRemove, onClose, onCheckout, visible, setCart}) {
+  const total = cart.reduce((s,p)=>s+(p.sellPrice*(p.qty||1)),0);
   return (
     <div style={{
       position:"fixed",inset:0,zIndex:1000,
@@ -1252,7 +1299,7 @@ function CartDrawer({cart, onRemove, onClose, onCheckout, visible}) {
         <div style={{padding:"18px 22px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <div>
             <div style={{fontFamily:serif,fontSize:15,fontWeight:700,color:C.ink}}>Your Order</div>
-            <div style={{fontSize:9,color:C.muted,marginTop:2,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.2em"}}>{cart.length} item{cart.length!==1?"s":""}</div>
+            <div style={{fontSize:9,color:C.muted,marginTop:2,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.2em"}}>{cart.reduce((s,p)=>s+(p.qty||1),0)} item{cart.reduce((s,p)=>s+(p.qty||1),0)!==1?"s":""}</div>
           </div>
           <button onClick={onClose} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,cursor:"pointer",padding:"5px 10px",borderRadius:R.sm,fontSize:12,fontFamily:mono}}>Close</button>
         </div>
@@ -1261,16 +1308,18 @@ function CartDrawer({cart, onRemove, onClose, onCheckout, visible}) {
             ?<div style={{textAlign:"center",padding:"48px 0",color:C.dim,fontSize:13,fontFamily:sans}}>Your order is empty.</div>
             :cart.map((item,i)=>(
               <div key={i} style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",padding:"13px 0",borderBottom:`1px solid ${C.border}`}}>
-                <div>
+                <div style={{flex:1}}>
                   <div style={{color:C.ink,fontSize:13,fontWeight:600,fontFamily:serif}}>{item.name}</div>
                   <div style={{color:C.muted,fontSize:10,marginTop:2,fontFamily:mono}}>{item.mg}</div>
-                  <div style={{display:"flex",gap:4,marginTop:4,flexWrap:"wrap"}}>
-                    {item.id?.startsWith("k")&&<Tag label="KIT" color={C.accent}/>}
-                    {item.stackDiscount&&<Tag label="15% OFF" color={C.gold}/>}
-                  </div>
+                  {item.id?.startsWith("k")&&<div style={{marginTop:4}}><Tag label="KIT" color={C.accent}/></div>}
                 </div>
-                <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
-                  <span style={{color:C.ink,fontFamily:serif,fontSize:14,fontWeight:700}}>€{item.sellPrice}</span>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+                  <div style={{display:"flex",alignItems:"center",gap:0,border:`1px solid ${C.border}`,borderRadius:R.sm,overflow:"hidden"}}>
+                    <button onClick={()=>{const newQty=(item.qty||1)-1;if(newQty<=0)onRemove(i);else setCart(prev=>prev.map((p,j)=>j===i?{...p,qty:newQty}:p));}} style={{width:26,height:26,background:"none",border:"none",color:C.muted,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+                    <span style={{width:22,textAlign:"center",fontFamily:mono,fontSize:11,fontWeight:700,color:C.ink}}>{item.qty||1}</span>
+                    <button onClick={()=>{if((item.qty||1)<20)setCart(prev=>prev.map((p,j)=>j===i?{...p,qty:Math.min((p.qty||1)+1,20)}:p));}} style={{width:26,height:26,background:"none",border:"none",color:C.muted,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+                  </div>
+                  <span style={{color:C.ink,fontFamily:mono,fontSize:13,fontWeight:700,minWidth:48,textAlign:"right"}}>€{item.sellPrice*(item.qty||1)}</span>
                   <button onClick={()=>onRemove(i)} style={{background:"none",border:"none",color:C.dim,cursor:"pointer",fontSize:16,padding:0}}>×</button>
                 </div>
               </div>
@@ -1487,7 +1536,22 @@ export default function App() {
   const closeCart = () => { setCartVisible(false); setTimeout(()=>setCartOpen(false),340); };
 
   const cartIds   = cart.map(p=>p.name);
-  const addToCart = item => { if(!cartIds.includes(item.name)) setCart(p=>[...p,item]); };
+  const cartCount = cart.reduce((s,p)=>s+(p.qty||1),0);
+  const addToCart = (item, qty = 1) => {
+    setCart(prev => {
+      const existing = prev.find(p => p.name === item.name);
+      if (existing) {
+        return prev.map(p => p.name === item.name
+          ? {...p, qty: Math.min((p.qty||1) + qty, 20)}
+          : p
+        );
+      }
+      return [...prev, {...item, qty}];
+    });
+  };
+  const removeFromCart = (name) => {
+    setCart(prev => prev.filter(p => p.name !== name));
+  };
   const addStack  = stack => {
     const all   = [...KITS,...SINGLES];
     const toAdd = stack.peptides
@@ -1516,8 +1580,8 @@ export default function App() {
         <TubelightNav tab={tab} onTabChange={handleTabClick}/>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
           <button onClick={()=>setShowAdmin(!showAdmin)} style={{background:"none",border:"none",color:C.dim,cursor:"pointer",fontSize:14,padding:"4px 6px"}}>⚙</button>
-          <button onClick={openCart} style={{padding:"8px 16px",background:cart.length>0?C.accentLt:C.surface,border:`1px solid ${cart.length>0?C.accentMd:C.border}`,color:cart.length>0?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:500,cursor:"pointer",borderRadius:100,transition:"all 0.24s"}}>
-            Order{cart.length>0?` (${cart.length})`:""}
+          <button onClick={openCart} style={{padding:"8px 16px",background:cartCount>0?C.accentLt:C.surface,border:`1px solid ${cartCount>0?C.accentMd:C.border}`,color:cartCount>0?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:500,cursor:"pointer",borderRadius:100,transition:"all 0.24s"}}>
+            Order{cartCount>0?` (${cartCount})`:""}
           </button>
         </div>
       </header>
@@ -1615,7 +1679,7 @@ export default function App() {
               <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>10 vials per kit · best value · click any card for full details</span>
             </div>
             <div key={catFilter} className="filter-enter catalogue-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(308px,1fr))",gap:14,alignItems:"stretch"}}>
-              {fKits.map((p,i)=><ScrollRevealItem key={p.id} index={i}><KitCard item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/></ScrollRevealItem>)}
+              {fKits.map((p,i)=><ScrollRevealItem key={p.id} index={i}><KitCard item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem} cart={cart} setCart={setCart} onRemove={removeFromCart}/></ScrollRevealItem>)}
             </div>
           </div>
           </ScrollTiltSection>
@@ -1632,12 +1696,12 @@ export default function App() {
               <span style={{fontSize:11,color:C.muted,fontFamily:mono}}>individual compounds · click any row for full details</span>
             </div>
             <div key={catFilter} className="filter-enter" style={{display:"flex",flexDirection:"column",gap:10}}>
-              {fSingles.map((p,i)=><ScrollRevealItem key={p.id} index={i}><SingleRow item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/></ScrollRevealItem>)}
+              {fSingles.map((p,i)=><ScrollRevealItem key={p.id} index={i}><SingleRow item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem} cart={cart} setCart={setCart} onRemove={removeFromCart}/></ScrollRevealItem>)}
             </div>
             <div style={{height:1,background:C.border,margin:"36px 0"}}/>
             <h2 style={{fontFamily:serif,fontSize:20,fontWeight:700,color:C.ink,marginBottom:20}}>Tablets</h2>
             <div style={{display:"flex",flexDirection:"column",gap:10}}>
-              {TABLETS.map(p=><SingleRow key={p.id} item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem}/>)}
+              {TABLETS.map(p=><SingleRow key={p.id} item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem} cart={cart} setCart={setCart} onRemove={removeFromCart}/>)}
             </div>
           </div>
           </ScrollTiltSection>
@@ -1673,10 +1737,10 @@ export default function App() {
       </div>
 
       {/* PRODUCT MODAL */}
-      {modalItem && <ProductModal item={modalItem} onClose={()=>setModalItem(null)} onAdd={addToCart} cartIds={cartIds}/>}
+      {modalItem && <ProductModal item={modalItem} onClose={()=>setModalItem(null)} onAdd={addToCart} cartIds={cartIds} cart={cart} setCart={setCart} onRemove={removeFromCart}/>}
 
       {/* CART */}
-      {cartOpen&&<CartDrawer cart={cart} onRemove={i=>setCart(p=>p.filter((_,j)=>j!==i))} onClose={closeCart} onCheckout={()=>{closeCart();setTimeout(()=>setCheckoutOpen(true),360);}} visible={cartVisible}/>}
+      {cartOpen&&<CartDrawer cart={cart} onRemove={i=>setCart(p=>p.filter((_,j)=>j!==i))} onClose={closeCart} onCheckout={()=>{closeCart();setTimeout(()=>setCheckoutOpen(true),360);}} visible={cartVisible} setCart={setCart}/>}
 
       {/* CHECKOUT */}
       {checkoutOpen&&<CheckoutModal cart={cart} onClose={()=>setCheckoutOpen(false)} onSuccess={handleSuccess}/>}
@@ -1696,10 +1760,10 @@ export default function App() {
             <span style={{fontSize:9,fontFamily:mono,letterSpacing:"0.08em",textTransform:"uppercase"}}>{label}</span>
           </button>
         ))}
-        <button onClick={openCart} style={{flex:1,background:"none",border:"none",borderTop:cart.length>0?`2px solid ${C.accent}`:"2px solid transparent",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,cursor:"pointer",color:cart.length>0?C.accent:C.muted,transition:"all 0.2s",padding:0,position:"relative"}}>
-          {cart.length>0&&<div style={{position:"absolute",top:8,right:"calc(50% - 16px)",width:16,height:16,background:C.accent,borderRadius:"50%",fontSize:9,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontFamily:mono}}>{cart.length}</div>}
+        <button onClick={openCart} style={{flex:1,background:"none",border:"none",borderTop:cartCount>0?`2px solid ${C.accent}`:"2px solid transparent",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,cursor:"pointer",color:cartCount>0?C.accent:C.muted,transition:"all 0.2s",padding:0,position:"relative"}}>
+          {cartCount>0&&<div style={{position:"absolute",top:8,right:"calc(50% - 16px)",width:16,height:16,background:C.accent,borderRadius:"50%",fontSize:9,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontFamily:mono}}>{cartCount}</div>}
           <svg viewBox="0 0 20 20" fill="none" width="20" height="20"><path d="M3 4h2l2.5 8h7l2-5H6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="15.5" r="1.2" fill="currentColor"/><circle cx="14" cy="15.5" r="1.2" fill="currentColor"/></svg>
-          <span style={{fontSize:9,fontFamily:mono,letterSpacing:"0.08em",textTransform:"uppercase"}}>{cart.length>0?`(${cart.length})`:"Order"}</span>
+          <span style={{fontSize:9,fontFamily:mono,letterSpacing:"0.08em",textTransform:"uppercase"}}>{cartCount>0?`(${cartCount})`:"Order"}</span>
         </button>
       </div>
 
