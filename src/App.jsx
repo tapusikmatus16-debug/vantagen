@@ -1422,6 +1422,7 @@ export default function App() {
 
   const handleTabClick = (id) => {
     setTab(id);
+    setCatFilter("All");
     scrollToCatalogue();
   };
 
@@ -1518,10 +1519,10 @@ export default function App() {
         </ScrollTiltSection>
 
         {/* FILTER BAR — catalogue anchor */}
-        <div ref={catalogueRef} style={{borderBottom:`1px solid ${C.border}`,background:C.surface,padding:"0 40px"}}>
-          <div className="filter-bar" style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:0}}>
+        <div ref={catalogueRef} style={{borderBottom:`1px solid ${C.border}`,background:C.surface,padding:"0 40px",position:"sticky",top:64,zIndex:90}}>
+          <div className="filter-bar" style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:0,overflowX:"auto",whiteSpace:"nowrap",scrollbarWidth:"none"}}>
             {CATS.map(c=>(
-              <button key={c} onClick={()=>setCatFilter(c)} style={{padding:"14px 18px",background:"transparent",border:"none",borderBottom:`2px solid ${catFilter===c?(CAT[c]||C.accent):"transparent"}`,color:catFilter===c?(CAT[c]||C.accent):C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",transition:"all 0.24s",textTransform:"uppercase"}}>{c}</button>
+              <button key={c} onClick={()=>setCatFilter(c)} style={{padding:"14px 18px",background:"transparent",border:"none",borderBottom:`2px solid ${catFilter===c?(CAT[c]||C.accent):"transparent"}`,color:catFilter===c?(CAT[c]||C.accent):C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",transition:"all 0.24s",textTransform:"uppercase",flexShrink:0}}>{c}</button>
             ))}
           </div>
         </div>
@@ -1719,6 +1720,7 @@ export default function App() {
           .catalogue-grid { grid-template-columns: 1fr !important; }
 
           .filter-bar { overflow-x: auto !important; white-space: nowrap !important; -webkit-overflow-scrolling: touch !important; }
+          div[style*="padding:\"0 40px\""], .filter-bar-wrap { padding: 0 !important; }
 
           .catalogue-grid .card-padding { padding: 16px !important; }
 
