@@ -25,7 +25,7 @@ const sans  = "'Outfit',system-ui,sans-serif";
 // fullDesc: displayed in the modal — accessible but professional
 const KITS = [
   {
-    id:"k1", name:"Retatrutide", code:"RT10", mg:"10mg × 10 vials",
+    id:"k1", name:"Retatrutide", code:"RT10", mg:"10mg × 10 vials", image:"/products/retatrutide.png",
     supplierPrice:230, sellPrice:289, category:"Weight Loss", badge:"BESTSELLER",
     desc:"Triple GIP/GLP-1/Glucagon agonist. The most advanced metabolic research compound currently available.",
     fullDesc:`Retatrutide is a next-generation synthetic peptide designed to simultaneously engage three distinct hormonal receptor systems: GLP-1 (glucagon-like peptide-1), GIP (glucose-dependent insulinotropic polypeptide), and glucagon receptors. This triple-agonist profile makes it one of the most structurally sophisticated compounds currently studied in metabolic research.
@@ -35,7 +35,7 @@ Each of these receptor pathways plays a specific role in how the body processes 
 This material is supplied as a lyophilised (freeze-dried) research-grade peptide, intended strictly for in-vitro and analytical laboratory applications by qualified scientific professionals. It is not approved for human or veterinary use.`,
   },
   {
-    id:"k2", name:"Retatrutide 20", code:"RT20", mg:"20mg × 10 vials",
+    id:"k2", name:"Retatrutide 20", code:"RT20", mg:"20mg × 10 vials", image:"/products/retatrutide-20.png",
     supplierPrice:410, sellPrice:519, category:"Weight Loss", badge:"HIGH DOSE",
     desc:"High-dose Retatrutide kit for extended metabolic research protocols.",
     fullDesc:`Retatrutide 20 is the high-dose formulation of the triple GIP/GLP-1/Glucagon receptor agonist, supplied at 20mg per vial for research applications that require larger quantities or longer-duration protocols.
@@ -45,7 +45,7 @@ Its triple-agonist mechanism engages three interconnected hormonal receptor syst
 The higher per-vial concentration reduces reconstitution frequency and is suited to extended or comparative in-vitro studies. Supplied as a lyophilised research-grade substance for use exclusively in regulated laboratory environments by qualified researchers.`,
   },
   {
-    id:"k3", name:"Tirzepatide", code:"TR10", mg:"10mg × 10 vials",
+    id:"k3", name:"Tirzepatide", code:"TR10", mg:"10mg × 10 vials", image:"/products/tirzepatide.png",
     supplierPrice:115, sellPrice:145, category:"Weight Loss", badge:null,
     desc:"Dual GIP/GLP-1 receptor agonist. Extensively studied for metabolic and glycaemic research.",
     fullDesc:`Tirzepatide is a dual-incretin peptide that acts as a simultaneous agonist at two receptor types: GLP-1 (glucagon-like peptide-1) and GIP (glucose-dependent insulinotropic polypeptide). Both are naturally occurring hormones secreted by the gut in response to food intake, and they play complementary roles in insulin regulation and metabolic signalling.
@@ -55,7 +55,7 @@ What makes Tirzepatide particularly interesting from a research perspective is h
 Supplied as a lyophilised research-grade peptide for in-vitro and laboratory use only. Not intended for human or veterinary application.`,
   },
   {
-    id:"k4", name:"Tirzepatide 20", code:"TR20", mg:"20mg × 10 vials",
+    id:"k4", name:"Tirzepatide 20", code:"TR20", mg:"20mg × 10 vials", image:"/products/tirzepatide-20.png",
     supplierPrice:220, sellPrice:279, category:"Weight Loss", badge:null,
     desc:"High-dose Tirzepatide. Comprehensive dual-receptor metabolic pathway research.",
     fullDesc:`Tirzepatide 20 is the high-dose kit formulation of the dual GLP-1 and GIP receptor agonist, providing 20mg per vial for research protocols requiring extended quantities or dose-escalation study designs.
@@ -65,7 +65,7 @@ As a dual-incretin compound, Tirzepatide engages the GLP-1 and GIP receptor syst
 Supplied as a lyophilised research-grade substance for qualified laboratory professionals. Intended solely for in-vitro and analytical research applications within regulated environments.`,
   },
   {
-    id:"k5", name:"CJC-1295 (no DAC)", code:"CJC", mg:"2mg × 10 vials",
+    id:"k5", name:"CJC-1295 (no DAC)", code:"CJC", mg:"2mg × 10 vials", image:"/products/cjc-1295.png",
     supplierPrice:110, sellPrice:139, category:"Performance", badge:null,
     desc:"Modified GRF 1-29 GHRH analog. Short-acting, pulsatile GH release without DAC modification.",
     fullDesc:`CJC-1295 without DAC — also referred to as Modified GRF 1-29 — is a synthetic analogue of Growth Hormone Releasing Hormone (GHRH), the natural signal produced by the hypothalamus that prompts the pituitary gland to secrete growth hormone.
@@ -75,7 +75,7 @@ The "no DAC" designation indicates the absence of a Drug Affinity Complex modifi
 This compound is widely used in GH axis research, endocrinological studies, and experiments examining how pulsatile hormone release differs from continuous exposure. Supplied as a lyophilised research-grade peptide for laboratory use by qualified professionals only.`,
   },
   {
-    id:"k6", name:"TB-500", code:"TB4", mg:"5mg × 10 vials",
+    id:"k6", name:"TB-500", code:"TB4", mg:"5mg × 10 vials", image:"/products/tb-500.png",
     supplierPrice:140, sellPrice:179, category:"Recovery", badge:null,
     desc:"Thymosin Beta-4 fragment. Widely studied for systemic healing and cellular migration.",
     fullDesc:`TB-500 is a synthetic peptide corresponding to the most biologically active region of Thymosin Beta-4 — a naturally occurring protein present in virtually all human and animal cells, where it plays structural and regulatory roles in cellular organisation.
@@ -85,7 +85,7 @@ The specific fragment used in TB-500 (amino acids 17–23 of the full Thymosin B
 TB-500 has been studied in a broad range of research contexts and is considered a well-characterised reference compound in regenerative biochemistry. Supplied as a lyophilised research-grade substance for in-vitro and analytical use in regulated laboratory environments only.`,
   },
   {
-    id:"k7", name:"BPC-157", code:"BPC157", mg:"5mg × 10 vials",
+    id:"k7", name:"BPC-157", code:"BPC157", mg:"5mg × 10 vials", image:"/products/bpc-157.png",
     supplierPrice:80, sellPrice:99, category:"Recovery", badge:"POPULAR",
     desc:"Body Protective Compound. Among the most extensively researched peptides for gut and tissue repair.",
     fullDesc:`BPC-157, or Body Protective Compound-157, is a synthetic pentadecapeptide — a chain of precisely 15 amino acids — originally derived from a protein naturally present in human gastric secretions. Despite its small size, it has become one of the most extensively researched peptides in the fields of regenerative biochemistry and gastrointestinal physiology.
@@ -96,7 +96,7 @@ Its stability under acidic conditions — unusual for a peptide — has also mad
     hasSingle: true,
   },
   {
-    id:"k8", name:"DSIP", code:"DSIP", mg:"5mg × 10 vials",
+    id:"k8", name:"DSIP", code:"DSIP", mg:"5mg × 10 vials", image:"/products/dsip.png",
     supplierPrice:90, sellPrice:115, category:"Longevity", badge:null,
     desc:"Delta Sleep-Inducing Peptide. Studied for sleep architecture regulation and stress response.",
     fullDesc:`DSIP — Delta Sleep-Inducing Peptide — is a nonapeptide (nine amino acids) first isolated in the 1970s from the cerebral venous blood of rabbits during slow-wave sleep states. Since its discovery, it has attracted sustained interest in neurochemical and neuroendocrine research.
@@ -106,7 +106,7 @@ Its name reflects its original association with the induction of delta-wave brai
 DSIP is considered a structurally unusual peptide due to its apparent resistance to rapid degradation and its ability to cross the blood-brain barrier — both properties that make it a useful tool in neurochemical research. Supplied as a lyophilised research-grade peptide for regulated laboratory use by qualified professionals only.`,
   },
   {
-    id:"k9", name:"Selank", code:"SELANK", mg:"5mg × 10 vials",
+    id:"k9", name:"Selank", code:"SELANK", mg:"5mg × 10 vials", image:"/products/selank.png",
     supplierPrice:80, sellPrice:99, category:"Longevity", badge:null,
     desc:"Anxiolytic heptapeptide. Studied extensively for cognitive and neurological research applications.",
     fullDesc:`Selank is a synthetic heptapeptide (seven amino acids) developed as a structural analogue of Tuftsin — a naturally occurring immunomodulatory tetrapeptide derived from immunoglobulin G. Through the addition of a stabilising amino acid sequence, Selank exhibits enhanced metabolic stability compared to its parent compound.
@@ -116,7 +116,7 @@ It belongs to a class of compounds studied in neurochemical research for their i
 Selank was originally developed and researched extensively in Russian scientific institutions and has been the subject of numerous peer-reviewed neurobiological studies. This material is supplied as a research-grade compound for use exclusively in qualified laboratory environments, and is not associated with any approved therapeutic application in the EU.`,
   },
   {
-    id:"k10", name:"Semax", code:"SEMAX", mg:"10mg × 10 vials",
+    id:"k10", name:"Semax", code:"SEMAX", mg:"10mg × 10 vials", image:"/products/semax.png",
     supplierPrice:100, sellPrice:129, category:"Longevity", badge:null,
     desc:"Neuropeptide ACTH analog. Studied for cognitive performance and neuroprotective mechanisms.",
     fullDesc:`Semax is a synthetic heptapeptide derived from the 4–10 fragment of adrenocorticotropic hormone (ACTH) — a pituitary hormone involved in the stress response — with modifications that remove its hormonal activity while preserving and enhancing its neurological research properties.
@@ -126,7 +126,7 @@ It is primarily studied for its effects on BDNF (Brain-Derived Neurotrophic Fact
 Like Selank, Semax was developed within Russian academic research institutions and has been documented in a substantial body of peer-reviewed literature. It is supplied here as a lyophilised research-grade peptide for in-vitro and analytical laboratory applications by qualified professionals. Not approved for any therapeutic, cosmetic, or nutritional use.`,
   },
   {
-    id:"k11", name:"CJC + Ipamorelin", code:"CJC+IPA", mg:"5mg × 10 vials",
+    id:"k11", name:"CJC + Ipamorelin", code:"CJC+IPA", mg:"5mg × 10 vials", image:"/products/cjc-ipamorelin.png",
     supplierPrice:190, sellPrice:239, category:"Performance", badge:"STACK KIT",
     desc:"Pre-combined synergistic GH secretagogue kit. Full pulsatile GH release research protocol.",
     fullDesc:`This kit combines two complementary growth hormone secretagogues — CJC-1295 (no DAC) and Ipamorelin — pre-formulated together in each vial, making it a convenient option for research protocols that study both compounds in combination.
@@ -136,7 +136,7 @@ CJC-1295 (no DAC) works at the level of the hypothalamus, acting as a GHRH (Grow
 When studied together, these two mechanisms are understood to have a synergistic relationship: activating both pathways simultaneously produces a stronger and more sustained GH secretion pulse than either compound alone. This makes the combination particularly useful for researchers studying GH axis dynamics, secretagogue interactions, or pulsatile hormone release patterns. Pre-combined in each vial for research convenience. Supplied as a lyophilised research-grade substance for laboratory use only.`,
   },
   {
-    id:"k12", name:"Ipamorelin", code:"IPA", mg:"5mg × 10 vials",
+    id:"k12", name:"Ipamorelin", code:"IPA", mg:"5mg × 10 vials", image:"/products/ipamorelin.png",
     supplierPrice:90, sellPrice:115, category:"Performance", badge:null,
     desc:"Selective GHRP with minimal side-effect profile. Clean, well-researched GH secretagogue.",
     fullDesc:`Ipamorelin is a synthetic pentapeptide (five amino acids) classified as a Growth Hormone Releasing Peptide (GHRP). It acts as an agonist at the ghrelin receptor — also known as the GHS-R (Growth Hormone Secretagogue Receptor) — stimulating growth hormone release from the anterior pituitary gland.
@@ -147,7 +147,7 @@ Ipamorelin is one of the most frequently cited reference compounds in GH secreta
     hasSingle: true,
   },
   {
-    id:"k13", name:"GHRP-6", code:"GHRP6", mg:"5mg × 10 vials",
+    id:"k13", name:"GHRP-6", code:"GHRP6", mg:"5mg × 10 vials", image:"/products/ghrp-6.png",
     supplierPrice:80, sellPrice:99, category:"Performance", badge:null,
     desc:"Growth hormone releasing hexapeptide. Studied for comprehensive GH axis stimulation.",
     fullDesc:`GHRP-6 — Growth Hormone Releasing Peptide-6 — is a synthetic hexapeptide (six amino acids) and one of the earliest GH secretagogues developed for research purposes. It acts as an agonist at the ghrelin receptor, stimulating growth hormone release from the pituitary gland through a mechanism independent of the GHRH pathway.
@@ -157,7 +157,7 @@ As one of the original GHRP compounds, GHRP-6 has an extensive research history 
 GHRP-6 has been documented across a wide range of peer-reviewed neuroendocrine and endocrinological research. Supplied as a lyophilised research-grade peptide for qualified laboratory professionals. Not intended for human or veterinary use.`,
   },
   {
-    id:"k14", name:"MOTS-c", code:"MOTSC", mg:"10mg × 10 vials",
+    id:"k14", name:"MOTS-c", code:"MOTSC", mg:"10mg × 10 vials", image:"/products/mots-c.png",
     supplierPrice:160, sellPrice:199, category:"Longevity", badge:"LONGEVITY",
     desc:"Mitochondrial-derived peptide. Studied for metabolic regulation and longevity signalling pathways.",
     fullDesc:`MOTS-c (Mitochondrial Open Reading Frame of the 12S rRNA type-c) is a small peptide encoded not in the cell's nucleus, but within the mitochondrial genome itself — a discovery that challenged long-held assumptions about what mitochondria produce. It was first characterised in 2015 and has since generated significant research interest in geroscience and metabolic biology.
@@ -167,7 +167,7 @@ Mitochondria are the energy-producing structures within cells, and MOTS-c appear
 Its mitochondrial origin and its apparent capacity to translocate to the nucleus under certain conditions make MOTS-c a structurally and functionally unique research compound. Supplied as a lyophilised research-grade peptide for in-vitro and analytical laboratory use by qualified professionals only.`,
   },
   {
-    id:"k15", name:"SS-31", code:"SS31", mg:"10mg × 10 vials",
+    id:"k15", name:"SS-31", code:"SS31", mg:"10mg × 10 vials", image:"/products/ss-31.png",
     supplierPrice:200, sellPrice:249, category:"Longevity", badge:null,
     desc:"Mitochondria-targeting tetrapeptide. Studied for cardioprotection and anti-aging mechanisms.",
     fullDesc:`SS-31 (also known by its research name Elamipretide) is a synthetic tetrapeptide (four amino acids) engineered with a specific alternating aromatic-cationic structure that gives it a strong affinity for the inner mitochondrial membrane — a rare and deliberate design feature.
@@ -180,7 +180,7 @@ SS-31 is considered a leading research compound in the emerging field of mitocho
 
 const SINGLES = [
   {
-    id:"s1", name:"BPC-157", mg:"5mg",
+    id:"s1", name:"BPC-157", mg:"5mg", image:"/products/bpc-157.png",
     supplierPrice:25, sellPrice:30, category:"Recovery",
     desc:"Single vial BPC-157 for targeted gut and tissue repair research.",
     fullDesc:`BPC-157, or Body Protective Compound-157, is a synthetic pentadecapeptide — a chain of precisely 15 amino acids — originally derived from a protein naturally present in human gastric secretions. Despite its small size, it has become one of the most extensively researched peptides in the fields of regenerative biochemistry and gastrointestinal physiology.
@@ -191,7 +191,7 @@ Its stability under acidic conditions — unusual for a peptide — has also mad
     kitId:"k7",
   },
   {
-    id:"s2", name:"MT-2", mg:"10mg",
+    id:"s2", name:"MT-2", mg:"10mg", image:"/products/mt-2.png",
     supplierPrice:20, sellPrice:24, category:"Performance",
     desc:"Melanotan II. Studied for melanocortin receptor activity and pigmentation research.",
     fullDesc:`Melanotan II (MT-2) is a synthetic analogue of alpha-melanocyte-stimulating hormone (α-MSH), a naturally occurring peptide hormone that interacts with the melanocortin receptor family — a group of receptors distributed across diverse tissue types including the skin, brain, and adipose tissue.
@@ -201,7 +201,7 @@ In research contexts, MT-2 is primarily used to study melanocortin receptor phar
 MT-2 has been documented extensively in dermatological, endocrinological, and neuroscience research literature. Supplied as a lyophilised research-grade compound for in-vitro and analytical use by qualified laboratory professionals only. Not approved for any therapeutic or cosmetic application within the EU.`,
   },
   {
-    id:"s3", name:"Tesamorelin", mg:"5mg",
+    id:"s3", name:"Tesamorelin", mg:"5mg", image:"/products/tesamorelin.png",
     supplierPrice:30, sellPrice:37, category:"Performance",
     desc:"Growth hormone releasing factor analog. Studied for visceral adipose tissue research.",
     fullDesc:`Tesamorelin is a synthetic analogue of Growth Hormone Releasing Hormone (GHRH) — the hypothalamic signal that instructs the pituitary gland to produce and secrete growth hormone. It consists of the full 44-amino acid GHRH sequence with the addition of a trans-3-hexenoic acid group at the N-terminus, a modification that significantly increases the peptide's metabolic stability without altering its receptor binding profile.
@@ -211,7 +211,7 @@ In research settings, Tesamorelin is particularly associated with studies on vis
 Supplied as a lyophilised research-grade peptide for in-vitro and analytical laboratory use only. Not approved for human or veterinary use in the EU outside of specifically authorised clinical contexts.`,
   },
   {
-    id:"s4", name:"Ipamorelin", mg:"5mg",
+    id:"s4", name:"Ipamorelin", mg:"5mg", image:"/products/ipamorelin.png",
     supplierPrice:15, sellPrice:19, category:"Performance",
     desc:"Single vial Ipamorelin for introductory GH secretagogue research.",
     fullDesc:`Ipamorelin is a synthetic pentapeptide (five amino acids) classified as a Growth Hormone Releasing Peptide (GHRP). It acts as an agonist at the ghrelin receptor — also known as the GHS-R (Growth Hormone Secretagogue Receptor) — stimulating growth hormone release from the anterior pituitary gland.
@@ -232,7 +232,7 @@ From a research perspective, GHK-Cu is notable for its interaction with a wide v
 The copper coordination is essential to its activity — the Cu²⁺ ion is not merely a structural addition but appears to participate directly in several of GHK-Cu's observed biological interactions. Supplied as a lyophilised research-grade compound for in-vitro and analytical laboratory use by qualified professionals only.`,
   },
   {
-    id:"s6", name:"GLOW", mg:"70mg",
+    id:"s6", name:"GLOW", mg:"70mg", image:"/products/glow.png",
     supplierPrice:65, sellPrice:79, category:"Longevity",
     desc:"Combined skin-focused peptide blend for regenerative skin research applications.",
     fullDesc:`GLOW is a research-formulated blend of complementary skin-biology peptides, assembled specifically for use in studies examining regenerative, structural, and anti-aging mechanisms within cutaneous tissue models.
@@ -242,7 +242,7 @@ Rather than isolating a single signalling pathway, GLOW is designed to engage mu
 The specific peptide composition of GLOW has been selected for complementary mechanisms with minimal pathway overlap, making it a practical starting point for researchers designing multi-target in-vitro skin biology experiments. Supplied as a lyophilised research-grade compound for analytical and laboratory use by qualified professionals only.`,
   },
   {
-    id:"s7", name:"BAC Water", mg:"10ml",
+    id:"s7", name:"BAC Water", mg:"10ml", image:"/products/bac-water.png",
     supplierPrice:5, sellPrice:7, category:"Supplies",
     desc:"Bacteriostatic water for reconstitution of lyophilised peptides.",
     fullDesc:`Bacteriostatic Water (BAC Water) is sterile water for injection containing 0.9% benzyl alcohol as a preservative. It is used as the standard diluent for reconstituting lyophilised (freeze-dried) peptide compounds prior to use in laboratory research.
@@ -255,7 +255,7 @@ BAC Water is an essential consumable for any laboratory working with lyophilised
 
 const TABLETS = [
   {
-    id:"t1", name:"SLU-PP-332", mg:"450mcg × 100 pcs",
+    id:"t1", name:"SLU-PP-332", mg:"450mcg × 100 pcs", image:"/products/slu-pp-332.png",
     supplierPrice:55, sellPrice:69, category:"Performance",
     desc:"ERR agonist compound. Studied for metabolic activity and exercise-mimetic research effects.",
     fullDesc:`SLU-PP-332 is a synthetic small-molecule compound functioning as a pan-agonist of the Estrogen-Related Receptor (ERR) family — specifically ERRα, ERRβ, and ERRγ. Despite the name, these receptors are not directly regulated by oestrogen; rather, they are nuclear receptors that act as master regulators of mitochondrial biogenesis and oxidative metabolism.
@@ -893,8 +893,10 @@ function ProductModal({item, onClose, onAdd, cartIds}) {
 
           {/* Product image */}
           {item.image && (
-            <div style={{display:"flex",justifyContent:"center",marginBottom:24}}>
-              <img src={item.image} alt={item.name} style={{height:180,objectFit:"contain"}} />
+            <div style={{display:"flex",justifyContent:"center",marginBottom:24,paddingBottom:20,borderBottom:`1px solid ${C.border}`}}>
+              <img src={item.image} alt={item.name}
+                style={{height:200,objectFit:"contain",
+                filter:"drop-shadow(0 6px 20px rgba(44,95,84,0.15))"}}/>
             </div>
           )}
 
