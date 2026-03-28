@@ -1508,6 +1508,149 @@ function PasswordGate({onUnlock}) {
 }
 
 // ─── ADMIN ───────────────────────────────────────────────────────────────────
+function AboutPage({onClose}) {
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:3500,background:C.bg,overflowY:"auto"}}>
+      <div style={{maxWidth:780,margin:"0 auto",padding:"80px 40px 80px"}}>
+        <button onClick={onClose} style={{display:"flex",alignItems:"center",gap:8,background:"none",border:"none",cursor:"pointer",color:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.18em",textTransform:"uppercase",marginBottom:48,padding:0}}>← Back</button>
+        <div style={{fontSize:8,letterSpacing:"0.46em",color:C.accent,fontFamily:mono,textTransform:"uppercase",marginBottom:20,display:"flex",alignItems:"center",gap:12}}>
+          <div style={{width:24,height:"1px",background:C.accentMd}}/>
+          About Vantagen
+        </div>
+        <h1 style={{fontFamily:serif,fontSize:"clamp(32px,4vw,52px)",fontWeight:700,color:C.ink,lineHeight:1.08,marginBottom:32}}>
+          Research-grade peptides,<br/>
+          <em style={{color:C.accent,fontStyle:"italic"}}>supplied with integrity.</em>
+        </h1>
+        <div style={{height:1,background:`linear-gradient(90deg,${C.accent}50,${C.accentMd},${C.border}80)`,marginBottom:48}}/>
+        <div style={{marginBottom:48}}>
+          <div style={{fontSize:8,letterSpacing:"0.34em",color:C.muted,fontFamily:mono,textTransform:"uppercase",marginBottom:16}}>Our Mission</div>
+          <p style={{fontSize:16,color:C.ink2,lineHeight:1.95,fontFamily:sans,marginBottom:16}}>Vantagen was founded to address a clear gap in the European research compound market: the absence of a supplier combining pharmaceutical-grade quality, transparent sourcing, and a purchasing experience built for serious researchers.</p>
+          <p style={{fontSize:16,color:C.ink2,lineHeight:1.95,fontFamily:sans}}>We supply lyophilised peptide compounds exclusively for in-vitro and analytical laboratory research. Every compound we carry is selected based on the depth of published scientific literature supporting its research applications — not commercial trends.</p>
+        </div>
+        <div style={{marginBottom:48,background:C.surface,border:`1px solid ${C.border}`,borderRadius:R.card,padding:"32px 36px"}}>
+          <div style={{fontSize:8,letterSpacing:"0.34em",color:C.muted,fontFamily:mono,textTransform:"uppercase",marginBottom:24}}>What We Stand For</div>
+          {[
+            ["Quality First","Every compound is sourced from GMP-compliant manufacturers. We do not compromise on purity specifications or analytical documentation."],
+            ["Transparency","We are explicit about what our compounds are, what they are not, and what they are legally permitted to be used for in the EU."],
+            ["Research Integrity","Our catalogue is built around scientific merit. We do not make therapeutic claims, implied or otherwise, about any compound we supply."],
+            ["EU Compliance","All compounds are supplied in accordance with applicable EU regulations governing research chemicals and laboratory reagents."],
+          ].map(([title,text])=>(
+            <div key={title} style={{display:"flex",gap:20,marginBottom:24,paddingBottom:24,borderBottom:`1px solid ${C.border}`}}>
+              <div style={{width:6,height:6,borderRadius:"50%",background:C.accent,flexShrink:0,marginTop:7}}/>
+              <div>
+                <div style={{fontFamily:serif,fontSize:16,fontWeight:700,color:C.ink,marginBottom:6}}>{title}</div>
+                <p style={{fontSize:14,color:C.ink2,lineHeight:1.85,fontFamily:sans,margin:0}}>{text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{padding:"20px 24px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:R.card,marginBottom:48}}>
+          <div style={{fontSize:8,letterSpacing:"0.3em",color:C.red,fontFamily:mono,textTransform:"uppercase",marginBottom:12}}>Important Legal Notice</div>
+          <p style={{fontSize:13,color:C.ink2,lineHeight:1.9,fontFamily:sans,margin:0}}>All products offered by Vantagen are supplied strictly for in-vitro laboratory and analytical research purposes only. They are not medicinal products, food supplements, cosmetics, or veterinary medicines. They are not approved for administration to humans or animals under any circumstances. By purchasing from Vantagen, you confirm that you are a qualified research professional operating within a regulated laboratory environment, that you are aged 18 or over, and that the use of such compounds is lawful in your jurisdiction. Vantagen accepts no liability for misuse of supplied compounds.</p>
+        </div>
+        <div style={{background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:R.card,padding:"28px 32px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:20}}>
+          <div>
+            <div style={{fontFamily:serif,fontSize:18,fontWeight:700,color:C.ink,marginBottom:6}}>Get in touch</div>
+            <p style={{fontSize:13,color:C.ink2,fontFamily:sans,margin:0}}>Questions about compounds, orders, or research applications.</p>
+          </div>
+          <a href="mailto:orders@vantagen.eu" style={{padding:"11px 22px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.16em",cursor:"pointer",borderRadius:R.sm,textDecoration:"none",display:"inline-block"}}>orders@vantagen.eu</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FAQPage({onClose}) {
+  const [open, setOpen] = React.useState(null);
+  const faqs = [
+    {
+      cat:"Ordering & Shipping",
+      items:[
+        ["Where do you ship to?","We ship to all EU member states. Orders are dispatched within 1-2 business days of payment confirmation. Delivery typically takes 3-5 business days within the EU via tracked courier."],
+        ["What payment methods do you accept?","We accept Revolut Pay, European Bank Transfer (SEPA), Bitcoin (BTC), USDT (TRC-20), card payment via Revolut link, and PayPal Friends & Family. Full details are shown at checkout."],
+        ["How do I place an order?","Add compounds to your order, proceed to checkout, select your payment method and enter shipping details. Your order summary is sent via email — we confirm receipt within 24 hours and dispatch after payment is verified."],
+        ["Is my order discreet?","Yes. All shipments are plain-packaged with no reference to the contents on the outer packaging. The sender address references a logistics partner only."],
+      ]
+    },
+    {
+      cat:"Products & Quality",
+      items:[
+        ["What purity levels do your compounds have?","All compounds are supplied at ≥98% purity as standard, verified by HPLC analysis. Certificates of Analysis are available on request for any batch."],
+        ["Are your compounds lyophilised?","Yes. All peptide compounds are supplied in lyophilised (freeze-dried) powder form, which provides maximum stability during storage and transport. Bacteriostatic water for reconstitution is available separately."],
+        ["How should I store the compounds?","Lyophilised peptides should be stored at -20°C long-term, or at 2-8°C for short-term use (up to 4 weeks). Avoid repeated freeze-thaw cycles. Once reconstituted, store at 2-8°C and use within 28 days."],
+        ["Can I get a Certificate of Analysis for my order?","Yes. Contact us at orders@vantagen.eu with your order reference and the specific compound. We will provide the relevant batch CoA within 24 hours."],
+      ]
+    },
+    {
+      cat:"Legal & Compliance",
+      items:[
+        ["Are these compounds legal to purchase in the EU?","Research peptides occupy a complex regulatory space. In most EU jurisdictions, purchasing them for legitimate laboratory research purposes is lawful. However, regulations vary by country and it is your responsibility to verify legality in your specific jurisdiction before ordering."],
+        ["Can I use these compounds for personal use?","No. All compounds sold by Vantagen are strictly for in-vitro and analytical laboratory research only. They are not approved for human or veterinary administration. By purchasing, you confirm you are a qualified researcher using compounds in a regulated laboratory environment."],
+        ["Why do you require an access code?","Our platform operates in private beta to ensure our customer base consists of verified researchers. This also allows us to maintain compliance with applicable regulations regarding the supply of research compounds."],
+        ["Do you report orders to authorities?","We operate in full compliance with applicable EU regulations and data protection laws (GDPR). Customer data is used solely for order processing and is never sold to third parties. We cooperate with lawful regulatory requests where required."],
+      ]
+    },
+    {
+      cat:"Returns & Issues",
+      items:[
+        ["What if my order arrives damaged?","Contact us at orders@vantagen.eu within 48 hours of receipt with photos of the damage. We will arrange a replacement shipment at no cost."],
+        ["Can I return an order?","Due to the nature of research compounds and cold-chain requirements, we cannot accept returns of opened or used products. Unopened products in original packaging may be returned within 7 days — contact us first to arrange."],
+        ["What if my compound doesn't match the specification?","We stand behind our quality. If a compound does not meet the stated specification, contact us with your CoA and we will investigate immediately and provide a replacement or refund."],
+      ]
+    },
+  ];
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:3500,background:C.bg,overflowY:"auto"}}>
+      <div style={{maxWidth:780,margin:"0 auto",padding:"80px 40px 80px"}}>
+        <button onClick={onClose} style={{display:"flex",alignItems:"center",gap:8,background:"none",border:"none",cursor:"pointer",color:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.18em",textTransform:"uppercase",marginBottom:48,padding:0}}>← Back</button>
+        <div style={{fontSize:8,letterSpacing:"0.46em",color:C.accent,fontFamily:mono,textTransform:"uppercase",marginBottom:20,display:"flex",alignItems:"center",gap:12}}>
+          <div style={{width:24,height:"1px",background:C.accentMd}}/>
+          Support
+        </div>
+        <h1 style={{fontFamily:serif,fontSize:"clamp(28px,4vw,48px)",fontWeight:700,color:C.ink,lineHeight:1.08,marginBottom:16}}>
+          Frequently Asked<br/>
+          <em style={{color:C.accent,fontStyle:"italic"}}>Questions.</em>
+        </h1>
+        <p style={{fontSize:15,color:C.muted,fontFamily:sans,lineHeight:1.8,marginBottom:48}}>
+          Can't find what you're looking for? Email us at{" "}
+          <a href="mailto:orders@vantagen.eu" style={{color:C.accent,textDecoration:"none"}}>orders@vantagen.eu</a>
+        </p>
+        <div style={{height:1,background:`linear-gradient(90deg,${C.accent}50,${C.accentMd},${C.border}80)`,marginBottom:48}}/>
+        {faqs.map((section,si)=>(
+          <div key={si} style={{marginBottom:40}}>
+            <div style={{fontSize:8,letterSpacing:"0.34em",color:C.accent,fontFamily:mono,textTransform:"uppercase",marginBottom:16,display:"flex",alignItems:"center",gap:10}}>
+              <div style={{width:16,height:"1px",background:C.accentMd}}/>
+              {section.cat}
+            </div>
+            {section.items.map(([q,a],qi)=>{
+              const key=`${si}-${qi}`;
+              const isOpen=open===key;
+              return (
+                <div key={qi} style={{borderBottom:`1px solid ${C.border}`,overflow:"hidden"}}>
+                  <button onClick={()=>setOpen(isOpen?null:key)} style={{width:"100%",padding:"18px 0",background:"none",border:"none",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",gap:16,textAlign:"left"}}>
+                    <span style={{fontFamily:serif,fontSize:16,fontWeight:700,color:C.ink,lineHeight:1.3}}>{q}</span>
+                    <span style={{color:C.accent,fontSize:20,flexShrink:0,fontWeight:300,transition:"transform 0.3s",transform:isOpen?"rotate(45deg)":"rotate(0deg)",display:"inline-block"}}>+</span>
+                  </button>
+                  {isOpen&&(
+                    <div style={{padding:"0 0 20px",animation:"panelIn 0.3s ease both"}}>
+                      <p style={{fontSize:14,color:C.ink2,lineHeight:1.9,fontFamily:sans,margin:0}}>{a}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+        <div style={{marginTop:48,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:R.card,padding:"28px 32px",textAlign:"center"}}>
+          <div style={{fontFamily:serif,fontSize:18,fontWeight:700,color:C.ink,marginBottom:8}}>Still have questions?</div>
+          <p style={{fontSize:13,color:C.ink2,fontFamily:sans,marginBottom:18,lineHeight:1.8}}>Our team responds within 24 hours.</p>
+          <a href="mailto:orders@vantagen.eu" style={{padding:"11px 28px",background:C.accent,border:`1px solid ${C.accent}`,color:"#fff",fontFamily:mono,fontSize:10,letterSpacing:"0.16em",borderRadius:R.sm,textDecoration:"none",display:"inline-block"}}>Contact Us</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AdminPanel({orders, onClose}) {
   return (
     <div style={{position:"fixed",inset:0,zIndex:4000,background:C.bg,overflowY:"auto"}}>
@@ -1546,6 +1689,8 @@ export default function App() {
   const [orders, setOrders]             = useState([]);
   const [adminOpen, setAdminOpen]       = useState(false);
   const [showAdmin, setShowAdmin]       = useState(false);
+  const [showAbout, setShowAbout]       = React.useState(false);
+  const [showFAQ, setShowFAQ]           = React.useState(false);
   const [adminInput, setAdminInput]     = useState("");
   const [successMsg, setSuccessMsg]     = useState(false);
   const [modalItem, setModalItem]       = useState(null);
@@ -1758,7 +1903,12 @@ export default function App() {
         {/* FOOTER */}
         <footer style={{borderTop:`1px solid ${C.border}`,background:C.surface,padding:"28px 40px",textAlign:"center"}}>
           <Logo size={13}/>
-          <p style={{fontSize:9,color:C.dim,lineHeight:2,maxWidth:600,margin:"14px auto 0",fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.08em"}}>
+          <div style={{display:"flex",justifyContent:"center",gap:24,marginTop:16,marginBottom:14,flexWrap:"wrap"}}>
+            <button onClick={()=>setShowAbout(true)} style={{background:"none",border:"none",cursor:"pointer",color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.18em",textTransform:"uppercase",textDecoration:"underline",textUnderlineOffset:3}}>About</button>
+            <button onClick={()=>setShowFAQ(true)} style={{background:"none",border:"none",cursor:"pointer",color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.18em",textTransform:"uppercase",textDecoration:"underline",textUnderlineOffset:3}}>FAQ</button>
+            <a href="mailto:orders@vantagen.eu" style={{color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.18em",textTransform:"uppercase",textDecoration:"underline",textUnderlineOffset:3}}>Contact</a>
+          </div>
+          <p style={{fontSize:9,color:C.dim,lineHeight:2,maxWidth:600,margin:"0 auto",fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.08em"}}>
             All products sold by Vantagen are intended for laboratory and in-vitro research only. Not for human or veterinary use. 18+ only. Compliant with applicable EU regulations. © 2025 Vantagen.
           </p>
         </footer>
@@ -1794,6 +1944,10 @@ export default function App() {
           <span style={{fontSize:9,fontFamily:mono,letterSpacing:"0.08em",textTransform:"uppercase"}}>{cartCount>0?`(${cartCount})`:"Order"}</span>
         </button>
       </div>
+
+      {/* ABOUT / FAQ PAGES */}
+      {showAbout && <AboutPage onClose={()=>setShowAbout(false)}/>}
+      {showFAQ   && <FAQPage   onClose={()=>setShowFAQ(false)}/>}
 
       {/* SUCCESS */}
       {successMsg&&(
