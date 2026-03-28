@@ -453,8 +453,8 @@ function ScrollTiltSection({children}) {
           const progress = Math.min(1, Math.max(0,
             (vh - rect.top) / (vh * 0.6)
           ));
-          const rotateX = 8 * (1 - progress);
-          const opacity = 0.4 + progress * 0.6;
+          const rotateX = 4 * (1 - progress);
+          const opacity = 0.85 + progress * 0.15;
           el.style.opacity = opacity;
           el.style.transform = progress >= 1
             ? "none"
@@ -1055,37 +1055,55 @@ function SingleRow({item, onAdd, inCart, onOpenModal, cart, setCart, onRemove}) 
   const [hov, setHov] = useState(false);
   const cc = CAT[item.category] || C.muted;
   return (
-    <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-      style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:R.sm,padding:"16px 20px",transition:"all 0.2s",display:"flex",alignItems:"center",gap:18,boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",cursor:"pointer"}}
+    <div
+      onMouseEnter={()=>setHov(true)}
+      onMouseLeave={()=>setHov(false)}
       onClick={()=>onOpenModal(item)}
+      style={{
+        background:C.surface,
+        border:`1px solid ${hov?C.borderMd:C.border}`,
+        borderRadius:R.card,
+        padding:"20px",
+        transition:"all 0.22s",
+        boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",
+        cursor:"pointer",
+        position:"relative",
+        overflow:"hidden",
+      }}
     >
-      <div style={{width:3,height:36,background:cc,borderRadius:R.xs,flexShrink:0,opacity:0.6}}/>
-      {item.image && (
-        <img src={item.image} alt={item.name}
-          style={{width:72,height:72,objectFit:"contain",flexShrink:0,
-          filter:"drop-shadow(0 2px 8px rgba(44,95,84,0.12))"}}/>
-      )}
-      <div style={{flex:1}}>
-        <div style={{fontSize:8,letterSpacing:"0.26em",color:cc,fontFamily:mono,marginBottom:4,textTransform:"uppercase"}}>{item.category}</div>
-        <div style={{fontSize:15,fontWeight:700,color:C.ink,fontFamily:serif}}>{item.name}</div>
-        <div style={{fontSize:11,color:C.muted,fontFamily:mono,marginTop:1}}>{item.mg}</div>
-        <div style={{fontSize:12,color:C.ink2,marginTop:6,lineHeight:1.7}}>{item.desc}</div>
-        {item.kitId && <div style={{fontSize:9,color:C.accent,fontFamily:mono,marginTop:4}}>also available as 10-vial kit</div>}
-      </div>
-      <div style={{textAlign:"right",flexShrink:0}}>
-        <div style={{fontSize:18,fontWeight:700,color:C.ink,fontFamily:serif,marginBottom:8}}>€{item.sellPrice}</div>
-        <div style={{display:"flex",gap:6,justifyContent:"flex-end"}}>
-          <button onClick={e=>{e.stopPropagation();onOpenModal(item);}} style={{padding:"6px 10px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:8,letterSpacing:"0.12em",cursor:"pointer",borderRadius:R.sm}}>Details</button>
-          {inCart ? (
-            <div style={{display:"flex",alignItems:"center",gap:0,border:`1px solid ${C.accentMd}`,borderRadius:R.sm,overflow:"hidden",background:C.accentLt,height:32}}>
-              <button onClick={e=>{e.stopPropagation();const current=cart.find(p=>p.name===item.name);const newQty=(current?.qty||1)-1;if(newQty<=0)onRemove(item.name);else setCart(prev=>prev.map(p=>p.name===item.name?{...p,qty:newQty}:p));}} style={{width:28,height:"100%",background:"none",border:"none",color:C.accent,fontSize:15,cursor:"pointer",flexShrink:0}}>−</button>
-              <span style={{width:24,textAlign:"center",fontFamily:mono,fontSize:11,color:C.accent,fontWeight:700}}>{cart.find(p=>p.name===item.name)?.qty||1}</span>
-              <button onClick={e=>{e.stopPropagation();onAdd(item,1);}} style={{width:28,height:"100%",background:"none",border:"none",color:C.accent,fontSize:15,cursor:"pointer",flexShrink:0}}>+</button>
-            </div>
-          ) : (
-            <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{padding:"6px 12px",background:C.surface2,border:`1px solid ${C.border}`,color:C.ink2,fontFamily:mono,fontSize:8,letterSpacing:"0.12em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>+ Add</button>
+      {/* Top colour bar */}
+      <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:cc,opacity:0.7,borderRadius:`${R.card}px ${R.card}px 0 0`}}/>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginTop:8,marginBottom:12,gap:12}}>
+        {/* Left: image + info */}
+        <div style={{display:"flex",gap:14,alignItems:"flex-start",flex:1}}>
+          {item.image && (
+            <img src={item.image} alt={item.name}
+              style={{width:56,height:56,objectFit:"contain",flexShrink:0,mixBlendMode:"multiply",filter:"drop-shadow(0 2px 6px rgba(44,95,84,0.12))"}}/>
           )}
+          <div>
+            <div style={{fontSize:8,letterSpacing:"0.26em",color:cc,fontFamily:mono,marginBottom:4,textTransform:"uppercase"}}>{item.category}</div>
+            <div style={{fontSize:17,fontWeight:700,color:C.ink,fontFamily:serif,lineHeight:1.2}}>{item.name}</div>
+            <div style={{fontSize:11,color:C.muted,fontFamily:mono,marginTop:2}}>{item.mg}</div>
+            {item.kitId && <div style={{fontSize:9,color:C.accent,fontFamily:mono,marginTop:4}}>also available as 10-vial kit</div>}
+          </div>
         </div>
+        {/* Right: price */}
+        <div style={{textAlign:"right",flexShrink:0}}>
+          <div style={{fontSize:22,fontWeight:700,color:C.ink,fontFamily:mono,fontVariantNumeric:"tabular-nums"}}>€{item.sellPrice}</div>
+        </div>
+      </div>
+      <p style={{fontSize:13,color:C.ink2,lineHeight:1.8,marginBottom:16}}>{item.desc}</p>
+      <div style={{display:"flex",gap:8}} onClick={e=>e.stopPropagation()}>
+        <button onClick={e=>{e.stopPropagation();onOpenModal(item);}} style={{flex:1,padding:"9px",background:C.surface2,border:`1px solid ${C.border}`,color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm}}>View details</button>
+        {inCart ? (
+          <div style={{flex:2,display:"flex",alignItems:"center",gap:0,border:`1px solid ${C.accentMd}`,borderRadius:R.sm,overflow:"hidden",background:C.accentLt}}>
+            <button onClick={e=>{e.stopPropagation();const current=cart.find(p=>p.name===item.name);const newQty=(current?.qty||1)-1;if(newQty<=0)onRemove(item.name);else setCart(prev=>prev.map(p=>p.name===item.name?{...p,qty:newQty}:p));}} style={{width:36,height:36,background:"none",border:"none",color:C.accent,fontSize:16,cursor:"pointer",flexShrink:0}}>−</button>
+            <span style={{flex:1,textAlign:"center",fontFamily:mono,fontSize:11,color:C.accent,fontWeight:700}}>{cart.find(p=>p.name===item.name)?.qty||1}</span>
+            <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{width:36,height:36,background:"none",border:"none",color:C.accent,fontSize:16,cursor:"pointer",flexShrink:0}}>+</button>
+          </div>
+        ) : (
+          <button onClick={e=>{e.stopPropagation();onAdd(item);}} style={{flex:2,padding:"9px",background:C.surface2,border:`1px solid ${C.border}`,color:C.ink2,fontFamily:mono,fontSize:9,letterSpacing:"0.14em",cursor:"pointer",borderRadius:R.sm,transition:"all 0.18s"}}>Add to order</button>
+        )}
       </div>
     </div>
   );
@@ -1688,7 +1706,6 @@ export default function App() {
         {/* KITS */}
         {tab==="kits"&&(
           <div style={{background:C.bg,minHeight:"60vh"}}>
-          <ScrollTiltSection>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"36px 40px 64px"}}>
             <div style={{display:"flex",alignItems:"baseline",gap:14,marginBottom:26}}>
               <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Research Kits</h2>
@@ -1698,14 +1715,12 @@ export default function App() {
               {fKits.map((p,i)=><ScrollRevealItem key={p.id} index={i}><KitCard item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem} cart={cart} setCart={setCart} onRemove={removeFromCart}/></ScrollRevealItem>)}
             </div>
           </div>
-          </ScrollTiltSection>
           </div>
         )}
 
         {/* SINGLES */}
         {tab==="singles"&&(
           <div style={{background:C.bg,minHeight:"60vh"}}>
-          <ScrollTiltSection>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"36px 40px 64px"}}>
             <div style={{display:"flex",alignItems:"baseline",gap:14,marginBottom:26}}>
               <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Single Vials</h2>
@@ -1720,14 +1735,12 @@ export default function App() {
               {TABLETS.map(p=><SingleRow key={p.id} item={p} onAdd={addToCart} inCart={cartIds.includes(p.name)} onOpenModal={setModalItem} cart={cart} setCart={setCart} onRemove={removeFromCart}/>)}
             </div>
           </div>
-          </ScrollTiltSection>
           </div>
         )}
 
         {/* STACKS */}
         {tab==="stacks"&&(
           <div style={{background:C.bg,minHeight:"60vh"}}>
-          <ScrollTiltSection>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"36px 40px 64px"}}>
             <div style={{display:"flex",alignItems:"baseline",gap:14,marginBottom:26}}>
               <h2 style={{fontFamily:serif,fontSize:22,fontWeight:700,color:C.ink}}>Research Protocols</h2>
@@ -1737,7 +1750,6 @@ export default function App() {
               {fStacks.map((s,i)=><ScrollRevealItem key={s.name} index={i}><StackCard stack={s} onAddStack={addStack} cartIds={cartIds}/></ScrollRevealItem>)}
             </div>
           </div>
-          </ScrollTiltSection>
           </div>
         )}
 
