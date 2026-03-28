@@ -222,7 +222,7 @@ Available as a single vial for pilot studies or smaller research runs, or in a c
     kitId:"k12",
   },
   {
-    id:"s5", name:"GHK-Cu", mg:"50mg",
+    id:"s5", name:"GHK-Cu", mg:"50mg", image:"/products/ghk-cu.png",
     supplierPrice:25, sellPrice:30, category:"Longevity",
     desc:"Copper peptide complex. Studied for wound healing, skin regeneration and antioxidant properties.",
     fullDesc:`GHK-Cu is a naturally occurring tripeptide — comprising the amino acids Glycine, Histidine, and Lysine — complexed with a copper (II) ion (Cu²⁺). It is found endogenously in human plasma, saliva, and urine, and its concentration declines measurably with age, a fact that has contributed to significant interest in its biological roles.
@@ -886,6 +886,13 @@ function ProductModal({item, onClose, onAdd, cartIds}) {
             </div>
           )}
 
+          {/* Product image */}
+          {item.image && (
+            <div style={{display:"flex",justifyContent:"center",marginBottom:24}}>
+              <img src={item.image} alt={item.name} style={{height:180,objectFit:"contain"}} />
+            </div>
+          )}
+
           {/* Full description */}
           <div style={{marginBottom:24}}>
             <div style={{fontSize:9,letterSpacing:"0.22em",color:C.muted,fontFamily:mono,textTransform:"uppercase",marginBottom:12}}>About this compound</div>
@@ -965,6 +972,9 @@ function SingleRow({item, onAdd, inCart, onOpenModal}) {
       onClick={()=>onOpenModal(item)}
     >
       <div style={{width:3,height:36,background:cc,borderRadius:R.xs,flexShrink:0,opacity:0.6}}/>
+      {item.image && (
+        <img src={item.image} alt={item.name} style={{width:64,height:64,objectFit:"contain",flexShrink:0,borderRadius:4}} />
+      )}
       <div style={{flex:1}}>
         <div style={{fontSize:8,letterSpacing:"0.26em",color:cc,fontFamily:mono,marginBottom:4,textTransform:"uppercase"}}>{item.category}</div>
         <div style={{fontSize:15,fontWeight:700,color:C.ink,fontFamily:serif}}>{item.name}</div>
