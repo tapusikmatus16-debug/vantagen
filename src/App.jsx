@@ -444,22 +444,40 @@ function ScrollTiltSection({children}) {
   React.useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    let ticking = false;
     const onScroll = () => {
-      const rect = el.getBoundingClientRect();
-      const vh = window.innerHeight;
-      // progress 0 when top of section is at bottom of viewport, 1 when top reaches viewport center
-      const progress = Math.min(1, Math.max(0, (vh - rect.top) / (vh * 0.6)));
-      const rotateX = 10 - progress * 10;       // 10deg → 0deg
-      const opacity  = 0.3 + progress * 0.7;    // 0.3 → 1
-      el.style.opacity = opacity;
-      el.style.transform = `perspective(1200px) rotateX(${rotateX}deg)`;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const rect = el.getBoundingClientRect();
+          const vh = window.innerHeight;
+          const progress = Math.min(1, Math.max(0,
+            (vh - rect.top) / (vh * 0.6)
+          ));
+          const rotateX = 8 * (1 - progress);
+          const opacity = 0.4 + progress * 0.6;
+          el.style.opacity = opacity;
+          el.style.transform = progress >= 1
+            ? "none"
+            : `perspective(1200px) rotateX(${rotateX}deg)`;
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
     window.addEventListener("scroll", onScroll, {passive:true});
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   return (
-    <div ref={ref} style={{willChange:"transform, opacity", transformOrigin:"top center"}}>
+    <div
+      ref={ref}
+      style={{
+        willChange:"transform, opacity",
+        transformOrigin:"top center",
+        backfaceVisibility:"hidden",
+        WebkitBackfaceVisibility:"hidden",
+      }}
+    >
       {children}
     </div>
   );
@@ -1653,9 +1671,7 @@ export default function App() {
         </div>
 
         {/* FEATURED SELECTION */}
-        <ScrollTiltSection>
-          <FeaturedSection onOpenModal={setModalItem} cartIds={cartIds}/>
-        </ScrollTiltSection>
+        <FeaturedSection onOpenModal={setModalItem} cartIds={cartIds}/>
 
         {/* FILTER BAR — catalogue anchor */}
         <div ref={catalogueRef} style={{borderBottom:`1px solid ${C.border}`,background:C.surface,padding:"0 40px",position:"sticky",top:64,zIndex:90}}>
