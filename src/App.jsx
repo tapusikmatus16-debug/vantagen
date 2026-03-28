@@ -549,14 +549,19 @@ function FeaturedCard({item, glyphKey, isLast, onOpenModal, inCart}) {
         position:"relative",
       }}
     >
-      {/* Glyph */}
+      {/* Glyph / image */}
       <div style={{
-        height:108, display:"flex", alignItems:"center", justifyContent:"center",
+        height:140, display:"flex", alignItems:"center", justifyContent:"center",
         marginBottom:22,
         transition:"transform 0.4s ease",
         transform: hov ? "scale(1.07)" : "scale(1)",
       }}>
-        {Glyph && <Glyph size={88}/>}
+        {item.image
+          ? <img src={item.image} alt={item.name}
+              style={{height:130,width:130,objectFit:"contain",
+              filter:"drop-shadow(0 4px 12px rgba(44,95,84,0.15))"}}/>
+          : Glyph && <Glyph size={88}/>
+        }
       </div>
 
       {/* Thin rule — animates colour on hover */}
@@ -938,6 +943,13 @@ function KitCard({item, onAdd, inCart, onOpenModal}) {
       style={{background:C.surface,border:`1px solid ${hov?C.borderMd:C.border}`,borderRadius:R.card,padding:"24px",transition:"all 0.22s",boxShadow:hov?"0 4px 24px rgba(26,28,30,0.10)":"0 1px 4px rgba(26,28,30,0.05)",display:"flex",flexDirection:"column",position:"relative",overflow:"hidden",cursor:"pointer",flex:1}}
       onClick={()=>onOpenModal(item)}
     >
+      {item.image && (
+        <div style={{width:"100%",height:160,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:16,borderBottom:`1px solid ${C.border}`,paddingBottom:16}}>
+          <img src={item.image} alt={item.name}
+            style={{height:148,objectFit:"contain",
+            filter:"drop-shadow(0 4px 16px rgba(44,95,84,0.12))"}}/>
+        </div>
+      )}
       <div style={{position:"absolute",left:0,top:16,bottom:16,width:3,background:cc,borderRadius:"0 2px 2px 0",opacity:hov?1:0.5,transition:"opacity 0.22s"}}/>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14,paddingLeft:8}}>
         <div>
@@ -973,7 +985,9 @@ function SingleRow({item, onAdd, inCart, onOpenModal}) {
     >
       <div style={{width:3,height:36,background:cc,borderRadius:R.xs,flexShrink:0,opacity:0.6}}/>
       {item.image && (
-        <img src={item.image} alt={item.name} style={{width:64,height:64,objectFit:"contain",flexShrink:0,borderRadius:4}} />
+        <img src={item.image} alt={item.name}
+          style={{width:72,height:72,objectFit:"contain",flexShrink:0,
+          filter:"drop-shadow(0 2px 8px rgba(44,95,84,0.12))"}}/>
       )}
       <div style={{flex:1}}>
         <div style={{fontSize:8,letterSpacing:"0.26em",color:cc,fontFamily:mono,marginBottom:4,textTransform:"uppercase"}}>{item.category}</div>
