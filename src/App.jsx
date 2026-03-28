@@ -838,14 +838,31 @@ function ProductModal({item, onClose, onAdd, cartIds}) {
   const cc = CAT[item.category] || C.accent;
 
   return (
-    <div style={{position:"fixed",inset:0,zIndex:3000,background:"rgba(244,242,237,0.9)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"fadeIn 0.28s ease"}} onClick={onClose}>
+    <div style={{
+      position:"fixed",inset:0,zIndex:3000,
+      background:"rgba(244,242,237,0.9)",
+      backdropFilter:"blur(8px)",
+      display:"flex",
+      alignItems: window.innerWidth <= 768 ? "flex-end" : "center",
+      justifyContent:"center",
+      padding: window.innerWidth <= 768 ? "0" : "20px",
+      animation:"fadeIn 0.28s ease",
+    }} onClick={onClose}>
       <div onClick={e=>e.stopPropagation()} className="modal-panel" style={{
-        background:C.surface,border:`1px solid ${C.borderMd}`,borderRadius:R.card,
-        width:"100%",maxWidth:620,maxHeight:"90vh",overflowY:"auto",
-        boxShadow:"0 20px 80px rgba(26,28,30,0.2)",
+        background:C.surface,
+        border:`1px solid ${C.borderMd}`,
+        borderRadius: window.innerWidth <= 768 ? "20px 20px 0 0" : R.card,
+        width:"100%",
+        maxWidth: window.innerWidth <= 768 ? "100%" : 620,
+        maxHeight: window.innerWidth <= 768 ? "92dvh" : "90vh",
+        overflowY:"auto",
+        boxShadow:"0 -4px 40px rgba(26,28,30,0.18)",
         display:"flex",flexDirection:"column",
-        animation:"scaleIn 0.32s cubic-bezier(0.22,1,0.36,1)",
+        animation: window.innerWidth <= 768
+          ? "slideUpSheet 0.44s cubic-bezier(0.22,1,0.36,1)"
+          : "scaleIn 0.32s cubic-bezier(0.22,1,0.36,1)",
       }}>
+        <div className="modal-drag-handle" style={{width:36,height:4,borderRadius:2,background:C.borderMd,margin:"10px auto 0",flexShrink:0}}/>
         {/* Top colour bar */}
         <div style={{height:4,background:`linear-gradient(90deg, ${cc}, ${cc}80)`,borderRadius:`${R.card}px ${R.card}px 0 0`}}/>
 
@@ -1204,20 +1221,34 @@ function CheckoutModal({cart, onClose, onSuccess}) {
 function CartDrawer({cart, onRemove, onClose, onCheckout, visible}) {
   const total = cart.reduce((s,p)=>s+p.sellPrice,0);
   return (
-    <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex"}}>
+    <div style={{
+      position:"fixed",inset:0,zIndex:1000,
+      display:"flex",
+      flexDirection: window.innerWidth <= 768 ? "column" : "row",
+      alignItems: window.innerWidth <= 768 ? "flex-end" : "stretch",
+      justifyContent: window.innerWidth <= 768 ? "center" : "flex-end",
+    }}>
       <div onClick={onClose} style={{
         flex:1, background:"rgba(244,242,237,0.7)", backdropFilter:"blur(4px)",
         opacity: visible ? 1 : 0,
         transition:"opacity 0.34s ease",
       }}/>
       <div className="cart-drawer" style={{
-        width:340, background:C.surface,
-        borderLeft:`1px solid ${C.border}`,
+        width:"min(100%, 380px)", background:C.surface,
+        borderLeft: window.innerWidth > 768 ? `1px solid ${C.border}` : "none",
+        borderTop: window.innerWidth <= 768 ? `1px solid ${C.border}` : "none",
+        borderRadius: window.innerWidth <= 768 ? "20px 20px 0 0" : "0",
         display:"flex", flexDirection:"column",
-        boxShadow:"-4px 0 32px rgba(26,28,30,0.14)",
-        transform: visible ? "translateX(0)" : "translateX(100%)",
+        boxShadow: window.innerWidth <= 768
+          ? "0 -4px 40px rgba(26,28,30,0.18)"
+          : "-4px 0 32px rgba(26,28,30,0.14)",
+        transform: visible
+          ? "translateX(0)"
+          : window.innerWidth <= 768 ? "translateY(100%)" : "translateX(100%)",
         transition:"transform 0.38s cubic-bezier(0.22,1,0.36,1)",
+        maxHeight: window.innerWidth <= 768 ? "88dvh" : "100%",
       }}>
+        <div className="cart-drag-handle" style={{width:36,height:4,borderRadius:2,background:C.borderMd,margin:"10px auto 0",flexShrink:0}}/>
         <div style={{padding:"18px 22px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <div>
             <div style={{fontFamily:serif,fontSize:15,fontWeight:700,color:C.ink}}>Your Order</div>
@@ -1507,12 +1538,12 @@ export default function App() {
           <div style={{position:"absolute",inset:0,background:"rgba(244,242,237,0.72)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",pointerEvents:"none"}}/>
           <div className="hero-vials" style={{position:"absolute",inset:0,pointerEvents:"none",zIndex:1,overflow:"hidden"}}>
             {/* RETA — largest, upper right area, slight tilt right */}
-            <div style={{position:"absolute",top:"2%",right:"28%",zIndex:1,pointerEvents:"none",animation:"floatDown1 1.2s cubic-bezier(0.22,1,0.36,1) 0.1s both"}}>
-              <img src="/products/retatrutide.png" alt="" style={{width:200,height:200,objectFit:"contain",mixBlendMode:"multiply",filter:"drop-shadow(0 16px 32px rgba(44,95,84,0.22))",transform:"rotate(6deg)",animation:"sway1 6s ease-in-out infinite"}}/>
+            <div style={{position:"absolute",top:"-2%",right:"24%",zIndex:1,pointerEvents:"none",animation:"floatDown1 1.2s cubic-bezier(0.22,1,0.36,1) 0.1s both"}}>
+              <img src="/products/retatrutide.png" alt="" style={{width:280,height:280,objectFit:"contain",mixBlendMode:"multiply",filter:"drop-shadow(0 16px 32px rgba(44,95,84,0.22))",transform:"rotate(6deg)",animation:"sway1 6s ease-in-out infinite"}}/>
             </div>
             {/* BPC-157 — right side, medium, tilt left */}
-            <div style={{position:"absolute",top:"5%",right:"4%",zIndex:1,pointerEvents:"none",animation:"floatDown2 1.2s cubic-bezier(0.22,1,0.36,1) 0.3s both"}}>
-              <img src="/products/bpc-157.png" alt="" style={{width:150,height:150,objectFit:"contain",mixBlendMode:"multiply",filter:"drop-shadow(0 12px 24px rgba(44,95,84,0.18))",transform:"rotate(-5deg)",animation:"sway2 7s ease-in-out infinite 1s"}}/>
+            <div style={{position:"absolute",top:"0%",right:"2%",zIndex:1,pointerEvents:"none",animation:"floatDown2 1.2s cubic-bezier(0.22,1,0.36,1) 0.3s both"}}>
+              <img src="/products/bpc-157.png" alt="" style={{width:220,height:220,objectFit:"contain",mixBlendMode:"multiply",filter:"drop-shadow(0 12px 24px rgba(44,95,84,0.18))",transform:"rotate(-5deg)",animation:"sway2 7s ease-in-out infinite 1s"}}/>
             </div>
             {/* GHK-Cu — lower right behind stats, blurred, small tilt */}
             <div style={{position:"absolute",bottom:"8%",right:"18%",zIndex:1,pointerEvents:"none",animation:"floatDown1 1.4s cubic-bezier(0.22,1,0.36,1) 0.5s both"}}>
@@ -1732,6 +1763,11 @@ export default function App() {
           animation: successPop 0.44s cubic-bezier(0.22,1,0.36,1) both;
         }
 
+        @keyframes slideUpSheet {
+          from { opacity:0; transform:translateY(100%); }
+          to   { opacity:1; transform:translateY(0); }
+        }
+
         @keyframes floatDown1 {
           from { opacity:0; transform:translateY(-80px) rotate(6deg); filter:blur(8px); }
           to   { opacity:1; transform:translateY(0) rotate(6deg);    filter:blur(0px); }
@@ -1751,6 +1787,11 @@ export default function App() {
         @keyframes sway3 {
           0%,100% { transform:translateY(0px) rotate(8deg); }
           50%     { transform:translateY(-8px) rotate(6deg); }
+        }
+
+        @media (min-width: 769px) {
+          .modal-drag-handle { display: none !important; }
+          .cart-drag-handle  { display: none !important; }
         }
 
         @media (max-width: 768px) {
@@ -1774,8 +1815,8 @@ export default function App() {
           .hero-content > div:last-child { display: none !important; }
           .hero-stats-mobile { display: flex !important; }
 
-          .hero-content h1 { font-size: clamp(26px, 7vw, 36px) !important; }
-          .hero-content p { font-size: 13px !important; }
+          .hero-content h1 { font-size: clamp(28px, 8vw, 42px) !important; line-height: 1.08 !important; }
+          .hero-content p { font-size: 13px !important; line-height: 1.7 !important; }
 
           .featured-grid {
             grid-template-columns: repeat(5, 200px) !important;
@@ -1801,10 +1842,9 @@ export default function App() {
 
           .modal-panel {
             max-width: 100% !important;
-            max-height: 100dvh !important;
-            border-radius: 0 !important;
+            max-height: 92dvh !important;
+            border-radius: 20px 20px 0 0 !important;
             margin: 0 !important;
-            height: 100dvh !important;
           }
           .checkout-panel {
             max-width: 100% !important;
