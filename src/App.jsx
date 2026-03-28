@@ -279,7 +279,7 @@ const METHODS = [
   {id:"bank",   label:"European Bank Transfer",  sub:"SEPA · any EU bank · typically free",  icon:"€", color:CAT["Weight Loss"],note:"IBAN details shown at confirmation. SEPA transfers arrive within 0–1 business days."},
   {id:"crypto", label:"Crypto",                  sub:"Bitcoin (BTC) or USDT (TRC-20)",       icon:"₿", color:C.gold,           note:"Wallet addresses shown at confirmation. Order processed after 1 network confirmation."},
   {id:"card",   label:"Card Payment",            sub:"Visa / Mastercard via Revolut link",   icon:"▣", color:C.accent,         note:"We send a secure Revolut payment link to your email after you place the order."},
-  {id:"paypal", label:"PayPal",                  sub:"Friends & Family only",                icon:"P", color:"#003087",        note:"Send as Friends & Family to payments@vantagen.com to avoid transaction fees."},
+  {id:"paypal", label:"PayPal",                  sub:"Friends & Family only",                icon:"P", color:"#003087",        note:"Send as Friends & Family to @martintapusik on PayPal to avoid transaction fees."},
 ];
 
 // ─── COMPOUND GLYPHS ─────────────────────────────────────────────────────────
@@ -1266,7 +1266,7 @@ function CheckoutModal({cart, onClose, onSuccess}) {
               </div>}
               {method==="bank"&&<div style={{padding:16,background:"#EEF2F9",border:`1px solid ${CAT["Weight Loss"]}30`,borderRadius:R.sm,marginBottom:18}}>
                 <div style={{fontSize:8,color:CAT["Weight Loss"],letterSpacing:"0.22em",marginBottom:12,fontFamily:mono,textTransform:"uppercase"}}>European Bank Transfer (SEPA)</div>
-                {[["Account Name","VANTAGEN s.r.o."],["IBAN","— replace with your IBAN —"],["BIC/SWIFT","— replace with your BIC —"],["Reference",`ORD-${Math.floor(Math.random()*90000)+10000}`]].map(([k,v])=>(
+                {[["Account Name","VANTAGEN"],["IBAN","SK73 1100 0000 0029 3625 7478"],["BIC/SWIFT","TATRSKBX"],["Reference",`ORD-${Math.floor(Math.random()*90000)+10000}`]].map(([k,v])=>(
                   <div key={k} style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:`1px solid ${C.border}`}}>
                     <span style={{color:C.muted,fontFamily:mono,fontSize:9,textTransform:"uppercase"}}>{k}</span>
                     <span style={{color:C.ink,fontFamily:mono,fontSize:11,fontWeight:600}}>{v}</span>
@@ -1275,17 +1275,17 @@ function CheckoutModal({cart, onClose, onSuccess}) {
               </div>}
               {method==="revolut"&&<div style={{padding:16,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:R.sm,marginBottom:18}}>
                 <div style={{fontSize:8,color:C.accent,letterSpacing:"0.22em",marginBottom:8,fontFamily:mono,textTransform:"uppercase"}}>Revolut Pay</div>
-                <div style={{fontSize:15,color:C.ink,fontFamily:mono,marginBottom:6,fontWeight:600}}>@vantagen</div>
-                <p style={{fontSize:11,color:C.ink2,lineHeight:1.7}}>Send €{total} on Revolut to @vantagen. Include your name in the note.</p>
+                <div style={{fontSize:15,color:C.ink,fontFamily:mono,marginBottom:6,fontWeight:600}}>revolut.me/vantagen</div>
+                <p style={{fontSize:11,color:C.ink2,lineHeight:1.7}}>Send €{total} on Revolut to <a href="https://revolut.me/vantagen" target="_blank" rel="noreferrer" style={{color:C.accent,textDecoration:"none"}}>revolut.me/vantagen</a>. Include your name in the note.</p>
               </div>}
               {method==="card"&&<div style={{padding:16,background:C.accentLt,border:`1px solid ${C.accentMd}`,borderRadius:R.sm,marginBottom:18,textAlign:"center"}}>
                 <div style={{fontSize:8,color:C.accent,letterSpacing:"0.22em",marginBottom:8,fontFamily:mono,textTransform:"uppercase"}}>Card Payment</div>
-                <p style={{fontSize:12,color:C.ink2,lineHeight:1.8}}>After sending your order, we will email you a secure Revolut payment link. Visa & Mastercard accepted.</p>
+                <p style={{fontSize:12,color:C.ink2,lineHeight:1.8}}>After sending your order, we will email you a secure Revolut payment link via <a href="https://revolut.me/vantagen" target="_blank" rel="noreferrer" style={{color:C.accent,textDecoration:"none"}}>revolut.me/vantagen</a>. Visa &amp; Mastercard accepted.</p>
               </div>}
               {method==="paypal"&&<div style={{padding:16,background:"#EFF5FC",border:"1px solid #003087AA",borderRadius:R.sm,marginBottom:18}}>
                 <div style={{fontSize:8,color:"#003087",letterSpacing:"0.22em",marginBottom:8,fontFamily:mono,textTransform:"uppercase"}}>PayPal — Friends & Family</div>
-                <div style={{fontSize:14,color:C.ink,fontFamily:mono,marginBottom:6,fontWeight:600}}>payments@vantagen.com</div>
-                <p style={{fontSize:11,color:C.ink2,lineHeight:1.7}}>Send as <strong>Friends & Family</strong> only. Include your name in the note.</p>
+                <div style={{fontSize:14,color:C.ink,fontFamily:mono,marginBottom:6,fontWeight:600}}>Send to @martintapusik on PayPal</div>
+                <p style={{fontSize:11,color:C.ink2,lineHeight:1.7}}>Send as <strong>Friends &amp; Family</strong> only. Include your name in the note.</p>
               </div>}
               <div style={{fontSize:11,color:C.ink2,lineHeight:1.8,marginBottom:18,padding:"12px 14px",background:C.surface2,borderRadius:R.sm,border:`1px solid ${C.border}`}}>Clicking "Send order" will open your email client with the full order pre-filled. Send the email to complete your purchase — we confirm within 24 hours.</div>
               <div style={{display:"flex",gap:10}}>
