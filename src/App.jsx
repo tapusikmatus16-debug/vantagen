@@ -789,14 +789,14 @@ function AnimatedStats() {
   }, []);
   const s = stats[idx];
   return (
-    <div style={{display:"flex",flexDirection:"column",justifyContent:"center",minHeight:200}}>
+    <div style={{display:"flex",flexDirection:"column",justifyContent:"center",minHeight:240}}>
       <div style={{fontSize:10,letterSpacing:"0.36em",color:"rgba(122,126,132,0.8)",fontFamily:"'Courier Prime','Courier New',monospace",marginBottom:10,textTransform:"uppercase",opacity:1}}>
         What we offer
       </div>
-      <div style={{fontFamily:"'Libre Baskerville',Georgia,serif",fontSize:96,fontWeight:700,color:"#1A1C1E",lineHeight:1,letterSpacing:"-0.03em",transform:visible?"translateY(0)":"translateY(-14px)",opacity:visible?1:0,transition:"all 0.32s cubic-bezier(0.22,1,0.36,1)"}}>
+      <div style={{fontFamily:"'Libre Baskerville',Georgia,serif",fontSize:110,fontWeight:700,color:"#1A1C1E",lineHeight:1,letterSpacing:"-0.03em",transform:visible?"translateY(0)":"translateY(-14px)",opacity:visible?1:0,transition:"all 0.32s cubic-bezier(0.22,1,0.36,1)"}}>
         {s.n}
       </div>
-      <div style={{fontSize:12,color:"#2C5F54",fontFamily:"'Courier Prime','Courier New',monospace",textTransform:"uppercase",letterSpacing:"0.22em",marginTop:10,transform:visible?"translateY(0)":"translateY(10px)",opacity:visible?1:0,transition:"all 0.36s cubic-bezier(0.22,1,0.36,1) 0.06s"}}>
+      <div style={{fontSize:14,color:"#2C5F54",fontFamily:"'Courier Prime','Courier New',monospace",textTransform:"uppercase",letterSpacing:"0.22em",marginTop:10,transform:visible?"translateY(0)":"translateY(10px)",opacity:visible?1:0,transition:"all 0.36s cubic-bezier(0.22,1,0.36,1) 0.06s"}}>
         {s.label}
       </div>
       <div style={{display:"flex",gap:5,marginTop:16}}>
@@ -1505,6 +1505,24 @@ export default function App() {
         <div style={{position:"relative",overflow:"hidden",borderBottom:`1px solid ${C.border}`,minHeight:520}}>
           <WaveCanvas/>
           <div style={{position:"absolute",inset:0,background:"rgba(244,242,237,0.72)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",pointerEvents:"none"}}/>
+          <div className="hero-vials" style={{position:"absolute",inset:0,pointerEvents:"none",zIndex:1,overflow:"hidden"}}>
+            {/* RETA — largest, upper right area, slight tilt right */}
+            <div style={{position:"absolute",top:"2%",right:"28%",zIndex:1,pointerEvents:"none",animation:"floatDown1 1.2s cubic-bezier(0.22,1,0.36,1) 0.1s both"}}>
+              <img src="/products/retatrutide.png" alt="" style={{width:200,height:200,objectFit:"contain",mixBlendMode:"multiply",filter:"drop-shadow(0 16px 32px rgba(44,95,84,0.22))",transform:"rotate(6deg)",animation:"sway1 6s ease-in-out infinite"}}/>
+            </div>
+            {/* BPC-157 — right side, medium, tilt left */}
+            <div style={{position:"absolute",top:"5%",right:"4%",zIndex:1,pointerEvents:"none",animation:"floatDown2 1.2s cubic-bezier(0.22,1,0.36,1) 0.3s both"}}>
+              <img src="/products/bpc-157.png" alt="" style={{width:150,height:150,objectFit:"contain",mixBlendMode:"multiply",filter:"drop-shadow(0 12px 24px rgba(44,95,84,0.18))",transform:"rotate(-5deg)",animation:"sway2 7s ease-in-out infinite 1s"}}/>
+            </div>
+            {/* GHK-Cu — lower right behind stats, blurred, small tilt */}
+            <div style={{position:"absolute",bottom:"8%",right:"18%",zIndex:1,pointerEvents:"none",animation:"floatDown1 1.4s cubic-bezier(0.22,1,0.36,1) 0.5s both"}}>
+              <img src="/products/ghk-cu.png" alt="" style={{width:120,height:120,objectFit:"contain",mixBlendMode:"multiply",filter:"blur(2px) drop-shadow(0 8px 16px rgba(44,95,84,0.14))",transform:"rotate(8deg)",opacity:0.75,animation:"sway3 8s ease-in-out infinite 0.5s"}}/>
+            </div>
+            {/* CJC+Ipamorelin — lower far right, most blurred */}
+            <div style={{position:"absolute",bottom:"4%",right:"3%",zIndex:1,pointerEvents:"none",animation:"floatDown2 1.4s cubic-bezier(0.22,1,0.36,1) 0.7s both"}}>
+              <img src="/products/cjc-ipamorelin.png" alt="" style={{width:110,height:110,objectFit:"contain",mixBlendMode:"multiply",filter:"blur(3px) drop-shadow(0 6px 12px rgba(44,95,84,0.12))",transform:"rotate(-10deg)",opacity:0.65,animation:"sway1 9s ease-in-out infinite 2s"}}/>
+            </div>
+          </div>
           <div className="hero-content" style={{position:"relative",zIndex:2,maxWidth:1200,margin:"0 auto",padding:"80px 40px 72px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:40}}>
             <div style={{borderLeft:`2px solid ${C.accent}`,paddingLeft:32,maxWidth:580}}>
               <div style={{fontSize:10,letterSpacing:"0.42em",color:C.accent,fontFamily:mono,marginBottom:20,textTransform:"uppercase"}}>
@@ -1533,7 +1551,7 @@ export default function App() {
                 ))}
               </div>
             </div>
-            <div style={{flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:52,minWidth:280}}>
+            <div style={{flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:56,minWidth:320}}>
               <AnimatedStats/>
             </div>
           </div>
@@ -1714,8 +1732,30 @@ export default function App() {
           animation: successPop 0.44s cubic-bezier(0.22,1,0.36,1) both;
         }
 
+        @keyframes floatDown1 {
+          from { opacity:0; transform:translateY(-80px) rotate(6deg); filter:blur(8px); }
+          to   { opacity:1; transform:translateY(0) rotate(6deg);    filter:blur(0px); }
+        }
+        @keyframes floatDown2 {
+          from { opacity:0; transform:translateY(-60px) rotate(-5deg); filter:blur(8px); }
+          to   { opacity:1; transform:translateY(0) rotate(-5deg);     filter:blur(0px); }
+        }
+        @keyframes sway1 {
+          0%,100% { transform:translateY(0px) rotate(6deg); }
+          50%     { transform:translateY(-12px) rotate(8deg); }
+        }
+        @keyframes sway2 {
+          0%,100% { transform:translateY(0px) rotate(-5deg); }
+          50%     { transform:translateY(-10px) rotate(-7deg); }
+        }
+        @keyframes sway3 {
+          0%,100% { transform:translateY(0px) rotate(8deg); }
+          50%     { transform:translateY(-8px) rotate(6deg); }
+        }
+
         @media (max-width: 768px) {
           header { padding: 0 16px !important; height: 52px !important; }
+          .hero-vials { display: none !important; }
           header > div:nth-child(2) { display: none !important; }
           .mobile-bottom-bar { display: flex !important; }
 
