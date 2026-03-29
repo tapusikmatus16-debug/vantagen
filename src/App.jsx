@@ -1691,6 +1691,7 @@ export default function App() {
   const [showAdmin, setShowAdmin]       = useState(false);
   const [showAbout, setShowAbout]       = React.useState(false);
   const [showFAQ, setShowFAQ]           = React.useState(false);
+  const [showMobileMenu, setShowMobileMenu] = React.useState(false);
   const [adminInput, setAdminInput]     = useState("");
   const [successMsg, setSuccessMsg]     = useState(false);
   const [modalItem, setModalItem]       = useState(null);
@@ -1758,7 +1759,20 @@ export default function App() {
       {/* HEADER */}
       <header style={{position:"fixed",top:0,left:0,right:0,zIndex:500,background:"rgba(244,242,237,0.97)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderBottom:`1px solid ${C.border}`,padding:"0 40px",height:64,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <Logo size={16}/>
-        <TubelightNav tab={tab} onTabChange={handleTabClick}/>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <TubelightNav tab={tab} onTabChange={handleTabClick}/>
+          <div style={{width:1,height:20,background:C.border,margin:"0 4px"}}/>
+          <div className="about-faq-btns" style={{display:"flex",gap:0}}>
+            <button onClick={()=>setShowAbout(true)} style={{padding:"7px 14px",background:"transparent",border:"none",color:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",cursor:"pointer",borderRadius:R.sm,transition:"all 0.2s",whiteSpace:"nowrap"}}
+              onMouseEnter={e=>e.currentTarget.style.color=C.ink}
+              onMouseLeave={e=>e.currentTarget.style.color=C.muted}
+            >About</button>
+            <button onClick={()=>setShowFAQ(true)} style={{padding:"7px 14px",background:"transparent",border:"none",color:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",cursor:"pointer",borderRadius:R.sm,transition:"all 0.2s",whiteSpace:"nowrap"}}
+              onMouseEnter={e=>e.currentTarget.style.color=C.ink}
+              onMouseLeave={e=>e.currentTarget.style.color=C.muted}
+            >FAQ</button>
+          </div>
+        </div>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
           <button onClick={()=>setShowAdmin(!showAdmin)} style={{background:"none",border:"none",color:C.dim,cursor:"pointer",fontSize:14,padding:"4px 6px"}}>⚙</button>
           <button onClick={openCart} style={{padding:"8px 16px",background:cartCount>0?C.accentLt:C.surface,border:`1px solid ${cartCount>0?C.accentMd:C.border}`,color:cartCount>0?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:500,cursor:"pointer",borderRadius:100,transition:"all 0.24s"}}>
@@ -1776,7 +1790,7 @@ export default function App() {
         </div>
       )}
 
-      <div className="main-content" style={{position:"relative",zIndex:1,background:C.bg,paddingTop:64}}>
+      <div className="main-content" style={{position:"relative",zIndex:1,background:C.bg,paddingTop:64}} onClick={()=>showMobileMenu&&setShowMobileMenu(false)}>
         {/* HERO */}
         <div style={{position:"relative",overflow:"hidden",borderBottom:`1px solid ${C.border}`,minHeight:520}}>
           <WaveCanvas/>
@@ -1926,6 +1940,19 @@ export default function App() {
       {/* ADMIN */}
       {adminOpen&&<AdminPanel orders={orders} onClose={()=>setAdminOpen(false)}/>}
 
+      {/* MOBILE MORE MENU */}
+      {showMobileMenu && (
+        <div style={{position:"fixed",bottom:68,left:0,right:0,zIndex:499,background:"rgba(255,255,255,0.97)",backdropFilter:"blur(16px)",borderTop:`1px solid ${C.border}`,padding:"16px 0 8px",animation:"slideUp 0.28s cubic-bezier(0.22,1,0.36,1)"}}>
+          {[
+            ["About",()=>{setShowAbout(true);setShowMobileMenu(false);}],
+            ["FAQ",()=>{setShowFAQ(true);setShowMobileMenu(false);}],
+          ].map(([label,action])=>(
+            <button key={label} onClick={action} style={{display:"block",width:"100%",padding:"14px 24px",background:"none",border:"none",borderBottom:`1px solid ${C.border}`,color:C.ink,fontFamily:mono,fontSize:11,letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",textAlign:"left"}}>{label}</button>
+          ))}
+          <button onClick={()=>setShowMobileMenu(false)} style={{display:"block",width:"100%",padding:"14px 24px",background:"none",border:"none",color:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",cursor:"pointer",textAlign:"left"}}>✕ Close</button>
+        </div>
+      )}
+
       {/* MOBILE BOTTOM NAV */}
       <div className="mobile-bottom-bar" style={{display:"none",position:"fixed",bottom:0,left:0,right:0,zIndex:500,background:"rgba(255,255,255,0.96)",borderTop:`1px solid ${C.border}`,height:68,alignItems:"stretch",justifyContent:"space-around",padding:"0"}}>
         {[
@@ -1938,6 +1965,14 @@ export default function App() {
             <span style={{fontSize:9,fontFamily:mono,letterSpacing:"0.08em",textTransform:"uppercase"}}>{label}</span>
           </button>
         ))}
+        <button onClick={e=>{e.stopPropagation();setShowMobileMenu(v=>!v);}} style={{flex:1,background:"none",border:"none",borderTop:"2px solid transparent",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,cursor:"pointer",color:C.muted,transition:"all 0.2s",padding:0}}>
+          <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+            <circle cx="10" cy="5" r="1.5" fill="currentColor"/>
+            <circle cx="10" cy="10" r="1.5" fill="currentColor"/>
+            <circle cx="10" cy="15" r="1.5" fill="currentColor"/>
+          </svg>
+          <span style={{fontSize:9,fontFamily:mono,letterSpacing:"0.08em",textTransform:"uppercase"}}>More</span>
+        </button>
         <button onClick={openCart} style={{flex:1,background:"none",border:"none",borderTop:cartCount>0?`2px solid ${C.accent}`:"2px solid transparent",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,cursor:"pointer",color:cartCount>0?C.accent:C.muted,transition:"all 0.2s",padding:0,position:"relative"}}>
           {cartCount>0&&<div style={{position:"absolute",top:8,right:"calc(50% - 16px)",width:16,height:16,background:C.accent,borderRadius:"50%",fontSize:9,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontFamily:mono}}>{cartCount}</div>}
           <svg viewBox="0 0 20 20" fill="none" width="20" height="20"><path d="M3 4h2l2.5 8h7l2-5H6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="15.5" r="1.2" fill="currentColor"/><circle cx="14" cy="15.5" r="1.2" fill="currentColor"/></svg>
@@ -2044,6 +2079,7 @@ export default function App() {
           header { padding: 0 16px !important; height: 52px !important; }
           .hero-vials { display: none !important; }
           header > div:nth-child(2) { display: none !important; }
+          .about-faq-btns { display: none !important; }
           .mobile-bottom-bar { display: flex !important; }
 
           .main-content { padding-top: 52px !important; padding-bottom: 80px !important; }
