@@ -507,8 +507,8 @@ function ScrollRevealItem({ children, index = 0 }) {
 }
 
 // ─── TUBELIGHT NAV ───────────────────────────────────────────────────────────
-function TubelightNav({ tab, onTabChange }) {
-  const items = [{ id:"kits",label:"Kits" },{ id:"singles",label:"Singles" },{ id:"stacks",label:"Stacks" }];
+function TubelightNav({ tab, onTabChange, items }) {
+  items = items || [{ id:"kits",label:"Kits" },{ id:"singles",label:"Singles" },{ id:"stacks",label:"Stacks" }];
   const containerRef = useRef(null);
   const itemRefs = useRef([]);
   const [ind, setInd] = React.useState({ left:0, width:0 });
@@ -529,10 +529,15 @@ function TubelightNav({ tab, onTabChange }) {
       <div style={{ position:"absolute", top:4, bottom:4, left:ind.left, width:ind.width, background:C.accentLt, border:`1px solid ${C.accentMd}`, borderRadius:100, transition:mounted?"left 0.44s cubic-bezier(0.22,1,0.36,1),width 0.44s cubic-bezier(0.22,1,0.36,1)":"none", pointerEvents:"none", zIndex:0 }}/>
       <div style={{ position:"absolute", top:0, left:glowX-16, width:32, height:3, background:C.accent, borderRadius:"0 0 8px 8px", transition:mounted?"left 0.44s cubic-bezier(0.22,1,0.36,1)":"none", boxShadow:`0 0 8px ${C.accent}AA,0 0 20px ${C.accent}66,0 0 40px ${C.accent}33`, pointerEvents:"none", zIndex:2 }}/>
       {items.map((item,i)=>(
-        <button key={item.id} ref={el=>{itemRefs.current[i]=el;}} onClick={()=>onTabChange(item.id)}
-          style={{ position:"relative", padding:"8px 24px", background:"transparent", border:"none", borderRadius:100, cursor:"pointer", color:tab===item.id?C.accent:C.muted, fontFamily:sans, fontSize:13, fontWeight:tab===item.id?600:400, transition:"color 0.28s", zIndex:1 }}>
-          {item.label}
-        </button>
+        <React.Fragment key={item.id}>
+          {item.id==="about" && (
+            <div style={{width:1,height:16,background:C.border,margin:"0 4px",flexShrink:0,alignSelf:"center",zIndex:1}}/>
+          )}
+          <button ref={el=>{itemRefs.current[i]=el;}} onClick={()=>onTabChange(item.id)}
+            style={{ position:"relative", padding:"8px 18px", background:"transparent", border:"none", borderRadius:100, cursor:"pointer", color:tab===item.id?C.accent:C.muted, fontFamily:sans, fontSize:13, fontWeight:tab===item.id?600:400, transition:"color 0.28s", zIndex:1 }}>
+            {item.label}
+          </button>
+        </React.Fragment>
       ))}
     </div>
   );
@@ -1759,20 +1764,21 @@ export default function App() {
       {/* HEADER */}
       <header style={{position:"fixed",top:0,left:0,right:0,zIndex:500,background:"rgba(244,242,237,0.97)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderBottom:`1px solid ${C.border}`,padding:"0 40px",height:64,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <Logo size={16}/>
-        <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <TubelightNav tab={tab} onTabChange={handleTabClick}/>
-          <div style={{width:1,height:20,background:C.border,margin:"0 4px"}}/>
-          <div className="about-faq-btns" style={{display:"flex",gap:0}}>
-            <button onClick={()=>setShowAbout(true)} style={{padding:"7px 14px",background:"transparent",border:"none",color:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",cursor:"pointer",borderRadius:R.sm,transition:"all 0.2s",whiteSpace:"nowrap"}}
-              onMouseEnter={e=>e.currentTarget.style.color=C.ink}
-              onMouseLeave={e=>e.currentTarget.style.color=C.muted}
-            >About</button>
-            <button onClick={()=>setShowFAQ(true)} style={{padding:"7px 14px",background:"transparent",border:"none",color:C.muted,fontFamily:mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",cursor:"pointer",borderRadius:R.sm,transition:"all 0.2s",whiteSpace:"nowrap"}}
-              onMouseEnter={e=>e.currentTarget.style.color=C.ink}
-              onMouseLeave={e=>e.currentTarget.style.color=C.muted}
-            >FAQ</button>
-          </div>
-        </div>
+        <TubelightNav
+          tab={tab}
+          onTabChange={(id) => {
+            if (id==="about") { setShowAbout(true); return; }
+            if (id==="faq")   { setShowFAQ(true);   return; }
+            handleTabClick(id);
+          }}
+          items={[
+            { id:"kits",    label:"Kits"    },
+            { id:"singles", label:"Singles" },
+            { id:"stacks",  label:"Stacks"  },
+            { id:"about",   label:"About"   },
+            { id:"faq",     label:"FAQ"     },
+          ]}
+        />
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
           <button onClick={()=>setShowAdmin(!showAdmin)} style={{background:"none",border:"none",color:C.dim,cursor:"pointer",fontSize:14,padding:"4px 6px"}}>⚙</button>
           <button onClick={openCart} style={{padding:"8px 16px",background:cartCount>0?C.accentLt:C.surface,border:`1px solid ${cartCount>0?C.accentMd:C.border}`,color:cartCount>0?C.accent:C.ink2,fontFamily:sans,fontSize:13,fontWeight:500,cursor:"pointer",borderRadius:100,transition:"all 0.24s"}}>
@@ -2079,7 +2085,6 @@ export default function App() {
           header { padding: 0 16px !important; height: 52px !important; }
           .hero-vials { display: none !important; }
           header > div:nth-child(2) { display: none !important; }
-          .about-faq-btns { display: none !important; }
           .mobile-bottom-bar { display: flex !important; }
 
           .main-content { padding-top: 52px !important; padding-bottom: 80px !important; }
