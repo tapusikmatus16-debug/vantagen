@@ -361,127 +361,6 @@ FEATURED[2].item = SINGLES.find(s=>s.id==="s5");
 FEATURED[3].item = KITS.find(k=>k.id==="k14");
 FEATURED[4].item = KITS.find(k=>k.id==="k11");
 
-// ─── CONTAINER SCROLL ────────────────────────────────────────────────────────
-function ContainerScroll({onOpenModal, cartIds}) {
-  const ref = useRef(null);
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const onScroll = () => {
-      const rect = el.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const progress = Math.min(1, Math.max(0, (vh - rect.top) / (vh * 0.7)));
-      const rotateX = 24 - progress * 24;   // 24deg → 0deg
-      const scale   = 1.04 - progress * 0.04; // 1.04 → 1.0
-      el.style.transform = `perspective(1400px) rotateX(${rotateX}deg) scale(${scale})`;
-      el.style.opacity = 0.4 + progress * 0.6;
-    };
-    window.addEventListener("scroll", onScroll, {passive:true});
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return (
-    <div style={{padding:"0 32px 0", background:C.bg, overflow:"hidden"}}>
-      <div
-        ref={ref}
-        style={{
-          willChange:"transform, opacity",
-          transformOrigin:"top center",
-          background:C.surface,
-          border:`1px solid ${C.borderMd}`,
-          borderRadius:R.card,
-          boxShadow:"0 24px 80px rgba(26,28,30,0.13)",
-          overflow:"hidden",
-        }}
-      >
-        {/* Header strip */}
-        <div style={{padding:"16px 28px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div style={{fontSize:8,letterSpacing:"0.38em",color:C.muted,fontFamily:mono,textTransform:"uppercase"}}>Featured Compounds</div>
-          <div style={{fontSize:8,letterSpacing:"0.2em",color:C.dim,fontFamily:mono,textTransform:"uppercase"}}>Click to explore →</div>
-        </div>
-
-        {/* Horizontally scrollable compound row */}
-        <div style={{display:"flex",overflowX:"auto",padding:"28px 24px",gap:16,scrollbarWidth:"none"}}>
-          {FEATURED.map(({item, glyphKey}) => {
-            if (!item) return null;
-            const Glyph = GLYPHS[glyphKey];
-            const cc = CAT[item.category] || C.accent;
-            const inCart = cartIds.includes(item.name);
-            return (
-              <div
-                key={glyphKey}
-                onClick={()=>onOpenModal(item)}
-                style={{
-                  flexShrink:0, width:180,
-                  background:C.surface2, border:`1px solid ${C.border}`,
-                  borderRadius:R.card, padding:"20px 18px",
-                  cursor:"pointer", transition:"all 0.22s",
-                  position:"relative",
-                }}
-                onMouseEnter={e=>{e.currentTarget.style.background=C.surface;e.currentTarget.style.borderColor=C.borderMd;e.currentTarget.style.transform="translateY(-4px)";}}
-                onMouseLeave={e=>{e.currentTarget.style.background=C.surface2;e.currentTarget.style.borderColor=C.border;e.currentTarget.style.transform="translateY(0)";}}
-              >
-                {inCart&&<div style={{position:"absolute",top:8,right:8,width:7,height:7,borderRadius:"50%",background:C.accent}}/>}
-                <div style={{display:"flex",justifyContent:"center",marginBottom:14}}>
-                  {Glyph&&<Glyph size={56}/>}
-                </div>
-                <div style={{fontSize:7,letterSpacing:"0.28em",color:cc,fontFamily:mono,textTransform:"uppercase",marginBottom:5}}>{item.category}</div>
-                <div style={{fontFamily:serif,fontSize:14,fontWeight:700,color:C.ink,lineHeight:1.2,marginBottom:8}}>{item.name}</div>
-                <div style={{fontFamily:serif,fontSize:15,fontWeight:700,color:C.ink}}>€{item.sellPrice}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── SCROLL TILT SECTION ─────────────────────────────────────────────────────
-function ScrollTiltSection({children}) {
-  const ref = useRef(null);
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let ticking = false;
-    const onScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const rect = el.getBoundingClientRect();
-          const vh = window.innerHeight;
-          const progress = Math.min(1, Math.max(0,
-            (vh - rect.top) / (vh * 0.6)
-          ));
-          const rotateX = 4 * (1 - progress);
-          const opacity = 0.85 + progress * 0.15;
-          el.style.opacity = opacity;
-          el.style.transform = progress >= 1
-            ? "none"
-            : `perspective(1200px) rotateX(${rotateX}deg)`;
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-    window.addEventListener("scroll", onScroll, {passive:true});
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return (
-    <div
-      ref={ref}
-      style={{
-        willChange:"transform, opacity",
-        transformOrigin:"top center",
-        backfaceVisibility:"hidden",
-        WebkitBackfaceVisibility:"hidden",
-      }}
-    >
-      {children}
-    </div>
-  );
-}
 
 // ─── SCROLL REVEAL ITEM ──────────────────────────────────────────────────────
 function ScrollRevealItem({ children, index = 0 }) {
@@ -737,60 +616,6 @@ function FeaturedSection({onOpenModal, cartIds}) {
   );
 }
 
-// ─── SPIRAL CANVAS ────────────────────────────────────────────────────────────
-function SpiralCanvas() {
-  const canvasRef = useRef(null);
-  React.useEffect(() => {
-    const canvas = canvasRef.current;
-    const gl = canvas.getContext("webgl");
-    if (!gl) return;
-    const vert = `attribute vec2 a_pos; void main(){gl_Position=vec4(a_pos,0.0,1.0);}`;
-    const frag = `
-      precision highp float;
-      uniform float u_time; uniform vec2 u_res;
-      void main(){
-        vec2 uv=(gl_FragCoord.xy/u_res)*2.0-1.0;
-        uv.x*=u_res.x/u_res.y;
-        vec3 bg=vec3(0.957,0.949,0.929);
-        vec3 col=bg;
-        for(int k=0;k<18;k++){
-          float fk=float(k);
-          float angle=fk*0.37+u_time*(0.12+fk*0.008);
-          float r=0.05+fk*0.055;
-          vec2 centre=vec2(sin(u_time*0.07+fk*0.8)*0.25,cos(u_time*0.05+fk*0.6)*0.22);
-          vec2 d=uv-centre; float dist=length(d);
-          float theta=atan(d.y,d.x);
-          float arm=mod(theta-angle-dist*4.5,6.2832);
-          float armDist=min(arm,6.2832-arm);
-          float ringDist=abs(dist-r);
-          float line=smoothstep(0.025,0.0,armDist*dist+ringDist*0.4);
-          float t=fk/17.0;
-          vec3 teal=mix(vec3(0.173,0.373,0.329),vec3(0.761,0.851,0.835),t);
-          col+=teal*line*(0.55-t*0.2);
-        }
-        gl_FragColor=vec4(clamp(col,0.0,1.0),1.0);
-      }
-    `;
-    const compile=(type,src)=>{const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;};
-    const prog=gl.createProgram();
-    gl.attachShader(prog,compile(gl.VERTEX_SHADER,vert));
-    gl.attachShader(prog,compile(gl.FRAGMENT_SHADER,frag));
-    gl.linkProgram(prog);gl.useProgram(prog);
-    const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
-    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
-    const loc=gl.getAttribLocation(prog,"a_pos");
-    gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-    const uTime=gl.getUniformLocation(prog,"u_time");
-    const uRes=gl.getUniformLocation(prog,"u_res");
-    let raf;
-    const resize=()=>{canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;gl.viewport(0,0,canvas.width,canvas.height);};
-    window.addEventListener("resize",resize);resize();
-    const draw=(t)=>{gl.uniform1f(uTime,t*0.001);gl.uniform2f(uRes,canvas.width,canvas.height);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);raf=requestAnimationFrame(draw);};
-    raf=requestAnimationFrame(draw);
-    return()=>{cancelAnimationFrame(raf);window.removeEventListener("resize",resize);};
-  },[]);
-  return <canvas ref={canvasRef} style={{position:"absolute",inset:0,width:"100%",height:"100%",display:"block"}}/>;
-}
 
 // ─── ANIMATED STATS ───────────────────────────────────────────────────────────
 function AnimatedStats() {
@@ -1636,7 +1461,8 @@ export default function App() {
     setTimeout(() => {
       const el = contentAnchorRef.current;
       if (!el) return;
-      const top = el.getBoundingClientRect().top + window.pageYOffset - 64;
+      const headerH = window.innerWidth <= 768 ? 52 : 64;
+      const top = el.getBoundingClientRect().top + window.pageYOffset - headerH;
       window.scrollTo({ top, behavior: "smooth" });
     }, 60);
   };
@@ -2099,9 +1925,6 @@ export default function App() {
           .catalogue-grid { grid-template-columns: 1fr !important; }
 
           .filter-bar { overflow-x: auto !important; white-space: nowrap !important; -webkit-overflow-scrolling: touch !important; }
-          div[style*="padding:\"0 40px\""], .filter-bar-wrap { padding: 0 !important; }
-
-          .catalogue-grid .card-padding { padding: 16px !important; }
 
           .cart-drawer {
             width: 100% !important;
