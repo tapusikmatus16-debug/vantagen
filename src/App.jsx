@@ -1094,7 +1094,7 @@ function SingleRow({item, onAdd, inCart, onOpenModal, cart, setCart, onRemove}) 
         </div>
         {/* Right: price */}
         <div style={{textAlign:"right",flexShrink:0}}>
-          <div style={{fontSize:22,fontWeight:700,color:C.ink,fontFamily:mono,fontVariantNumeric:"tabular-nums"}}>€{item.sellPrice}</div>
+          <div style={{fontSize:22,fontWeight:700,color:C.ink,fontFamily:serif}}>€{item.sellPrice}</div>
         </div>
       </div>
       <p style={{fontSize:13,color:C.ink2,lineHeight:1.8,marginBottom:16}}>{item.desc}</p>
@@ -1360,7 +1360,7 @@ function CartDrawer({cart, onRemove, onClose, onCheckout, visible, setCart}) {
                     <span style={{width:22,textAlign:"center",fontFamily:mono,fontSize:11,fontWeight:700,color:C.ink}}>{item.qty||1}</span>
                     <button onClick={()=>{if((item.qty||1)<20)setCart(prev=>prev.map((p,j)=>j===i?{...p,qty:Math.min((p.qty||1)+1,20)}:p));}} style={{width:26,height:26,background:"none",border:"none",color:C.muted,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
                   </div>
-                  <span style={{color:C.ink,fontFamily:mono,fontSize:13,fontWeight:700,minWidth:48,textAlign:"right"}}>€{item.sellPrice*(item.qty||1)}</span>
+                  <span style={{color:C.ink,fontFamily:serif,fontSize:15,fontWeight:700,minWidth:48,textAlign:"right"}}>€{item.sellPrice*(item.qty||1)}</span>
                   <button onClick={()=>onRemove(i)} style={{background:"none",border:"none",color:C.dim,cursor:"pointer",fontSize:16,padding:0}}>×</button>
                 </div>
               </div>
