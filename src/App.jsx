@@ -1557,7 +1557,7 @@ export default function App() {
 
       <div className="main-content" style={{position:"relative",zIndex:1,background:C.bg,paddingTop:64}} onClick={()=>showMobileMenu&&setShowMobileMenu(false)}>
         {/* HERO */}
-        <div style={{position:"relative",overflow:"hidden",borderBottom:`1px solid ${C.border}`,minHeight:520}}>
+        <div className="hero-outer" style={{position:"relative",overflow:"hidden",borderBottom:`1px solid ${C.border}`,minHeight:520}}>
           <WaveCanvas/>
           <div style={{position:"absolute",inset:0,background:"rgba(244,242,237,0.72)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",pointerEvents:"none"}}/>
           <div className="hero-vials" style={{position:"absolute",inset:0,pointerEvents:"none",zIndex:1,overflow:"hidden"}}>
@@ -1579,22 +1579,26 @@ export default function App() {
             </div>
           </div>
           <div className="hero-content" style={{position:"relative",zIndex:2,maxWidth:1200,margin:"0 auto",padding:"80px 40px 72px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:40}}>
-            <div style={{borderLeft:`2px solid ${C.accent}`,paddingLeft:32,maxWidth:580}}>
+            <div className="hero-left" style={{borderLeft:`2px solid ${C.accent}`,paddingLeft:32,maxWidth:580}}>
               <div style={{fontSize:10,letterSpacing:"0.42em",color:C.accent,fontFamily:mono,marginBottom:20,textTransform:"uppercase"}}>
                 Research Compounds · EU Compliant
               </div>
-              <h1 style={{fontFamily:serif,fontWeight:700,fontSize:"clamp(38px,5vw,72px)",lineHeight:1.06,color:C.ink,margin:0}}>
-                Premium Peptide<br/>Research Compounds<br/><em style={{color:C.accent,fontStyle:"italic"}}>for Europe.</em>
+              <h1 className="hero-h1-text" style={{fontFamily:serif,fontWeight:700,fontSize:"clamp(32px,8vw,52px)",lineHeight:1.1,color:C.ink,margin:0}}>
+                Premium<br/>
+                Peptide Research<br/>
+                Compounds.<br/>
+                <em style={{color:C.accent,fontStyle:"italic"}}>For Europe.</em>
               </h1>
-              <div style={{display:"flex",alignItems:"center",gap:10,margin:"22px 0",opacity:0.5}}>
+              <div className="hero-divider" style={{display:"flex",alignItems:"center",gap:10,margin:"22px 0",opacity:0.5}}>
                 <div style={{flex:1,height:1,background:C.accentMd}}/>
                 <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><rect x="1" y="1" width="6" height="6" stroke={C.accent} strokeWidth="0.9" transform="rotate(45 4 4)"/></svg>
                 <div style={{flex:1,height:1,background:C.accentMd}}/>
               </div>
-              <p style={{color:C.ink2,lineHeight:1.95,fontSize:16,marginBottom:26,fontFamily:sans}}>
-                Pharmaceutical-grade research peptides for serious scientific protocols. Available as kits or individual vials, with EU-wide delivery. Strictly for in-vitro and laboratory use only.
+              <p className="hero-desc" style={{color:C.ink2,lineHeight:1.95,fontSize:16,marginBottom:26,fontFamily:sans}}>
+                <span className="hero-desc-full">Pharmaceutical-grade research peptides for serious scientific protocols. Available as kits or individual vials, with EU-wide delivery. Strictly for in-vitro and laboratory use only.</span>
+                <span className="hero-desc-short">Research-grade peptides. EU-wide delivery. In-vitro use only.</span>
               </p>
-              <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"7px 14px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:R.xs,fontSize:10,color:C.red,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>
+              <div className="hero-warn-badge" style={{display:"inline-flex",alignItems:"center",gap:8,padding:"7px 14px",background:"#FDF5F4",border:"1px solid #d4a59a",borderRadius:R.xs,fontSize:10,color:C.red,fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.14em"}}>
                 ⚠ Not for human use · Research purposes only · 18+
               </div>
               <div className="hero-stats-mobile" style={{display:"none",borderTop:`1px solid ${C.border}`,marginTop:16,paddingTop:14,gap:0}}>
@@ -1606,14 +1610,16 @@ export default function App() {
                 ))}
               </div>
             </div>
-            <div style={{flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:56,minWidth:320}}>
+            <div className="hero-stats-desktop" style={{flexShrink:0,borderLeft:`1px solid ${C.border}`,paddingLeft:56,minWidth:320}}>
               <AnimatedStats/>
             </div>
           </div>
         </div>
 
         {/* FEATURED SELECTION */}
+        <div className="featured-section-wrap">
         <FeaturedSection onOpenModal={setModalItem} cartIds={cartIds}/>
+        </div>
 
         {/* CONTENT ANCHOR — always present, used for all tab scroll targets */}
         <div ref={contentAnchorRef}/>
@@ -1892,6 +1898,9 @@ export default function App() {
           .cart-drag-handle  { display: none !important; }
         }
 
+        /* ── default (desktop) short description hidden ── */
+        .hero-desc-short { display: none; }
+
         @media (max-width: 768px) {
           header { padding: 0 16px !important; height: 52px !important; }
           .hero-vials { display: none !important; }
@@ -1900,21 +1909,79 @@ export default function App() {
 
           .main-content { padding-top: 52px !important; padding-bottom: 80px !important; }
 
+          /* ── FIX 7: hero outer & content padding ── */
+          .hero-outer { min-height: unset !important; }
           .hero-content {
             flex-direction: column !important;
-            padding: 24px 18px 20px !important;
+            padding: 24px 20px 20px !important;
             gap: 0 !important;
+            min-height: unset !important;
           }
-          .hero-content > div:first-child {
-            border-left: 2px solid #2C5F54 !important;
-            padding-left: 16px !important;
+
+          /* ── FIX 1: left column — centered, no border ── */
+          .hero-left {
+            border-left: none !important;
+            padding-left: 0 !important;
+            text-align: center !important;
+            align-items: center !important;
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100% !important;
             max-width: 100% !important;
           }
-          .hero-content > div:last-child { display: none !important; }
-          .hero-stats-mobile { display: flex !important; }
+          .hero-left > div:first-child {
+            text-align: center !important;
+            justify-content: center !important;
+          }
 
-          .hero-content h1 { font-size: clamp(28px, 8vw, 42px) !important; line-height: 1.08 !important; }
-          .hero-content p { font-size: 13px !important; line-height: 1.7 !important; }
+          /* ── FIX 2: h1 size ── */
+          .hero-left h1 {
+            font-size: 36px !important;
+            line-height: 1.1 !important;
+            text-align: center !important;
+          }
+
+          /* ── FIX 3: short description on mobile ── */
+          .hero-left p {
+            font-size: 13px !important;
+            line-height: 1.7 !important;
+            text-align: center !important;
+            max-width: 300px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+          }
+          .hero-desc-full { display: none !important; }
+          .hero-desc-short { display: inline !important; }
+
+          /* ── FIX 4: shrink warning badge ── */
+          .hero-warn-badge {
+            font-size: 7px !important;
+            padding: 5px 10px !important;
+            letter-spacing: 0.08em !important;
+            justify-content: center !important;
+            width: auto !important;
+            max-width: 100% !important;
+            margin: 0 auto !important;
+          }
+
+          /* ── FIX 5: hide animated stats counter ── */
+          .hero-stats-desktop { display: none !important; }
+
+          /* ── FIX 6: show compact 4-number stats row ── */
+          .hero-stats-mobile {
+            display: flex !important;
+            margin-top: 16px !important;
+            width: 100% !important;
+          }
+
+          /* ── FIX 8: center diamond divider ── */
+          .hero-divider {
+            margin: 14px auto !important;
+            max-width: 200px !important;
+          }
+
+          /* ── FIX 7: reduce gap before featured section ── */
+          .featured-section-wrap { margin-top: -8px !important; }
 
           .featured-grid {
             grid-template-columns: repeat(5, 200px) !important;
