@@ -1628,12 +1628,13 @@ export default function App() {
   const [successMsg, setSuccessMsg]     = useState(false);
   const [modalItem, setModalItem]       = useState(null);
   const catalogueRef = useRef(null);
+  const contentAnchorRef = useRef(null);
 
   if (!unlocked) return <PasswordGate onUnlock={()=>setUnlocked(true)}/>;
 
-  const scrollToCatalogue = () => {
+  const scrollToContent = () => {
     setTimeout(() => {
-      const el = catalogueRef.current;
+      const el = contentAnchorRef.current;
       if (!el) return;
       const top = el.getBoundingClientRect().top + window.pageYOffset - 64;
       window.scrollTo({ top, behavior: "smooth" });
@@ -1643,7 +1644,7 @@ export default function App() {
   const handleTabClick = (id) => {
     setTab(id);
     setCatFilter("All");
-    scrollToCatalogue();
+    scrollToContent();
   };
 
   const openCart = () => { setCartOpen(true); setTimeout(()=>setCartVisible(true),20); };
@@ -1698,7 +1699,7 @@ export default function App() {
           onTabChange={(id) => {
             if (id==="about" || id==="faq") {
               setTab(id);
-              window.scrollTo({top:0,behavior:"smooth"});
+              scrollToContent();
             } else {
               handleTabClick(id);
             }
@@ -1787,6 +1788,9 @@ export default function App() {
 
         {/* FEATURED SELECTION */}
         <FeaturedSection onOpenModal={setModalItem} cartIds={cartIds}/>
+
+        {/* CONTENT ANCHOR — always present, used for all tab scroll targets */}
+        <div ref={contentAnchorRef}/>
 
         {/* FILTER BAR — catalogue anchor */}
         <div ref={catalogueRef} style={{borderBottom:`1px solid ${C.border}`,background:C.surface,padding:"0 40px",position:"sticky",top:64,zIndex:90,display:(tab==="about"||tab==="faq")?"none":"block"}}>
@@ -1909,8 +1913,8 @@ export default function App() {
         <footer style={{borderTop:`1px solid ${C.border}`,background:C.surface,padding:"28px 40px",textAlign:"center"}}>
           <Logo size={13}/>
           <div style={{display:"flex",justifyContent:"center",gap:24,marginTop:16,marginBottom:14,flexWrap:"wrap"}}>
-            <button onClick={()=>{setTab("about");window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.18em",textTransform:"uppercase",textDecoration:"underline",textUnderlineOffset:3}}>About</button>
-            <button onClick={()=>{setTab("faq");window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.18em",textTransform:"uppercase",textDecoration:"underline",textUnderlineOffset:3}}>FAQ</button>
+            <button onClick={()=>{setTab("about");scrollToContent();}} style={{background:"none",border:"none",cursor:"pointer",color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.18em",textTransform:"uppercase",textDecoration:"underline",textUnderlineOffset:3}}>About</button>
+            <button onClick={()=>{setTab("faq");scrollToContent();}} style={{background:"none",border:"none",cursor:"pointer",color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.18em",textTransform:"uppercase",textDecoration:"underline",textUnderlineOffset:3}}>FAQ</button>
             <a href="mailto:orders@vantagen.eu" style={{color:C.muted,fontFamily:mono,fontSize:9,letterSpacing:"0.18em",textTransform:"uppercase",textDecoration:"underline",textUnderlineOffset:3}}>Contact</a>
           </div>
           <p style={{fontSize:9,color:C.dim,lineHeight:2,maxWidth:600,margin:"0 auto",fontFamily:mono,textTransform:"uppercase",letterSpacing:"0.08em"}}>
@@ -1935,8 +1939,8 @@ export default function App() {
       {showMobileMenu && (
         <div style={{position:"fixed",bottom:68,left:0,right:0,zIndex:499,background:"rgba(255,255,255,0.97)",backdropFilter:"blur(16px)",borderTop:`1px solid ${C.border}`,padding:"16px 0 8px",animation:"slideUp 0.28s cubic-bezier(0.22,1,0.36,1)"}}>
           {[
-            ["About",()=>{setTab("about");window.scrollTo({top:0,behavior:"smooth"});setShowMobileMenu(false);}],
-            ["FAQ",()=>{setTab("faq");window.scrollTo({top:0,behavior:"smooth"});setShowMobileMenu(false);}],
+            ["About",()=>{setTab("about");scrollToContent();setShowMobileMenu(false);}],
+            ["FAQ",()=>{setTab("faq");scrollToContent();setShowMobileMenu(false);}],
           ].map(([label,action])=>(
             <button key={label} onClick={action} style={{display:"block",width:"100%",padding:"14px 24px",background:"none",border:"none",borderBottom:`1px solid ${C.border}`,color:C.ink,fontFamily:mono,fontSize:11,letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",textAlign:"left"}}>{label}</button>
           ))}
