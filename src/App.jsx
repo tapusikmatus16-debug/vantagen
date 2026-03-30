@@ -539,13 +539,13 @@ function FeaturedSection({onOpenModal, cartIds}) {
 
       <div style={{maxWidth:1200, margin:"0 auto", position:"relative", zIndex:1}}>
         {/* Section header */}
-        <div style={{
+        <div className="featured-header-row" style={{
           display:"flex", alignItems:"flex-end",
           justifyContent:"space-between", marginBottom:52,
           flexWrap:"wrap", gap:24,
         }}>
-          <div>
-            <div style={{
+          <div className="featured-header-left">
+            <div className="featured-eyebrow" style={{
               fontSize:8, letterSpacing:"0.46em", color:C.muted,
               fontFamily:mono, marginBottom:18, textTransform:"uppercase",
               display:"flex", alignItems:"center", gap:12,
@@ -553,7 +553,7 @@ function FeaturedSection({onOpenModal, cartIds}) {
               <div style={{width:24, height:"1px", background:C.accentMd}}/>
               Researcher's Selection · 2025
             </div>
-            <h2 style={{
+            <h2 className="featured-h2" style={{
               fontFamily:serif, fontSize:"clamp(28px,3.2vw,46px)",
               fontWeight:700, color:C.ink, lineHeight:1.08, margin:0,
             }}>
@@ -562,11 +562,12 @@ function FeaturedSection({onOpenModal, cartIds}) {
             </h2>
           </div>
 
-          <p style={{
+          <p className="featured-desc" style={{
             fontSize:13, color:C.muted, fontFamily:sans,
             maxWidth:260, lineHeight:1.85, textAlign:"right",
           }}>
-            A curated selection of our most-studied research compounds, chosen for breadth of application and depth of published research.
+            <span className="featured-desc-full">A curated selection of our most-studied research compounds, chosen for breadth of application and depth of published research.</span>
+            <span className="featured-desc-short">A curated selection of our most-studied research compounds.</span>
           </p>
         </div>
 
@@ -1898,8 +1899,9 @@ export default function App() {
           .cart-drag-handle  { display: none !important; }
         }
 
-        /* ── default (desktop) short description hidden ── */
+        /* ── default (desktop) short descriptions hidden ── */
         .hero-desc-short { display: none; }
+        .featured-desc-short { display: none; }
 
         @media (max-width: 768px) {
           header { padding: 0 16px !important; height: 52px !important; }
@@ -1979,6 +1981,32 @@ export default function App() {
             margin: 14px auto !important;
             max-width: 200px !important;
           }
+
+          /* ── Featured section header — centred on mobile ── */
+          .featured-header-row {
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+            margin-bottom: 32px !important;
+          }
+          .featured-header-left {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          .featured-eyebrow {
+            justify-content: center !important;
+          }
+          .featured-h2 {
+            font-size: clamp(32px, 7vw, 46px) !important;
+            text-align: center !important;
+          }
+          .featured-desc {
+            text-align: center !important;
+            max-width: 100% !important;
+          }
+          .featured-desc-full { display: none !important; }
+          .featured-desc-short { display: inline !important; }
 
           /* ── FIX 7: reduce gap before featured section ── */
           .featured-section-wrap { margin-top: -8px !important; }
